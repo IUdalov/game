@@ -4,4 +4,5 @@ SOURCES += \
     INDIan/example.cpp
 
 HEADERS += \
-    INDIan/example.h
+    INDIan/example.h \
+    exampe0.h
