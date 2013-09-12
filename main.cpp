@@ -1,11 +1,11 @@
-#include "iostream"
-//просто коммент
+#include "core_includes.h"
+#include "MainWindow.h"
 
-using namespace std;
-
-int main(void) {
-
-    cout<<"Hello game!"<<endl;
-
-    return 0;
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    
+    return a.exec();
 }
