@@ -12,25 +12,28 @@ TARGET = game
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-    MainWindow.cpp \
-    Root.cpp \
-    Models.cpp \
-    Object.cpp \
-    Graphics.cpp \
-    Resources.cpp \
-    Formuls.cpp
+SOURCES += INDIan/main.cpp\
+    INDIan/MainWindow.cpp \
+    INDIan/Root.cpp \
+    INDIan/Models.cpp \
+    INDIan/Object.cpp \
+    INDIan/Graphics.cpp \
+    INDIan/Resources.cpp \
+    INDIan/Formuls.cpp
 
 HEADERS  += \
-    MainWindow.h \
-    Root.h \
-    Graphics.h \
-    Transport.h \
-    Formuls.h \
-    Models.h \
-    core_includes.h \
-    Object.h \
-    Resources.h
+    INDIan/MainWindow.h \
+    INDIan/Root.h \
+    INDIan/Graphics.h \
+    INDIan/Transport.h \
+    INDIan/Formuls.h \
+    INDIan/Models.h \
+    INDIan/core_includes.h \
+    INDIan/Object.h \
+    INDIan/Resources.h \
+    physics/param.h \
+    physics/data.h \
+    physics/physics.h
 
 OTHER_FILES += \
     ../README.txt
