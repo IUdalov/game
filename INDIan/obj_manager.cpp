@@ -51,9 +51,9 @@ void Obj_Manager::DrawByGrid(int NumLev){
     NewDraw=false;
 }
 bool Obj_Manager::isActual(IDn ID){
-    if(ID.ID<0||ID.ID>=DimOfObj.size())
+    if( ID.ID >= DimOfObj.size())
         return false;
-    if(DimOfObj[ID.ID]->Status==OS_DELETE||DimOfObj[ID.ID]->DateBorn!=ID.DateBorn)
+    if ((DimOfObj[ID.ID]->Status == OS_DELETE) || (DimOfObj[ID.ID]->DateBorn != ID.DateBorn) )
         return false;
     return true;
 }
@@ -79,7 +79,7 @@ void Obj_Manager::ReBuildGrid(unsigned int _Width_Grid,unsigned int _Height_Grid
             for(unsigned int j=0;j<Height_Grid;j++){
                 Grid[i][j].Objects.clear();
                 if(GridBgIsFull){
-                    delete Grid[i][j].BackGround;
+                    delete[] (char*)Grid[i][j].BackGround;
                     Grid[i][j].BackGround = NULL;
                 }
             }
@@ -131,7 +131,7 @@ Obj_Manager::~Obj_Manager(){
             for(unsigned int j=0;j<Height_Grid;j++){
                 Grid[i][j].Objects.clear();
                 if(GridBgIsFull){
-                    delete Grid[i][j].BackGround;
+                    delete[] (char*)Grid[i][j].BackGround;
                     Grid[i][j].BackGround = NULL;
                 }
             }
@@ -208,32 +208,32 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     Model_Objects* MO=obj->lpModel;
     RECT rect=obj->GetRect();
 
-    unsigned int left=(unsigned int)(rect.left/Width_Cell);
-    unsigned int right=(unsigned int)(rect.right/Width_Cell);
-    unsigned int top=(unsigned int)(rect.top/Height_Cell);
-    unsigned int bottom=(unsigned int)(rect.bottom/Height_Cell);
+    int left = (rect.left / (int)Width_Cell);
+    int right = (rect.right / (int)Width_Cell);
+    int top = (rect.top / (int)Height_Cell);
+    int bottom = (rect.bottom / (int)Height_Cell);
 
-    right=right>=Width_Grid?Width_Grid-1:right;
-    bottom=bottom>=Height_Grid?Height_Grid-1:bottom;
-    left=left<0?0:left;
-    top=top<0?0:top;
-    if(left>Width_Grid||top>Height_Grid||bottom<0||right<0)
+    right = right >= (int)Width_Grid ? (int)Width_Grid-1 : (int)right;
+    bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : (int)bottom;
+    left = left < 0 ? 0 : left;
+    top = top < 0 ? 0 : top;
+    if( (left > (int)Width_Grid) || (top > (int)Height_Grid) || (bottom < 0) || (right < 0))
         return false;
 
     Cell copy;
 
-    for(unsigned int i=left;i<=right;i++){
-        for(unsigned int j=top;j<=bottom;j++){
+    for( int i = left; i <= right; i++){
+        for( int j = top; j <= bottom; j++){
             if(SendHit){
-                for(unsigned int k=0;k<Grid[i][j].Objects.size();k++){
-                    IDn ID2=Grid[i][j].Objects[k];
-                    CObj* obj2=&(DimOfObj[ID2.ID]->Obj);
-                    Model_Objects* MO2=obj2->lpModel;
+                for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
+                    IDn ID2 = Grid[i][j].Objects[k];
+                    CObj* obj2 = &(DimOfObj[ID2.ID]->Obj);
+                    Model_Objects* MO2 = obj2->lpModel;
 
-                    bool next=false;
-                    for(unsigned int p=0;p<copy.Objects.size();p++){
+                    bool next = false;
+                    for( int p=0;p < (int)copy.Objects.size(); p++){
                         if( (copy.Objects[p].ID == ID2.ID) && (copy.Objects[p].DateBorn == ID2.DateBorn))
-                            next=true;
+                            next = true;
                         if(next)
                             break;
                     }
@@ -243,20 +243,20 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
 
                     copy.Objects.push_back(ID2);
 
-                    IDn* data=(IDn*)Root.PutEventToQueue(sizeof(IDn)*2,ME_HITEVENT,MO->GetSubType());
-                    data=&ID;
+                    IDn* data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO->GetSubType());
+                    data = &ID;
                     data++;
-                    data=&ID2;
+                    data = &ID2;
 
-                    data=(IDn*)Root.PutEventToQueue(sizeof(IDn)*2,ME_HITEVENT,MO2->GetSubType());
-                    data=&ID2;
+                    data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO2->GetSubType());
+                    data = &ID2;
                     data++;
-                    data=&ID;
+                    data = &ID;
                 }
             }
             unsigned int NewNum = Grid[i][j].Objects.size();
             unsigned int LevDr = DimOfObj[ID.ID]->Obj.LevelOfDraw;
-            for(unsigned int k = 0;k<Grid[i][j].Objects.size();k++){
+            for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
                 if(DimOfObj[Grid[i][j].Objects[k].ID]->Obj.LevelOfDraw>LevDr){
                     NewNum = k;
                     break;
@@ -276,29 +276,28 @@ bool Obj_Manager::DeleteFromGrid(IDn ID){
 
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
-    Model_Objects* MO=obj->lpModel;
     RECT rect=obj->GetRect();
 
-    unsigned int left=(unsigned int)(rect.left/Width_Cell);
-    unsigned int right=(unsigned int)(rect.right/Width_Cell);
-    unsigned int top=(unsigned int)(rect.top/Height_Cell);
-    unsigned int bottom=(unsigned int)(rect.bottom/Height_Cell);
+    int left = (rect.left / (int)Width_Cell);
+    int right = (rect.right / (int)Width_Cell);
+    int top = (rect.top / (int)Height_Cell);
+    int bottom = (rect.bottom / (int)Height_Cell);
 
-    right=right>=Width_Grid?Width_Grid-1:right;
-    bottom=bottom>=Height_Grid?Height_Grid-1:bottom;
-    left=left<0?0:left;
-    top=top<0?0:top;
-    if(left>Width_Grid||top>Height_Grid||bottom<0||right<0)
+    right = right >= (int)Width_Grid ? (int)Width_Grid-1 : right;
+    bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : bottom;
+    left = left < 0 ? 0 : left;
+    top = top < 0 ? 0 : top;
+    if( (left > (int)Width_Grid) || (top > (int)Height_Grid) || (bottom < 0) || (right < 0))
         return false;
 
 
-    for(unsigned int i=left;i<=right;i++){
-        for(unsigned int j=top;j<=bottom;j++){
-            bool next=false;
-            for(unsigned int k=0;k<Grid[i][j].Objects.size();k++){
+    for( int i = left; i <= right; i++){
+        for( int j = top; j <= bottom; j++){
+            bool next = false;
+            for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
                 if( (Grid[i][j].Objects[k].ID == ID.ID) && (Grid[i][j].Objects[k].DateBorn == ID.DateBorn)){
                     Grid[i][j].Objects.erase(Grid[i][j].Objects.begin()+k);
-                    next=true;
+                    next = true;
                 }
                 if(next)
                     break;
@@ -310,17 +309,17 @@ bool Obj_Manager::DeleteFromGrid(IDn ID){
 vector<IDn>* Obj_Manager::GetVObjByCrd(unsigned int _x, unsigned int _y){
     unsigned int x = (unsigned int)(_x / Width_Cell);
     unsigned int y = (unsigned int)(_y / Height_Cell);
-    if(x < 0 || x >= Width_Grid || y < 0 || y >= Height_Grid)
+    if( (x >= Width_Grid) || (y >= Height_Grid))
         return NULL;
     return &(Grid[x][y].Objects);
 }
 vector<IDn>* Obj_Manager::GetVObjByNum(unsigned int x,unsigned int y){
-    if(x<0||x>=Width_Grid||y<0||y>=Height_Grid)
+    if( (x >= Width_Grid) || (y >= Height_Grid))
         return NULL;
     return &(Grid[x][y].Objects);
 }
 void* Obj_Manager::GetBGByNum(unsigned int x,unsigned int y){
-    if(x<0||x>=Width_Grid||y<0||y>=Height_Grid)
+    if( (x >= Width_Grid) || (y >= Height_Grid))
         return NULL;
     return Grid[x][y].BackGround;
 }

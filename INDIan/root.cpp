@@ -124,6 +124,7 @@ bool System_ROOT::Draw(void){
 }
 bool System_ROOT::Timer(){
     TimerPlus();
+    return true;
 }
 bool System_ROOT::MouseUp(int mButton){
        switch(mButton){
