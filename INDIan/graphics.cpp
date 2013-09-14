@@ -1,4 +1,4 @@
-#include "Graphics.h"
+#include "graphics.h"
 
 int ScreenWidth = 0;
 int ScreenHeight = 0;

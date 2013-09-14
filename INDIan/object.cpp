@@ -1,5 +1,5 @@
-#include "Object.h"
-#include "Resources.h"
+#include "object.h"
+#include "resources.h"
 
 extern cResources Resources;
 

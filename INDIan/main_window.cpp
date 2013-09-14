@@ -1,6 +1,6 @@
-#include "MainWindow.h"
-#include "Root.h"
-#include "Graphics.h"
+#include "main_window.h"
+#include "root.h"
+#include "graphics.h"
 
 extern System_ROOT Root;
 extern int ScreenWidth;

@@ -1,10 +1,10 @@
 #ifndef ROOT_H
 #define ROOT_H
 
-#include "core_includes.h"
-#include "Formuls.h"
-#include "Models.h"
-#include "Resources.h"
+#include "dependences.h"
+#include "formuls.h"
+#include "models.h"
+#include "resources.h"
 
 struct Message{
     void*			Data;

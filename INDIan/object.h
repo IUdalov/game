@@ -1,9 +1,9 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "core_includes.h"
-#include "Formuls.h"
-#include "Resources.h"
+#include "dependences.h"
+#include "formuls.h"
+#include "resources.h"
 class Model_Objects;
 
 class CObj{
@@ -31,7 +31,7 @@ public:
     void SetRectByImage(void);
     friend class Model_Objects;
     friend class System_ROOT;
-//    friend class Obj_Manager;
+    friend class Obj_Manager;
 };
 
 

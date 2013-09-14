@@ -13,27 +13,32 @@ TEMPLATE = app
 
 
 SOURCES += INDIan/main.cpp\
-    INDIan/MainWindow.cpp \
-    INDIan/Root.cpp \
-    INDIan/Models.cpp \
-    INDIan/Object.cpp \
-    INDIan/Graphics.cpp \
-    INDIan/Resources.cpp \
-    INDIan/Formuls.cpp
+    INDIan/obj_manager.cpp \
+    INDIan/formuls.cpp \
+    INDIan/graphics.cpp \
+    INDIan/main_window.cpp \
+    INDIan/models.cpp \
+    INDIan/object.cpp \
+    INDIan/resources.cpp \
+    INDIan/root.cpp \
+    resources_declaretion.cpp
 
 HEADERS  += \
-    INDIan/MainWindow.h \
-    INDIan/Root.h \
-    INDIan/Graphics.h \
-    INDIan/Transport.h \
-    INDIan/Formuls.h \
-    INDIan/Models.h \
     INDIan/core_includes.h \
-    INDIan/Object.h \
-    INDIan/Resources.h \
     physics/param.h \
     physics/data.h \
-    physics/physics.h
+    physics/physics.h \
+    INDIan/obj_manager.h \
+    ../Virus War/INDIan/CORE/ObjManager.h \
+    INDIan/formuls.h \
+    INDIan/graphics.h \
+    INDIan/main_window.h \
+    INDIan/models.h \
+    INDIan/object.h \
+    INDIan/resources.h \
+    INDIan/root.h \
+    INDIan/transport.h \
+    INDIan/dependences.h
 
 OTHER_FILES += \
     ../README.txt

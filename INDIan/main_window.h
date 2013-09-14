@@ -2,9 +2,9 @@
 #define MainWindow_H
 
 
-#include "core_includes.h"
-#include "Root.h"
-#include "Graphics.h"
+#include "dependences.h"
+#include "root.h"
+#include "graphics.h"
 
 
 class MainWindow : public QGLWidget

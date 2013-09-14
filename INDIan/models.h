@@ -1,10 +1,10 @@
 #ifndef MODELS_H
 #define MODELS_H
 
-#include "core_includes.h"
-#include "Formuls.h"
-#include "Resources.h"
-#include "Object.h"
+#include "dependences.h"
+#include "formuls.h"
+#include "resources.h"
+#include "object.h"
 
 class Model_Objects{
 public:
@@ -29,7 +29,7 @@ public:
     IDn operator[](unsigned int num);
     IDn GetObj(unsigned int num);
     friend class System_ROOT;
-//    friend class Obj_Manager;
+    friend class Obj_Manager;
 };
 
 
