@@ -23,7 +23,7 @@ void Model_Objects::AddObj(IDn ID){
 Model_Objects::Model_Objects(unsigned int _SubType,int _SizeOfSubStr){
     SubType = _SubType;
     SizeOfSubStr = _SizeOfSubStr;
-    OnlyDraw = NotPaused=false;
+    OnlyDraw = NotPaused = false;
     DimOfModels.push_back(this);
 }
 Model_Objects::~Model_Objects(void){

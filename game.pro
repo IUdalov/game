@@ -21,7 +21,8 @@ SOURCES += INDIan/main.cpp\
     INDIan/object.cpp \
     INDIan/resources.cpp \
     INDIan/root.cpp \
-    resources_declaretion.cpp
+    resources_declaretion.cpp \
+    example_model.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
@@ -38,7 +39,8 @@ HEADERS  += \
     INDIan/resources.h \
     INDIan/root.h \
     INDIan/transport.h \
-    INDIan/dependences.h
+    INDIan/dependences.h \
+    example_model.h
 
 OTHER_FILES += \
     ../README.txt

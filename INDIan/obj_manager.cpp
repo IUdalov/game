@@ -356,6 +356,6 @@ void cObjectsManager::EventsHandler(unsigned int mess,void* data){
         default:
             break;
     }
-};
+}
 
 

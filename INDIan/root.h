@@ -56,7 +56,8 @@ public:
     void* PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int _To = 0);
     bool GetKeyStatus(short n);
     sMouse GetMouseStatus(void);
-//	friend class Obj_Manager;
+    void CloseApp();
+    friend class Obj_Manager;
 };
 
 #endif // ROOT_H

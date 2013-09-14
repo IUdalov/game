@@ -4,6 +4,7 @@
 #include "dependences.h"
 #include "formuls.h"
 #include "resources.h"
+
 class Model_Objects;
 
 class CObj{
