@@ -11,11 +11,13 @@
 typedef int T;
 typedef int Error;
 
+const double pi = 3.1416;
 const Error OK = 0;
 
 const T base = 256;
 const T baseRub = 16;
 const T baseTime = 16;
+
 
 namespace Spring {
     const T inert = 0;
@@ -38,9 +40,9 @@ namespace Rub {
 }
 
 namespace State {
-    const T vertical = 90;
+    const T vertical = pi / 2;
     const T horizontal = 0;
-    const T rotated = 45;
+    const T rotated = pi / 4;
 }
 
 #endif // PARAM_H
