@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "core_includes.h"
+#include "dependences.h"
 
 class xBmp{
 private:

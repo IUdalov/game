@@ -1,12 +1,9 @@
-#include "Resources.h"
+#include "resources.h"
 
 cResources Resources;
 
 cResources::cResources(){ fail = false;}
 cResources::~cResources(){}
-void cResources::AddBmpFiles(void){
-
-}
 void cResources::EndBmpSystem(void){
     for(unsigned int i=0;i<BmpDim.size();i++)
         if(BmpDim[i])

@@ -1,13 +1,13 @@
 #ifndef CRESOURCE_H
 #define CRESOURCE_H
 
-#include "core_includes.h"
-#include "Graphics.h"
-#include "Transport.h"
+#include "dependences.h"
+#include "graphics.h"
+#include "transport.h"
 
-//#define BEGIN		void
-//#define INIT_BMP	ResourcesAddBmpFiles(void){
-//#define END			}
+#define BEGIN		void
+#define INIT_BMP	cResources::AddBmpFiles(void){
+#define END			}
 
 class cResources{
 private:

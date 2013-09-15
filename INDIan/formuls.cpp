@@ -1,4 +1,4 @@
-#include "Formuls.h"
+#include "formuls.h"
 
 bool HitRectRect(const RECT& rect1,const RECT& rect2){
     if(rect1.left<=rect2.right&&

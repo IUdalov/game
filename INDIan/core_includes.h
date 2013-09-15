@@ -1,16 +1,15 @@
-//#ifndef CORE_INCLUDES_H
-//#define CORE_INCLUDES_H
+#ifndef CORE_INCLUDES_H
+#define CORE_INCLUDES_H
 
-#include <vector>
-#include <time.h>
+#include "dependences.h"
+#include "formuls.h"
+#include "graphics.h"
+#include "models.h"
+#include "obj_manager.h"
+#include "object.h"
+#include "resources.h"
+#include "root.h"
+#include "transport.h"
 
-#include <QGLWidget>
-#include <qapplication.h>
-#include <QTimer>
-#include <QMainWindow>
-#include <QtWidgets>
 
-using namespace std;
-
-
-//#endif // CORE_INCLUDES_H
+#endif // CORE_INCLUDES_H

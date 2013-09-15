@@ -1,10 +1,10 @@
-#include "Root.h"
-#include "Models.h"
+#include "root.h"
+#include "models.h"
 
-System_ROOT Root;
-
+extern QGLWidget* wndClass;
 extern vector<Model_Objects*> DimOfModels;
 extern cResources Resources;
+System_ROOT Root;
 
 void System_ROOT::MakeQueueEvents(void){
     GLuint k=0;
@@ -87,7 +87,7 @@ bool System_ROOT::Create(void){
     srand((unsigned)time(0));
     bool isCreated = Resources.Init_Resource();
 
-    for(GLuint j=0;j<DimOfModels.size();j++)
+    for(GLuint j = 0; j < DimOfModels.size();j++)
         if(DimOfModels[j]->SubType==0)
             DimOfSysModel.push_back(DimOfModels[j]);
 
@@ -124,6 +124,7 @@ bool System_ROOT::Draw(void){
 }
 bool System_ROOT::Timer(){
     TimerPlus();
+    return true;
 }
 bool System_ROOT::MouseUp(int mButton){
        switch(mButton){
@@ -187,14 +188,14 @@ bool System_ROOT::MouseMove(int x, int y){
     return true;
 }
 bool System_ROOT::KeyDown(int key){
-    if((key < 0) || (key > 255))
+     if((key < 0) || (key > 255))
         return false;
     Keys[key]=true;
-    for(GLuint i=0;i<DimOfModel.size();i++){
-        if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
+    for(GLuint i = 0; i < DimOfModel.size(); i++){
+        if((DimOfModel[i]->NotPaused && Pause) || (!Pause))
             DimOfModel[i]->EventsHandler(ME_KEYEVENT,NULL);
     }
-    for(GLuint k=0;k<DimOfSysModel.size();k++){
+    for(GLuint k = 0; k < DimOfSysModel.size(); k++){
         DimOfSysModel[k]->EventsHandler(ME_KEYEVENT,NULL);
     }
     return true;
@@ -213,7 +214,8 @@ bool System_ROOT::KeyUp(int key){
     return true;
 }
 bool System_ROOT::Destroy(){
-       Resources.DisResources();
+    Resources.DisResources();
+       return true;
 }
 int System_ROOT::AddTimer(GLuint timeSek){
     if(timeSek<=0)
@@ -254,4 +256,10 @@ bool System_ROOT::GetKeyStatus(short n){
 sMouse System_ROOT::GetMouseStatus(void){
     return Mouse;
 }
+void System_ROOT::CloseApp(){
+    exit(0);
+//    if(wndClass)
+//        wndClass->close();
+}
+
 

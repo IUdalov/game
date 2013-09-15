@@ -1,6 +1,6 @@
-#include "MainWindow.h"
-#include "Root.h"
-#include "Graphics.h"
+#include "main_window.h"
+#include "root.h"
+#include "graphics.h"
 
 extern System_ROOT Root;
 extern int ScreenWidth;
@@ -14,6 +14,8 @@ extern cResources Resources;
 MainWindow::MainWindow(QWidget *parent)
     : QGLWidget(parent)
 {
+    wndClass = this;
+
     setFormat(QGLFormat(QGL::DoubleBuffer)); // Двойная буферизация
     glDepthFunc(GL_LEQUAL); // Буфер глубины
 
@@ -52,6 +54,7 @@ MainWindow::~MainWindow(){
 
     Root.Destroy();
     glDeleteTextures(size, ids); // удаляем текстурные объекты
+    wndClass = NULL;
 }
 
 void MainWindow::initializeGL(){
@@ -78,7 +81,7 @@ void MainWindow::paintGL(){
 
     glPushMatrix();
     glScalef((float)ScaleX, (float)ScaleY, 1);
-    glTranslatef(0., 0., -1.);
+    glTranslatef(-(float)ScaleX/2., -(float)ScaleX/2., -1.);
 
     Root.Draw();
 

@@ -1,6 +1,6 @@
 //#include <QDebug>
 #include "core_includes.h"
-#include "MainWindow.h"
+#include "main_window.h"
 
 // пока просто для тестов
 #include "../physics/physics.h"

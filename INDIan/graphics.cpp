@@ -1,4 +1,4 @@
-#include "Graphics.h"
+#include "graphics.h"
 
 int ScreenWidth = 0;
 int ScreenHeight = 0;
@@ -15,13 +15,16 @@ xBmp::xBmp(){
     Width = Height = Volume = Columns = Lines = 0;
 }
 bool xBmp::Create(QString Image, QString Mask, int _Volume, int _Columns, int _Lines){
-    QImage image;
-    if(image.load(Image)){
-        Width = image.width();
-        Height = image.height();
+    QImage* image = new QImage;
+    if(image->load(QString(Image))){
+        Width = image->width();
+        Height = image->height();
+        delete image;
     }
-    else
+    else{
+        delete image;
         return false;
+    }
 
     // создаём, связываем, загружаем, возвращаем уникальный номер:
     TextureID = wndClass->bindTexture(QPixmap(QString(Image)), GL_TEXTURE_2D);
@@ -75,9 +78,8 @@ void xBmp::Draw(int num, int x, int y){
             glTexCoord2f(stepx*nnx(num), stepy*nny(num + 1));
                 glVertex2f(x, y + Height);
         glEnd();
-    }
     glBlendFunc(GL_ONE, GL_ONE);
-
+    }
     glBindTexture(GL_TEXTURE_2D, TextureID);
         glBegin(GL_QUADS);
             glTexCoord2f(stepx*nnx(num), stepy*nny(num));

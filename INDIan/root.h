@@ -1,10 +1,10 @@
 #ifndef ROOT_H
 #define ROOT_H
 
-#include "core_includes.h"
-#include "Formuls.h"
-#include "Models.h"
-#include "Resources.h"
+#include "dependences.h"
+#include "formuls.h"
+#include "models.h"
+#include "resources.h"
 
 struct Message{
     void*			Data;
@@ -56,7 +56,8 @@ public:
     void* PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int _To = 0);
     bool GetKeyStatus(short n);
     sMouse GetMouseStatus(void);
-//	friend class Obj_Manager;
+    void CloseApp();
+    friend class Obj_Manager;
 };
 
 #endif // ROOT_H

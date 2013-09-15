@@ -1,7 +1,7 @@
 #ifndef FORMULS_H
 #define FORMULS_H
 
-#include "core_includes.h"
+#include "dependences.h"
 
 #define MAX(a, b)			( (a) > (b) ? (a) : (b) )
 #define MIN(a, b)			( (a) < (b) ? (a) :(b) )
