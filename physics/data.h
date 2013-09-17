@@ -33,7 +33,7 @@ public:
 class Wall {
 public:
     T spring;
-    int phi;
+    double phi;
 public:
     Wall() : spring(Spring::normal), phi(State::vertical) {
     }
