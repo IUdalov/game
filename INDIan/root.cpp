@@ -1,5 +1,4 @@
 #include "root.h"
-#include "models.h"
 
 extern QGLWidget* wndClass;
 extern vector<Model_Objects*> DimOfModels;
@@ -76,8 +75,6 @@ System_ROOT::System_ROOT(){
     Pause = DrawMode = false;
     NumLevelDraw = 0;
     Mouse.L = Mouse.R = Mouse.M = S_UP;
-    for(GLuint i=0;i<256;i++)
-        Keys[i]=false;
 }
 System_ROOT::~System_ROOT(){
     for(GLuint i = 0; i < Timers.size(); i++)
@@ -85,6 +82,8 @@ System_ROOT::~System_ROOT(){
 }
 bool System_ROOT::Create(void){
     srand((unsigned)time(0));
+    QDebug debug(QtDebugMsg);
+    debug<<"-----------------------------------------------------";
     bool isCreated = Resources.Init_Resource();
 
     for(GLuint j = 0; j < DimOfModels.size();j++)
@@ -188,28 +187,28 @@ bool System_ROOT::MouseMove(int x, int y){
     return true;
 }
 bool System_ROOT::KeyDown(int key){
-     if((key < 0) || (key > 255))
-        return false;
-    Keys[key]=true;
+    int num;
     for(GLuint i = 0; i < DimOfModel.size(); i++){
+        num = key;
         if((DimOfModel[i]->NotPaused && Pause) || (!Pause))
-            DimOfModel[i]->EventsHandler(ME_KEYEVENT,NULL);
+            DimOfModel[i]->EventsHandler(ME_KEYDOWN, &num);
     }
     for(GLuint k = 0; k < DimOfSysModel.size(); k++){
-        DimOfSysModel[k]->EventsHandler(ME_KEYEVENT,NULL);
+        num = key;
+        DimOfSysModel[k]->EventsHandler(ME_KEYDOWN, &num);
     }
     return true;
 }
 bool System_ROOT::KeyUp(int key){
-    if((key < 0) || (key > 255))
-        return false;
-    Keys[key]=false;
+    int num;
     for(GLuint i=0;i<DimOfModel.size();i++){
+        num = key;
         if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
-            DimOfModel[i]->EventsHandler(ME_KEYEVENT,NULL);
+            DimOfModel[i]->EventsHandler(ME_KEYUP, &num);
     }
     for(GLuint k=0;k<DimOfSysModel.size();k++){
-        DimOfSysModel[k]->EventsHandler(ME_KEYEVENT,NULL);
+        num = key;
+        DimOfSysModel[k]->EventsHandler(ME_KEYUP, &num);
     }
     return true;
 }
@@ -246,12 +245,6 @@ void* System_ROOT::PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int
     }
     EQ.push_back(M);
     return M.Data;
-}
-bool System_ROOT::GetKeyStatus(short n){
-    if(n >= 0 && n < 256)
-        return Keys[n];
-    else
-        return false;
 }
 sMouse System_ROOT::GetMouseStatus(void){
     return Mouse;

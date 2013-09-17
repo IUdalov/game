@@ -1,12 +1,13 @@
 #include "obj_manager.h"
 
-cObjectsManager ObjectsManager;
-Obj_Manager ObjManager;
-
 extern System_ROOT Root;
 extern int ScreenWidth;
 extern int ScreenHeight;
 extern cResources Resources;
+extern vector<Model_Objects*> DimOfModels;
+
+Obj_Manager ObjManager;
+cObjectsManager ObjectsManager;
 
 void Obj_Manager::DrawByGrid(int NumLev){
     if(!Grid)
@@ -206,12 +207,12 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
     Model_Objects* MO=obj->lpModel;
-    RECT rect=obj->GetRect();
+    QRect rect=obj->GetRect();
 
-    int left = (rect.left / (int)Width_Cell);
-    int right = (rect.right / (int)Width_Cell);
-    int top = (rect.top / (int)Height_Cell);
-    int bottom = (rect.bottom / (int)Height_Cell);
+    int left = (rect.left() / (int)Width_Cell);
+    int right = (rect.right() / (int)Width_Cell);
+    int top = (rect.top() / (int)Height_Cell);
+    int bottom = (rect.bottom() / (int)Height_Cell);
 
     right = right >= (int)Width_Grid ? (int)Width_Grid-1 : (int)right;
     bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : (int)bottom;
@@ -276,12 +277,12 @@ bool Obj_Manager::DeleteFromGrid(IDn ID){
 
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
-    RECT rect=obj->GetRect();
+    QRect rect=obj->GetRect();
 
-    int left = (rect.left / (int)Width_Cell);
-    int right = (rect.right / (int)Width_Cell);
-    int top = (rect.top / (int)Height_Cell);
-    int bottom = (rect.bottom / (int)Height_Cell);
+    int left = (rect.left() / (int)Width_Cell);
+    int right = (rect.right() / (int)Width_Cell);
+    int top = (rect.top() / (int)Height_Cell);
+    int bottom = (rect.bottom() / (int)Height_Cell);
 
     right = right >= (int)Width_Grid ? (int)Width_Grid-1 : right;
     bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : bottom;

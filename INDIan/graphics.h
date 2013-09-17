@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include "dependences.h"
+#include "formuls.h"
 
 class xBmp{
 private:
@@ -11,6 +12,8 @@ private:
 
     int Width, Height;
     int Volume, Columns, Lines;
+
+    QImage image;
 
 private:
     int nnx(int num);
@@ -23,6 +26,9 @@ public:
     int GetVolume();
     void Draw(int num, int x, int y);
     GLuint GetTextID();
+    QImage GetImage(){ return image;}
 };
+
+bool HitImgImg(xBmp bmp1, QRect rect1, xBmp bmp2, QRect rect2);
 
 #endif // GRAPHICS_H

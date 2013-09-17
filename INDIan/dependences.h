@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QMainWindow>
 #include <QtWidgets>
+#include <QDebug>
 
 using namespace std;
 

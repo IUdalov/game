@@ -2,7 +2,8 @@
 #define TRANSPORT_H
 
 enum{
-    ME_KEYEVENT =	1,
+    ME_KEYUP =	1,
+    ME_KEYDOWN,
     ME_HITEVENT,
     ME_TIMER,
     ME_DRAW,

@@ -44,7 +44,7 @@ struct SysTimer{
 };
 
 //////////////////////////////////////
-bool HitRectRect(const RECT& rect1,const RECT& rect2);
-bool HitRectCrd(const RECT& rect,int  x, int y);
+bool HitRectRect(const QRect& rect1,const QRect& rect2);
+bool HitRectCrd(const QRect& rect,int  x, int y);
 
 #endif // FORMULS_H

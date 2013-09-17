@@ -31,7 +31,6 @@ public:
     unsigned int NumLevelDraw;
 private:
     sMouse Mouse;
-    bool Keys[256];
     vector<Model_Objects*> DimOfModel;
     vector<Model_Objects*> DimOfSysModel;
     vector<SysTimer*> Timers;
@@ -54,7 +53,6 @@ public:
 public:
     int AddTimer(GLuint timeSek);
     void* PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int _To = 0);
-    bool GetKeyStatus(short n);
     sMouse GetMouseStatus(void);
     void CloseApp();
     friend class Obj_Manager;

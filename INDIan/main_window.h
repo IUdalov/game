@@ -1,17 +1,17 @@
 #ifndef MainWindow_H
 #define MainWindow_H
 
-
 #include "dependences.h"
 #include "root.h"
+#include "models.h"
 #include "graphics.h"
+#include "obj_manager.h"
 
+void ReportSender(QtMsgType type, const QMessageLogContext& log, const QString& msg);
 
 class MainWindow : public QGLWidget
 {
     Q_OBJECT
-    int WndWidth;
-    int WndHeight;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

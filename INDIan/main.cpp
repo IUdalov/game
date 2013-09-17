@@ -1,4 +1,3 @@
-//#include <QDebug>
 #include "core_includes.h"
 #include "main_window.h"
 
@@ -7,8 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    //qDebug() << "Date:" << QDate::currentDate()<< "Start project!";
-
+    qInstallMessageHandler(ReportSender);
     QApplication a(argc, argv);
     MainWindow w;
     w.show();

@@ -15,14 +15,14 @@ xBmp::xBmp(){
     Width = Height = Volume = Columns = Lines = 0;
 }
 bool xBmp::Create(QString Image, QString Mask, int _Volume, int _Columns, int _Lines){
-    QImage* image = new QImage;
-    if(image->load(QString(Image))){
-        Width = image->width();
-        Height = image->height();
-        delete image;
+    QImage* img = new QImage;
+    if(img->load(QString(Image))){
+        Width = img->width() / _Columns;
+        Height = img->height() / _Lines;
+        delete img;
     }
     else{
-        delete image;
+        delete img;
         return false;
     }
 
@@ -65,30 +65,30 @@ void xBmp::Draw(int num, int x, int y){
     float stepy = 1./Lines;
 
     if(useMask){
-    glBlendFunc(GL_DST_COLOR,GL_ZERO);
+    glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
     glBindTexture(GL_TEXTURE_2D, MaskID);
         glBegin(GL_QUADS);
             glTexCoord2f(stepx*nnx(num), stepy*nny(num));
                 glVertex2f(x, y);
-            glTexCoord2f(stepx*nnx(num + 1), stepy*nny(num));
+            glTexCoord2f(stepx*(nnx(num) + 1), stepy*nny(num));
                 glVertex2f(x + Width, y);
-            glTexCoord2f(stepx*nnx(num + 1), stepy*nny(num + 1));
+            glTexCoord2f(stepx*(nnx(num) + 1), stepy*(nny(num) + 1));
                 glVertex2f(x + Width, y + Height);
-            glTexCoord2f(stepx*nnx(num), stepy*nny(num + 1));
+            glTexCoord2f(stepx*nnx(num), stepy*(nny(num) + 1));
                 glVertex2f(x, y + Height);
         glEnd();
-    glBlendFunc(GL_ONE, GL_ONE);
+       glBlendFunc(GL_ONE, GL_ONE);
     }
     glBindTexture(GL_TEXTURE_2D, TextureID);
         glBegin(GL_QUADS);
             glTexCoord2f(stepx*nnx(num), stepy*nny(num));
                 glVertex2f(x, y);
-            glTexCoord2f(stepx*nnx(num + 1), stepy*nny(num));
+            glTexCoord2f(stepx*(nnx(num)+1), stepy*nny(num));
                 glVertex2f(x + Width, y);
-            glTexCoord2f(stepx*nnx(num + 1), stepy*nny(num + 1));
+            glTexCoord2f(stepx*(nnx(num)+1), stepy*(nny(num) + 1));
                 glVertex2f(x + Width, y + Height);
-            glTexCoord2f(stepx*nnx(num), stepy*nny(num + 1));
+            glTexCoord2f(stepx*nnx(num), stepy*(nny(num) + 1));
                 glVertex2f(x, y + Height);
         glEnd();
 }
@@ -99,3 +99,21 @@ GLuint xBmp::GetTextID(){
 
 int xBmp::nnx(int num){ return num - (num / Columns); }
 int xBmp::nny(int num){ return (num / Columns); }
+
+bool HitImgImg(xBmp bmp1, QRect rect1, xBmp bmp2, QRect rect2){
+    if(!HitRectRect(rect1, rect2))
+        return false;
+
+    int left = MAX(rect1.left(), rect2.left());
+    int right = MIN(rect1.right(), rect2.right());
+    int top = MAX(rect1.top(), rect2.top());
+    int bottom = MIN(rect1.bottom(), rect2.bottom());
+
+    for( int x = left; x <= right; x++){
+        for( int y = top; y <= bottom; y++){
+            if(bmp1.GetImage().pixel(x,y) && bmp2.GetImage().pixel(x,y))
+                return true;
+        }
+    }
+    return false;
+}

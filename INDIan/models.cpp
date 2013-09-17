@@ -1,6 +1,5 @@
 #include "models.h"
 
-
 vector<Model_Objects*> DimOfModels;
 
 void Model_Objects::Destroy(unsigned int num){

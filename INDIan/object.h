@@ -11,7 +11,7 @@ class CObj{
 public:
     unsigned int LevelOfDraw;
     double x,y;
-    RECT Rect;
+    QRect Rect;
     unsigned int image;
     unsigned int BMP;
 private:
@@ -21,7 +21,7 @@ private:
 public:
     CObj(void);
     CObj(CObj& str);
-    RECT GetRect();
+    QRect GetRect();
     void Draw(void);
     void Draw(unsigned int _x,unsigned int _y);
     void DrawWithMove(int xm,int ym);

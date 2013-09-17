@@ -1,6 +1,6 @@
 #include "main_window.h"
-#include "root.h"
-#include "graphics.h"
+//#include "root.h"
+//#include "graphics.h"
 
 extern System_ROOT Root;
 extern int ScreenWidth;
@@ -10,6 +10,25 @@ extern int ScaleY;
 extern QGLWidget* wndClass;
 extern cResources Resources;
 
+void ReportSender(QtMsgType type, const QMessageLogContext& log, const QString& msg){
+    FILE *file; // указатель на файл, в который пишем
+    file = fopen("report.txt", "a"); // открываем файл на запись
+     switch (type) {
+     case QtDebugMsg:
+         fprintf(file, QString("Debug: %s\n").toStdString().c_str(), msg.toStdString().c_str());
+         break;
+     case QtWarningMsg:
+         fprintf(file, QString("Warning: %s\n").toStdString().c_str(), msg.toStdString().c_str());
+         break;
+     case QtCriticalMsg:
+         fprintf(file, QString("Critical: %s\n").toStdString().c_str(), msg.toStdString().c_str());
+         break;
+     case QtFatalMsg:
+         fprintf(file,  QString("Fatal: %s\n").toStdString().c_str(), msg.toStdString().c_str());
+         abort();
+     }
+    fclose(file); // закрываем файл
+ }
 
 MainWindow::MainWindow(QWidget *parent)
     : QGLWidget(parent)
@@ -29,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QRect rect= QApplication::desktop()->screenGeometry();
     int x1,y1;
-    rect.getCoords( &x1, &y1, &WndWidth, &WndHeight);
+    rect.getCoords( &x1, &y1, &ScreenWidth, &ScreenHeight);
     QWidget::showFullScreen();
 }
 
@@ -62,7 +81,7 @@ void MainWindow::initializeGL(){
     ScaleY = ScreenHeight;
     glViewport(0, 0, ScreenWidth, ScreenHeight); //Adjust the viewport
     glMatrixMode(GL_PROJECTION); //Adjust the projection matrix
-    glOrtho(-ScreenWidth/2, ScreenWidth/2, ScreenHeight/2, -ScreenHeight/2, -1, 1);
+    glOrtho(0, ScaleX, ScaleY, 0, 0, 1);
     glLoadIdentity();
     qglClearColor(Qt::black);
     //настройки для текстур
@@ -77,14 +96,19 @@ void MainWindow::resizeGL(int nWidth, int nHeight){
     glViewport(0, 0, (GLint)nWidth, (GLint)nHeight);
 }
 void MainWindow::paintGL(){
+    glClearColor(0.5, 0.5, 0.5, 0.5);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-    glScalef((float)ScaleX, (float)ScaleY, 1);
-    glTranslatef(-(float)ScaleX/2., -(float)ScaleX/2., -1.);
+    glOrtho(0, ScaleX, ScaleY, 0, 0, 1);
+    glEnable(GL_BLEND);       // Разрешение смешивания
+    glDisable(GL_DEPTH_TEST); // Запрет теста глубины
+//    glTranslatef(0,0,-1);//(float)ScaleX/2., (float)ScaleY/2., -1.);
 
     Root.Draw();
 
+    glEnable(GL_DEPTH_TEST); // Разрешение теста глубины
+    glDisable(GL_BLEND);     // Запрещение смешивания
     glPopMatrix();
     swapBuffers();
 }

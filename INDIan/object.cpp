@@ -1,12 +1,12 @@
 #include "object.h"
-#include "resources.h"
+//#include "resources.h"
 
 extern cResources Resources;
 
 CObj::CObj(void){
     x = 0;
     y = 0;
-    Rect.left = Rect.right = Rect.top = Rect.bottom = 0;
+    Rect = QRect(0, 0, 0, 0);
     image = 0;
     SubType = 0;
     lpModel = NULL;
@@ -25,13 +25,13 @@ CObj::CObj(CObj& str){
     SubStr = str.SubStr;
     LevelOfDraw = str.LevelOfDraw;
 }
-RECT CObj::GetRect(){
-    RECT rect;
+QRect CObj::GetRect(){
+    QRect rect;
 
-    rect.left = (long)x + Rect.left;
-    rect.top = (long)y + Rect.top;
-    rect.right = (long)x + Rect.right;
-    rect.bottom = (long)y + Rect.bottom;
+    rect.setLeft(x + Rect.left());
+    rect.setTop(y + Rect.top());
+    rect.setRight(x + Rect.right());
+    rect.setBottom(y + Rect.bottom());
     return rect;
 }
 void CObj::Draw(void){
@@ -72,9 +72,9 @@ void* CObj::GetSubStr(void){
 }
 void CObj::SetRectByImage(void){
     if(BMP){
-        Rect.left = Rect.top = 0;
-        Rect.right = Resources.Get_BMP(BMP)->GetWidth() - 1;
-        Rect.bottom = Resources.Get_BMP(BMP)->GetHeight() - 1;
+        Rect = QRect(0, 0,
+            Resources.Get_BMP(BMP)->GetWidth() - 1,
+            Resources.Get_BMP(BMP)->GetHeight() - 1);
     }
 }
 
