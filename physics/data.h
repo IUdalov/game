@@ -1,43 +1,42 @@
-#ifndef DATA_H
+#ifdef DATA_H
 #define DATA_H
-
-#include <vector>
-#include <QPoint>
 
 #include "param.h"
 
-class Checker {
+struct Vect {
 public:
-    T spring;         // упругость
-    T weight;         // вес
-    QPoint speed;
-    QPoint coord;
-    T rub;            //  трение
+    Real x, y;
+public:
+    Vect(Real _x = 0, Real _y = 0) : x(_x), y(_y) {
+    }
+};
+
+struct Checker {
+public:
+    Vect coord;
+    Vect speed;
+    Real spring;         // упругость
+    Real weight;         // вес
+    Real rub;            //  трение
 
 public:
-    Checker()
-        : spring(Spring::normal), weight(Weight::normal),
-          speed(0, 0), coord(0, 0), rub(Rub::normal) {
-    }
-    Checker(QPoint _coord, QPoint _speed, T _weight, T _spring, T _rub = 0)
-        : spring(_spring), weight(_weight), speed(_speed), coord(_coord),
-          rub(_rub) {
+    Checker(Vect _coord = Vect(0, 0), Vect _speed = Vect(0, 0), Real _weight = 0, Real _spring = 0, Real _rub = 0)
+        : coord(_coord), speed(_speed), spring(_spring),
+          weight(_weight), rub(_rub) {
     }
     Checker(const Checker& init)
-        : spring(init.spring), weight(init.weight),
-          speed(init.speed), coord(init.coord), rub(init.rub) {
+        : coord(init.coord), speed(init.speed), spring(init.spring),
+          weight(init.weight), rub(init.rub) {
     }
 
 };
 
-class Wall {
+struct Wall {
 public:
-    T spring;
-    double phi;
+    Real spring;
+    Real phi;
 public:
-    Wall() : spring(Spring::normal), phi(State::vertical) {
-    }
-    Wall(T _spring, T _state) : spring(_spring), phi(_state) {
+    Wall(Real _spring = 0, Real _state = 0) : spring(_spring), phi(_state) {
     }
     Wall(const Wall& init) : spring(init.spring), phi(init.phi) {
     }

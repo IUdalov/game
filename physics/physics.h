@@ -1,38 +1,54 @@
-#ifndef CLASH_H
-#define CLASH_H
+#ifdef PHYSICS_H
+#define PHYSICS_H
 
 #include <math.h>
+
 #include "data.h"
 
 // работает
-Error Move(Checker& ch, T time) {
-    ch.speed.setX(ch.speed.x() * base / (ch.rub * ch.weight / (baseRub + 1)));
-    ch.speed.setY(ch.speed.y() * base / (ch.rub * ch.weight / (baseRub + 1)));
+Error Move(Checker& ch, Real time) {
+    ch.speed.x *= ch.rub;
+    ch.speed.y *= ch.rub;
 
-    ch.coord.setX( ch.coord.x() + time * ch.speed.x() / base / baseTime);
-    ch.coord.setY( ch.coord.y() + time * ch.speed.y() / base / baseTime);
+    ch.coord.x += ch.speed.x * time;
+    ch.coord.y += ch.speed.y * time;
+
     return OK;
 }
 
-// я пока не в состоянии написать математику надо над ней подумать, но то что здесь вроде длжно работать
-// но нужно тестировать
-Error Clash(Wall& w, Checker& ch) {
-    ch.speed.setX(ch.speed.x() * ch.spring / base * w.spring / base );
-    ch.speed.setY(ch.speed.y() * ch.spring / base * w.spring / base );
 
-    // ЭТО ОЧЕНЬ МЕДЛЕННО
-    double m_speed = sqrt(pow((ch.speed.x()), 2) + pow((ch.speed.y()), 2));
-    double dir = 2*w.phi - atan( (double)ch.speed.x() / (double)ch.speed.x() );
+Error Clash(Checker& ch, Real _phi) {
 
-    ch.speed.setX(round(m_speed * cos(dir)));
-    ch.speed.setY(round(m_speed * sin(dir)));
+    double phi = ch.speed.y > 0 ? _phi : _phi + M_PI;
+    double ksi = atan(ch.speed.y / ch.speed.x); // если при делении на 0 получится INFINITY, то всё класно
+
+    // над этим надо подумать
+    double dir = ch.speed.x >= 0 ? 2 * phi - ksi : dir = 2 * phi - (pi + ksi);
+
+    ch.speed.x = len * cos(dir);
+    ch.speed.y = len * sin(dir);
+    return 0;
+}
+
+Error Clash(Checker& ch, Wall& w) {
+
+    ch.speed.x *= ch.rub * w.rub;
+    ch.speed.y *= ch.rub * w.rub;
+
+    Clash(ch, w.phi);
     return OK;
 }
 
-// no
 Error Clash(Checker& ch1, Checker& ch2) {
+    int _rub = ch1.rub * ch2.rub;
+    ch1.speed.x *= _rub;
+    ch1.speed.y *= _rub;
+    ch2.speed.x *= _rub;
+    ch2.speed.y *= _rub;
 
+    Clash(ch1, 0);
+    Clash(ch2, 0);
     return OK;
 }
 
-#endif // CLASH_H
+#endif // PHYSICS_H

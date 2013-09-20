@@ -22,7 +22,8 @@ SOURCES += INDIan/main.cpp\
     INDIan/object.cpp \
     INDIan/resources.cpp \
     resources_declaretion.cpp \
-    example_model.cpp
+    example_model.cpp \
+    physics/physics.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
