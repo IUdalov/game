@@ -24,7 +24,7 @@ public:
     int GetWidth();
     int GetHeight();
     int GetVolume();
-    void Draw(int num, int x, int y);
+    void Draw(int num, Coord x1, Coord x2, Coord x3, Coord x4);
     GLuint GetTextID();
     QImage GetImage(){ return image;}
 };

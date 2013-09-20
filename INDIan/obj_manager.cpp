@@ -58,8 +58,8 @@ bool Obj_Manager::isActual(IDn ID){
         return false;
     return true;
 }
-RECT Obj_Manager::GetActualWindRect(){
-    RECT rect;
+Rect Obj_Manager::GetActualWindRect(){
+    Rect    rect;
     rect.left=(unsigned int)(Camera.x/Width_Cell);
     rect.right=(unsigned int)((Camera.x+ScreenWidth)/Width_Cell) + 1;
     rect.top=(unsigned int)(Camera.y/Height_Cell);
@@ -207,12 +207,12 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
     Model_Objects* MO=obj->lpModel;
-    QRect rect=obj->GetRect();
+    pntRect rect = obj->GetRect();
 
-    int left = (rect.left() / (int)Width_Cell);
-    int right = (rect.right() / (int)Width_Cell);
-    int top = (rect.top() / (int)Height_Cell);
-    int bottom = (rect.bottom() / (int)Height_Cell);
+    int left = (MinXPntRect(rect) / (int)Width_Cell);
+    int right = (MaxXPntRect(rect) / (int)Width_Cell);
+    int top = (MinYPntRect(rect) / (int)Height_Cell);
+    int bottom = (MaxYPntRect(rect) / (int)Height_Cell);
 
     right = right >= (int)Width_Grid ? (int)Width_Grid-1 : (int)right;
     bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : (int)bottom;
@@ -277,12 +277,12 @@ bool Obj_Manager::DeleteFromGrid(IDn ID){
 
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
-    QRect rect=obj->GetRect();
+    pntRect rect=obj->GetRect();
 
-    int left = (rect.left() / (int)Width_Cell);
-    int right = (rect.right() / (int)Width_Cell);
-    int top = (rect.top() / (int)Height_Cell);
-    int bottom = (rect.bottom() / (int)Height_Cell);
+    int left = (MinXPntRect(rect) / (int)Width_Cell);
+    int right = (MaxXPntRect(rect) / (int)Width_Cell);
+    int top = (MinYPntRect(rect) / (int)Height_Cell);
+    int bottom = (MaxYPntRect(rect) / (int)Height_Cell);
 
     right = right >= (int)Width_Grid ? (int)Width_Grid-1 : right;
     bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : bottom;

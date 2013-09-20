@@ -131,10 +131,10 @@ bool System_ROOT::MouseUp(int mButton){
         Mouse.L = S_UP;
         goto MouseClick;
     case Qt::RightButton:
-        Mouse.L = S_UP;
+        Mouse.R = S_UP;
         goto MouseClick;
     case Qt::MiddleButton:
-        Mouse.L = S_UP;
+        Mouse.M = S_UP;
         goto MouseClick;
     }
 MouseClick:
@@ -156,10 +156,10 @@ bool System_ROOT::MouseDown(int mButton){
         Mouse.L = S_DOWN;
         goto MouseClick;
     case Qt::RightButton:
-        Mouse.L = S_DOWN;
+        Mouse.R = S_DOWN;
         goto MouseClick;
     case Qt::MiddleButton:
-        Mouse.L = S_DOWN;
+        Mouse.M = S_DOWN;
         goto MouseClick;
     }
 MouseClick:

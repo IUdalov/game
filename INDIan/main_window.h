@@ -20,7 +20,7 @@ protected:
     void resizeGL(int nWidth, int nHeight); // Метод вызываемый после каждого изменения размера окна
     void paintGL(); // Метод для вывода изображения на экран
     void keyPressEvent(QKeyEvent *ke); // Для перехвата нажатия клавиш на клавиатуре
-    void keyRealeseEvent(QKeyEvent *ke); // Для перехвата нажатия клавиш на клавиатуре
+    void keyReleaseEvent(QKeyEvent *ke); // Для перехвата нажатия клавиш на клавиатуре
     void mouseMoveEvent(QMouseEvent *me); // Метод реагирует на перемещение указателя, но по умолчанию setMouseTracking(false)
     void mousePressEvent(QMouseEvent *me); // Реагирует на нажатие кнопок мыши
     void mouseReleaseEvent(QMouseEvent *me); // Метод реагирует на "отжатие" кнопки мыши

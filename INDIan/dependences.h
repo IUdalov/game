@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <time.h>
+#include <math.h>
 
 #include <QGLWidget>
 #include <qapplication.h>

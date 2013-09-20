@@ -16,27 +16,41 @@ struct IDn{
     unsigned int DateBorn;
 };
 
-struct RECT{
+struct dCoord{
+    double x,y;
+};
+
+struct Coord{
+    int x,y;
+};
+
+struct pntRect{
+    Coord x1, x2, x3, x4;
+};
+
+struct Rect{
     int left, right, top, bottom;
 };
+
+double MinXPntRect(pntRect r);
+double MinYPntRect(pntRect r);
+double MaxXPntRect(pntRect r);
+double MaxYPntRect(pntRect r);
+
+/*bool HitCrdPntRect(Coord crd, pntRect r){
+
+}
+
+bool HitPntRectRect(pntRect r1, pntRect r2){
+
+}
+*/
+
 struct Cell{
     unsigned int			 CurNum;
     vector<IDn>		Objects;
     void*		 BackGround;
 };
-
-struct COORD{
-    int x,y;
-};
-
-typedef struct Double_COORD_STRUCT{
-    double x;
-    double y;
-}dCOORD;
-
-typedef struct Double_RECT_STRUCT{
-    double left,right,top,bottom;
-}dRECT;
 
 struct SysTimer{
     unsigned int MaxTime,

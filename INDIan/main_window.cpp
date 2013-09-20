@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
     int x1,y1;
     rect.getCoords( &x1, &y1, &ScreenWidth, &ScreenHeight);
     QWidget::showFullScreen();
+
+    setMouseTracking(true);
 }
 
 MainWindow::~MainWindow(){
@@ -96,7 +98,7 @@ void MainWindow::resizeGL(int nWidth, int nHeight){
     glViewport(0, 0, (GLint)nWidth, (GLint)nHeight);
 }
 void MainWindow::paintGL(){
-    glClearColor(0.5, 0.5, 0.5, 0.5);
+    glClearColor(0., 0., 0., 0.);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
@@ -115,7 +117,7 @@ void MainWindow::paintGL(){
 void MainWindow::keyPressEvent(QKeyEvent *ke){
     Root.KeyDown(ke->key());
 }
-void MainWindow::keyRealeseEvent(QKeyEvent *ke){
+void MainWindow::keyReleaseEvent(QKeyEvent *ke){
     Root.KeyUp(ke->key());
 }
 void MainWindow::mouseMoveEvent(QMouseEvent *me){

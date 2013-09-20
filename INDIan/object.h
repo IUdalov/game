@@ -11,17 +11,22 @@ class CObj{
 public:
     unsigned int LevelOfDraw;
     double x,y;
-    QRect Rect;
     unsigned int image;
     unsigned int BMP;
 private:
+    pntRect rect;
+    int Width, Height;
+    float angle;
     Model_Objects* lpModel;
     unsigned long SubType;
     void* SubStr;
+    bool isTurned;
+
+    Coord TurnPoint(Coord crd, Coord crd2, float angle);
 public:
     CObj(void);
     CObj(CObj& str);
-    QRect GetRect();
+    pntRect GetRect();
     void Draw(void);
     void Draw(unsigned int _x,unsigned int _y);
     void DrawWithMove(int xm,int ym);
@@ -29,7 +34,14 @@ public:
     Model_Objects* GetLpModel(void);
     unsigned int GetSubType(void);
     void* GetSubStr(void);
+    void SetWidthHeight(int width, int height);
+    void SetDefaultAngle(void);
     void SetRectByImage(void);
+    void TurnImage(float angle);
+    bool HitPoint(Coord pnt);
+    bool HitRect(Rect rect);
+    int GetWidth();
+    int GetHeight();
     friend class Model_Objects;
     friend class System_ROOT;
     friend class Obj_Manager;

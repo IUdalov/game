@@ -15,4 +15,16 @@ bool HitRectCrd(const QRect& rect,int  x, int y){
         return true;
     return false;
 }
+double MinXPntRect(pntRect r){
+    return MIN( r.x1.x, MIN( r.x2.x, MIN(r.x3.x, r.x4.x)));
+}
+double MinYPntRect(pntRect r){
+    return MIN( r.x1.y, MIN( r.x2.y, MIN(r.x3.y, r.x4.y)));
+}
+double MaxXPntRect(pntRect r){
+    return MAX( r.x1.x, MAX( r.x2.x, MAX(r.x3.x, r.x4.x)));
+}
+double MaxYPntRect(pntRect r){
+    return MAX( r.x1.y, MAX( r.x2.y, MAX(r.x3.y, r.x4.y)));
+}
 

@@ -11,6 +11,10 @@ extern Obj_Manager ObjManager;
 
 class cExample : Model_Objects{
 public:
+    Coord step;
+    short CheckEnable;
+    CObj arrow;
+
     cExample();
     ~cExample();
     virtual void EventsHandler(unsigned int mess, void *data);

@@ -25,7 +25,7 @@ struct ObjRoom{
 
 class Obj_Manager{
 public:
-    COORD Camera;
+    Coord Camera;
 private:
     bool StageDraw;
     vector<ObjRoom*> DimOfObj;
@@ -39,7 +39,7 @@ private:
     void DrawByGrid(int NumLev);
 public:
     bool isActual(IDn ID);
-    RECT GetActualWindRect();
+    Rect GetActualWindRect();
     void ReBuildGrid(unsigned int _Width_Grid,unsigned int _Height_Grid,unsigned int _Width_Cell, unsigned int _Height_Cell,int SizeOfBg = 0);
     Obj_Manager();
     ~Obj_Manager();

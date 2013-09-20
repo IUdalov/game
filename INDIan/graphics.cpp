@@ -60,7 +60,7 @@ int xBmp::GetHeight(){ return Height; }
 
 int xBmp::GetVolume(){ return Volume; }
 
-void xBmp::Draw(int num, int x, int y){
+void xBmp::Draw(int num,  Coord x1, Coord x2, Coord x3, Coord x4){
     float stepx = 1./Columns;
     float stepy = 1./Lines;
 
@@ -70,26 +70,26 @@ void xBmp::Draw(int num, int x, int y){
     glBindTexture(GL_TEXTURE_2D, MaskID);
         glBegin(GL_QUADS);
             glTexCoord2f(stepx*nnx(num), stepy*nny(num));
-                glVertex2f(x, y);
+                glVertex2f(x4.x, x4.y);
             glTexCoord2f(stepx*(nnx(num) + 1), stepy*nny(num));
-                glVertex2f(x + Width, y);
+                glVertex2f(x3.x, x3.y);
             glTexCoord2f(stepx*(nnx(num) + 1), stepy*(nny(num) + 1));
-                glVertex2f(x + Width, y + Height);
+                glVertex2f(x2.x, x2.y);
             glTexCoord2f(stepx*nnx(num), stepy*(nny(num) + 1));
-                glVertex2f(x, y + Height);
+                glVertex2f(x1.x, x1.y);
         glEnd();
        glBlendFunc(GL_ONE, GL_ONE);
     }
     glBindTexture(GL_TEXTURE_2D, TextureID);
         glBegin(GL_QUADS);
             glTexCoord2f(stepx*nnx(num), stepy*nny(num));
-                glVertex2f(x, y);
+                glVertex2f(x4.x, x4.y);
             glTexCoord2f(stepx*(nnx(num)+1), stepy*nny(num));
-                glVertex2f(x + Width, y);
+                glVertex2f(x3.x, x3.y);
             glTexCoord2f(stepx*(nnx(num)+1), stepy*(nny(num) + 1));
-                glVertex2f(x + Width, y + Height);
+                glVertex2f(x2.x, x2.y);
             glTexCoord2f(stepx*nnx(num), stepy*(nny(num) + 1));
-                glVertex2f(x, y + Height);
+                glVertex2f(x1.x, x1.y);
         glEnd();
 }
 
