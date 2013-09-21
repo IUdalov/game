@@ -1,16 +1,24 @@
-#ifdef CLASH_H
-#define CLASH_H
+#ifndef PHYSICS_H
+#define PHYSICS_H
 
 #include <math.h>
+
 #include "data.h"
 
-// двигать
+//
+inline Real RoundConPi(Real phi);
+
+// передвинуть за время
 Error Move(Checker& ch, Real time);
-// от плоскости под углом
-Error Clash(Checker& ch, Real phi);
-// от стены
+
+// столкнуть упруго с плоскостью под углом фи
+Error Clash(Checker& ch, Real _phi);
+
+// столкнуть со стеной
 Error Clash(Checker& ch, Wall& w);
-// от другой шашки
+
+// столкнуть две шашки
 Error Clash(Checker& ch1, Checker& ch2);
 
-#endif // CLASH_H
+
+#endif // PHYSICS_H

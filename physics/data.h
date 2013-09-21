@@ -1,4 +1,4 @@
-#ifdef DATA_H
+#ifndef DATA_H
 #define DATA_H
 
 #include "param.h"
@@ -35,7 +35,7 @@ struct Wall {
 public:
     Real spring;
     Real phi;
-public: 
+public:
     Wall(Real _spring = 0, Real _state = 0) : spring(_spring), phi(_state) {
     }
     Wall(const Wall& init) : spring(init.spring), phi(init.phi) {

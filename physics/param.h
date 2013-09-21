@@ -1,17 +1,9 @@
-#ifdef PARAM_H
+#ifndef PARAM_H
 #define PARAM_H
-
-/* N/A
- * Планируется реализовывать арифметику в целых числах
- *
- * для Spring, Weight, Speed 1000 эквивалентна одной 1 из классической физики
- * те Spring::normal = 1000 означает что удар абсолютно упругий
- */
 
 typedef double Real;
 typedef int Error;
 
-const double pi = 3.1416;
 const Error OK = 0;
 
 const Real base = 256;
@@ -34,15 +26,15 @@ namespace Weight {
 }
 
 namespace Rub {
-    const Real low;
+    const Real low = 10;
     const Real normal = baseRub;
     const Real high = baseRub * 2;
 }
 
 namespace State {
-    const Real vertical = pi / 2;
+    const Real vertical = M_PI / 2;
     const Real horizontal = 0;
-    const Real rotated = pi / 4;
+    const Real rotated = M_PI / 4;
 }
 
 #endif // PARAM_H
