@@ -46,4 +46,6 @@ OTHER_FILES += \
     ../README.txt \
     Build/Images/Untitled.bmp \
     Build/Images/mask.bmp \
-    README.md
+    README.md \
+    Build/Images/arrow_mask.bmp \
+    Build/Images/arrow.bmp
