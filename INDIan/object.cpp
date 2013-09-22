@@ -18,7 +18,7 @@ CObj::CObj(void){
     Width = 0;
     Height = 0;
 }
-CObj::CObj(CObj& str){
+CObj::CObj(const CObj& str){
     x = str.x;
     y = str.y;
     memcpy(&rect, &str.rect, sizeof(pntRect));

@@ -24,6 +24,7 @@ enum{
 
 enum{
     STO_SYSTEM	=	0,
+    STO_CHEKERS
 };
 
 enum{

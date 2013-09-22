@@ -25,7 +25,7 @@ private:
     Coord TurnPoint(Coord crd, Coord crd2, float angle);
 public:
     CObj(void);
-    CObj(CObj& str);
+    CObj(const CObj& str);
     pntRect GetRect();
     void Draw(void);
     void Draw(unsigned int _x,unsigned int _y);

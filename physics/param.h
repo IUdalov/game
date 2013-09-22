@@ -14,7 +14,7 @@ const Real baseTime = 16;
 namespace Spring {
     const Real inert = 0;
     const Real soft = base / 2;
-    const Real normal = base;
+    const Real normal = 1.; //++купер
     const Real power = base * 3 / 2;
     const Real superpower = base * 2;
 }
@@ -27,7 +27,7 @@ namespace Weight {
 
 namespace Rub {
     const Real low = 10;
-    const Real normal = baseRub;
+    const Real normal = 0.9;//++тож купер
     const Real high = baseRub * 2;
 }
 
