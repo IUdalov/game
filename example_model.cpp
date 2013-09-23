@@ -87,7 +87,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
         if(*((int*)data) == TimeSpeedReCalc){
             ObjManager.GetObj(this->GetObj(0),obj);
             ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-            if( sqrt( pow( objch->vSpeed.x,2.) + pow(objch->vSpeed.y, 2.)) < 0.000001 ){
+            if( sqrt( pow( objch->vSpeed.x,2.) + pow(objch->vSpeed.y, 2.)) < 0.001 ){
                 objch->vSpeed.x = 0.;
                 objch->vSpeed.y = 0.;
                 return;
