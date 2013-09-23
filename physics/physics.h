@@ -9,16 +9,16 @@
 inline Real RoundConPi(Real phi);
 
 // передвинуть за время
-Error Move(Checker& ch, Real time);
+Error Move(PhChecker& ch, Real time);
 
 // столкнуть упруго с плоскостью под углом фи
-Error Clash(Checker& ch, Real _phi);
+Error Clash(PhChecker& ch, Real _phi);
 
 // столкнуть со стеной
-Error Clash(Checker& ch, Wall& w);
+Error Clash(PhChecker& ch, PhWall& w);
 
 // столкнуть две шашки
-Error Clash(Checker& ch1, Checker& ch2);
+Error Clash(PhChecker& ch1, PhChecker& ch2);
 
 
 #endif // PHYSICS_H

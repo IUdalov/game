@@ -5,14 +5,14 @@ cExample Example;
 #define SpeedVal 10
 #define TimeSpeedReCalc 2
 
-static void CheckerToObj(Checker ch, ObjChecker& obj, double& x, double& y){
+static void CheckerToObj(PhChecker ch, ObjChecker& obj, double& x, double& y){
     x = ch.coord.x;
     y = ch.coord.y;
     obj.vSpeed.x = ch.speed.x;
     obj.vSpeed.y = ch.speed.y;
     obj.weight = ch.weight;
 }
-static void ObjToChecker(Checker& ch, ObjChecker obj, double x, double y){
+static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y){
     ch.coord.x = x;
     ch.coord.y = y;
     ch.speed.x = obj.vSpeed.x;
@@ -68,16 +68,16 @@ void cExample::EventsHandler(unsigned int mess, void *data){
             obj.y += objch->vSpeed.y;
 
             // ++столкновения со стенами
-            Checker ch;
-            Wall wall;
+            PhChecker ch;
+            PhWall wall;
             ObjToChecker(ch, *objch, obj.x, obj.y);
             wall.spring = Spring::normal;
             if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > ScreenWidth) ){
-                wall.phi = M_PI / 2.;
+                wall.phi = State::vertical;
                 Clash(ch, wall);
             }
             if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > ScreenHeight) ){
-                wall.phi = 0.;
+                wall.phi = State::horizontal;
                 Clash(ch, wall);
             }
             // --столкновения со стенами
@@ -93,7 +93,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
                 return;
             }
             // ++пересчет скорости
-            Checker ch;
+            PhChecker ch;
             ObjToChecker(ch, *objch, obj.x, obj.y);
             Move(ch, 1);
             CheckerToObj(ch, *objch, obj.x, obj.y);

@@ -11,7 +11,7 @@ public:
     }
 };
 
-struct Checker {
+struct PhChecker {
 public:
     Vect coord;
     Vect speed;
@@ -20,25 +20,25 @@ public:
     Real rub;            //  трение
 
 public:
-    Checker(Vect _coord = Vect(0, 0), Vect _speed = Vect(0, 0), Real _weight = 0, Real _spring = 0, Real _rub = 0)
+    PhChecker(Vect _coord = Vect(0, 0), Vect _speed = Vect(0, 0), Real _weight = 0, Real _spring = 0, Real _rub = 0)
         : coord(_coord), speed(_speed), spring(_spring),
           weight(_weight), rub(_rub) {
     }
-    Checker(const Checker& init)
+    PhChecker(const PhChecker& init)
         : coord(init.coord), speed(init.speed), spring(init.spring),
           weight(init.weight), rub(init.rub) {
     }
 
 };
 
-struct Wall {
+struct PhWall {
 public:
     Real spring;
     Real phi;
 public:
-    Wall(Real _spring = 0, Real _state = 0) : spring(_spring), phi(_state) {
+    PhWall(Real _spring = 0, Real _state = 0) : spring(_spring), phi(_state) {
     }
-    Wall(const Wall& init) : spring(init.spring), phi(init.phi) {
+    PhWall(const PhWall& init) : spring(init.spring), phi(init.phi) {
     }
 };
 

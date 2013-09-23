@@ -6,29 +6,26 @@ typedef int Error;
 
 const Error OK = 0;
 
-const Real base = 256;
-const Real baseRub = 16;
-const Real baseTime = 16;
-
+const Real MIN_SPEED = 0.0000001;
 
 namespace Spring {
     const Real inert = 0;
-    const Real soft = base / 2;
-    const Real normal = 1.; //++купер
-    const Real power = base * 3 / 2;
-    const Real superpower = base * 2;
+    const Real soft = 0.7;
+    const Real normal = 1.0; //++купер - правильно сделал
+    const Real power = 1.5;
+    const Real superpower = 2;
 }
 
 namespace Weight {
-    const Real low = base / 2;
-    const Real normal = 23;
-    const Real huge =  3;
+    const Real low = 10;
+    const Real normal = 25;
+    const Real huge =  50;
 }
 
 namespace Rub {
-    const Real low = 10;
-    const Real normal = 0.9;//++тож купер
-    const Real high = baseRub * 2;
+    const Real low = 1.000001;
+    const Real normal = 1.5;//++тож купер
+    const Real high = 2.5;
 }
 
 namespace State {
