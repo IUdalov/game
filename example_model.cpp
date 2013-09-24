@@ -3,7 +3,7 @@
 cExample Example;
 
 #define SpeedVal 10
-#define TimeSpeedReCalc 2
+#define TimeSpeedReCalc 20
 
 static void CheckerToObj(PhChecker ch, ObjChecker& obj, double& x, double& y){
     x = ch.coord.x;
@@ -18,9 +18,16 @@ static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y){
     ch.speed.x = obj.vSpeed.x;
     ch.speed.y = obj.vSpeed.y;
     ch.weight = obj.weight;
-    ch.rub = Rub::normal;
+    ch.rub = 1.;//Rub::normal;
     ch.spring = Spring::normal;
 }
+void AlignBetween( double& x, double width, double min, double max){
+    if( (x - width) <= min)
+        x = width + min + 1;
+    if( (x + width) >= max)
+        x = max - width - 1;
+}
+
 
 cExample::cExample() : Model_Objects( STO_CHEKERS, sizeof(ObjChecker)){
     CheckEnable = 0;
@@ -64,41 +71,31 @@ void cExample::EventsHandler(unsigned int mess, void *data){
         if(*((int*)data) == 1){
             ObjManager.GetObj(this->GetObj(0),obj);
             ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-            obj.x += objch->vSpeed.x;
-            obj.y += objch->vSpeed.y;
-
-            // ++столкновения со стенами
+            if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0) )
+                return;
             PhChecker ch;
             PhWall wall;
             ObjToChecker(ch, *objch, obj.x, obj.y);
+            //++движение
+            Move(ch, *((int*)data));
+            //--
+            // ++столкновения со стенами
             wall.spring = Spring::normal;
             if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > ScreenWidth) ){
+                AlignBetween(obj.x, obj.GetWidth()/2, 0, ScreenWidth);
+                ObjToChecker(ch, *objch, obj.x, obj.y);
                 wall.phi = State::vertical;
                 Clash(ch, wall);
             }
             if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > ScreenHeight) ){
+                AlignBetween(obj.y, obj.GetHeight() / 2, 0, ScreenHeight);
+                ObjToChecker(ch, *objch, obj.x, obj.y);
                 wall.phi = State::horizontal;
                 Clash(ch, wall);
             }
             // --столкновения со стенами
             CheckerToObj(ch, *objch, obj.x, obj.y);
             ObjManager.ChangeObj(this->GetObj(0), obj);
-        }
-        if(*((int*)data) == TimeSpeedReCalc){
-            ObjManager.GetObj(this->GetObj(0),obj);
-            ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-            if( sqrt( pow( objch->vSpeed.x,2.) + pow(objch->vSpeed.y, 2.)) < 0.001 ){
-                objch->vSpeed.x = 0.;
-                objch->vSpeed.y = 0.;
-                return;
-            }
-            // ++пересчет скорости
-            PhChecker ch;
-            ObjToChecker(ch, *objch, obj.x, obj.y);
-            Move(ch, 1);
-            CheckerToObj(ch, *objch, obj.x, obj.y);
-            ObjManager.ChangeObj(this->GetObj(0), obj);
-            // --пересчет скорости
         }
         break;
     case ME_KEYDOWN:

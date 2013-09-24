@@ -12,7 +12,7 @@ extern Obj_Manager ObjManager;
 
 struct ObjChecker{
     double weight;
-    Coord vSpeed;
+    dCoord vSpeed;
 };
 
 class cExample : Model_Objects{

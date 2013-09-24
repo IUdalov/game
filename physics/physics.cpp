@@ -6,13 +6,17 @@ inline Real RoundConPi(Real phi) {
 
 // вроде работает, от скуки можно пооптимизировать
 Error Move(PhChecker& ch, Real time) {
-    Real v = sqrt(ch.speed.x * ch.speed.x + ch.speed.y * ch.speed.y) - ch.rub;
-    if (v < MIN_SPEED) {
-        ch.speed.x = 0;
-        ch.speed.y = 0;
+    Real v = sqrt( pow( ch.speed.x, 2.) + pow( ch.speed.y, 2.) );
+    if (v <= ch.rub) {
+        ch.speed.x = 0.;
+        ch.speed.y = 0.;
+        return OK;
     }
 
-    Real dir = atan(ch.speed.y / ch.speed.x);
+    v -= ch.rub;
+
+    Real dir = ch.speed.x > 0 ? atan(ch.speed.y / ch.speed.x) : atan(ch.speed.y / ch.speed.x) + M_PI;
+
     ch.speed.x = v * cos(dir);
     ch.speed.y = v * sin(dir);
 
