@@ -19,6 +19,7 @@ class cExample : Model_Objects{
 public:
     short CheckEnable;
     vector<CObj> arrows;
+    IDn CheckChecker;
 
     cExample();
     ~cExample();

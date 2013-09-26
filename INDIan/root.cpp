@@ -6,12 +6,12 @@ extern cResources Resources;
 System_ROOT Root;
 
 void System_ROOT::MakeQueueEvents(void){
-    GLuint k=0;
+    GLuint k = 0;
     bool next = false;
     while(EQ.size()&&k<EQ.size()){
         if(EQ[k].To){
             for(GLuint i=0;i<DimOfModel.size();i++){
-                if(DimOfModel[i]->GetSubType()==EQ[k].To){
+                if(DimOfModel[i]->GetSubType() == EQ[k].To){
                     if(Pause){
                         if(DimOfModel[i]->NotPaused){
                             DimOfModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
@@ -233,15 +233,15 @@ void* System_ROOT::PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int
         return NULL;
     Message M;
 
-    M.To=_To;
-    M.Mess=mess;
+    M.To = _To;
+    M.Mess = mess;
     if(SizeOfData){
-        M.DataFull=true;
-        M.Data=malloc(SizeOfData);
+        M.DataFull = true;
+        M.Data = malloc(SizeOfData);
     }
     else{
-        M.DataFull=false;
-        M.Data=NULL;
+        M.DataFull = false;
+        M.Data = NULL;
     }
     EQ.push_back(M);
     return M.Data;

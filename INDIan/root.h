@@ -8,8 +8,8 @@
 
 struct Message{
     void*			Data;
-    unsigned int			  To;
-    unsigned int			Mess;
+    unsigned int	  To;
+    unsigned int	Mess;
     bool		DataFull;
 };
 

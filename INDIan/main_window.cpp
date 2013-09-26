@@ -35,12 +35,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     wndClass = this;
 
-    setFormat(QGLFormat(QGL::DoubleBuffer)); // Двойная буферизация
+//    QGLFormat newFormat;
+//    newFormat.setDoubleBuffer(true);
+//   setFormat(newFormat);
+//    setFormat(QGLFormat(QGL::DoubleBuffer)); // Двойная буферизация
     glDepthFunc(GL_LEQUAL); // Буфер глубины
 
     QTimer *timRepaint = new QTimer(this);
     connect(timRepaint, SIGNAL(timeout()), this, SLOT(repaint()));
-    timRepaint->start(20);
+    timRepaint->start(15);
 
     QTimer *time = new QTimer(this);
     connect(time, SIGNAL(timeout()), this, SLOT(mainTimer()));
@@ -81,6 +84,7 @@ MainWindow::~MainWindow(){
 void MainWindow::initializeGL(){
     ScaleX = ScreenWidth;
     ScaleY = ScreenHeight;
+    this->doubleBuffer();
     glViewport(0, 0, ScreenWidth, ScreenHeight); //Adjust the viewport
     glMatrixMode(GL_PROJECTION); //Adjust the projection matrix
     glOrtho(0, ScaleX, ScaleY, 0, 0, 1);
@@ -112,7 +116,7 @@ void MainWindow::paintGL(){
     glEnable(GL_DEPTH_TEST); // Разрешение теста глубины
     glDisable(GL_BLEND);     // Запрещение смешивания
     glPopMatrix();
-    swapBuffers();
+//    swapBuffers();
 }
 void MainWindow::keyPressEvent(QKeyEvent *ke){
     Root.KeyDown(ke->key());

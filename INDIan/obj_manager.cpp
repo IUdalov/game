@@ -245,14 +245,15 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
                     copy.Objects.push_back(ID2);
 
                     IDn* data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO->GetSubType());
-                    data = &ID;
+                    *data = ID;
                     data++;
-                    data = &ID2;
-
-                    data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO2->GetSubType());
-                    data = &ID2;
-                    data++;
-                    data = &ID;
+                    *data = ID2;
+                    if(MO != MO2){
+                        data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO2->GetSubType());
+                        data = &ID2;
+                        data++;
+                        data = &ID;
+                    }
                 }
             }
             unsigned int NewNum = Grid[i][j].Objects.size();

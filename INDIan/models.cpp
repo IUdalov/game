@@ -31,8 +31,6 @@ Model_Objects::~Model_Objects(void){
 void Model_Objects::CreateSimpleObj(CObj* obj){
     obj->lpModel = this;
     obj->SubType = SubType;
-    if(SizeOfSubStr)
-        obj->SubStr = malloc(SizeOfSubStr);
 }
 void Model_Objects::EventsHandler(unsigned int mess,void* data){
 }

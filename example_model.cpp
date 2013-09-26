@@ -3,7 +3,6 @@
 cExample Example;
 
 #define SpeedVal 10
-#define TimeSpeedReCalc 20
 
 static void CheckerToObj(PhChecker ch, ObjChecker& obj, double& x, double& y){
     x = ch.coord.x;
@@ -36,15 +35,14 @@ cExample::~cExample(){
 
 }
 void cExample::EventsHandler(unsigned int mess, void *data){
-    CObj obj;
-    IDn ID;
+    CObj obj, obj2;
+    IDn ID, ID2;
     sMouse mouse;
     Coord pnt;
     switch(mess){
     case ME_CREATE:
         Root.AddTimer(1);
-        Root.AddTimer(TimeSpeedReCalc);
-        ObjManager.ReBuildGrid(10, 10, 50, 50, 0);
+        ObjManager.ReBuildGrid(21, 12, 50, 50, 0);
         Root.NumLevelDraw = 2;
         this->CreateSimpleObj(&obj);
         obj.x = 200;
@@ -58,6 +56,19 @@ void cExample::EventsHandler(unsigned int mess, void *data){
         ((ObjChecker*)obj.GetSubStr())->weight = Weight::huge;
         ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
                 ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
+
+        this->CreateSimpleObj(&obj2);
+        obj2.x = 500;
+        obj2.y = 200;
+        obj2.BMP = ID_BMP_BACKGROUND;
+        obj2.image = 0;
+        obj2.SetRectByImage();
+        ObjManager.CreateObj(obj2, ID);
+        ObjManager.AddToGrid(ID, false);
+        ObjManager.GetObj(ID, obj2);
+        ((ObjChecker*)obj2.GetSubStr())->weight = Weight::huge;
+        ((ObjChecker*)obj2.GetSubStr())->vSpeed.x =
+                ((ObjChecker*)obj2.GetSubStr())->vSpeed.y = 0;
         break;
     case ME_DRAW:
         if(*((int*)data) != 1)
@@ -69,35 +80,39 @@ void cExample::EventsHandler(unsigned int mess, void *data){
         break;
     case ME_TIMER:
         if(*((int*)data) == 1){
-            ObjManager.GetObj(this->GetObj(0),obj);
-            ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-            if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0) )
-                return;
-            PhChecker ch;
-            PhWall wall;
-            ObjToChecker(ch, *objch, obj.x, obj.y);
-            //++движение
-            Move(ch, *((int*)data));
-            //--
-            // ++столкновения со стенами
-            wall.spring = Spring::normal;
-            if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > ScreenWidth) ){
-                AlignBetween(obj.x, obj.GetWidth()/2, 0, ScreenWidth);
+            for( int i = 0; i < (int)this->GetVolume(); i ++){
+                ObjManager.GetObj(this->GetObj(i),obj);
+                ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
+                if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0) )
+                    continue;
+                ObjManager.DeleteFromGrid(this->GetObj(i));
+                PhChecker ch;
+                PhWall wall;
                 ObjToChecker(ch, *objch, obj.x, obj.y);
-                wall.phi = State::vertical;
-                Clash(ch, wall);
-            }
-            if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > ScreenHeight) ){
-                AlignBetween(obj.y, obj.GetHeight() / 2, 0, ScreenHeight);
-                ObjToChecker(ch, *objch, obj.x, obj.y);
-                wall.phi = State::horizontal;
-                Clash(ch, wall);
-            }
-            // --столкновения со стенами
-            CheckerToObj(ch, *objch, obj.x, obj.y);
-            ObjManager.ChangeObj(this->GetObj(0), obj);
-        }
-        break;
+                //++движение
+                Move(ch, *((int*)data));
+                //--
+                // ++столкновения со стенами
+                wall.spring = Spring::normal;
+                if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > ScreenWidth) ){
+                    AlignBetween(obj.x, obj.GetWidth()/2, 0, ScreenWidth);
+                    ObjToChecker(ch, *objch, obj.x, obj.y);
+                    wall.phi = State::vertical;
+                    Clash(ch, wall);
+                }
+                if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > ScreenHeight) ){
+                    AlignBetween(obj.y, obj.GetHeight() / 2, 0, ScreenHeight);
+                    ObjToChecker(ch, *objch, obj.x, obj.y);
+                    wall.phi = State::horizontal;
+                    Clash(ch, wall);
+                }
+                // --столкновения со стенами
+                CheckerToObj(ch, *objch, obj.x, obj.y);
+                ObjManager.ChangeObj(this->GetObj(i), obj);
+                ObjManager.AddToGrid(this->GetObj(i), true);
+             }
+         }
+     break;
     case ME_KEYDOWN:
         switch(*((int*)data)){
 /*        case Qt::Key_Right:
@@ -123,23 +138,27 @@ void cExample::EventsHandler(unsigned int mess, void *data){
     case ME_MOUSECLICK:
         mouse = Root.GetMouseStatus();
         if(mouse.L == S_DOWN){
-            ObjManager.GetObj(this->GetObj(0),obj);
-            pnt.x = mouse.x;
-            pnt.y = mouse.y;
-            if(obj.HitPoint(pnt)){
-                CheckEnable = 1;
+            for( int i = 0; i < this->GetVolume(); i ++){
+                ObjManager.GetObj(this->GetObj(i),obj);
+                pnt.x = mouse.x;
+                pnt.y = mouse.y;
+                if(obj.HitPoint(pnt)){
+                    CheckEnable = 1;
+                    CheckChecker = this->GetObj(i);
+                    break;
+                }
             }
         }
         if(mouse.L == S_UP){
             if(CheckEnable == 2){
                 mouse = Root.GetMouseStatus();
-                ObjManager.GetObj(this->GetObj(0),obj);
+                ObjManager.GetObj(CheckChecker,obj);
                 double xr, yr;
                 xr = mouse.x - obj.x;
                 yr = mouse.y - obj.y;
                 ((ObjChecker*)obj.GetSubStr())->vSpeed.x = xr / SpeedVal;
                 ((ObjChecker*)obj.GetSubStr())->vSpeed.y = yr / SpeedVal;
-                ObjManager.ChangeObj(this->GetObj(0),obj);
+                ObjManager.ChangeObj(CheckChecker,obj);
             }
             CheckEnable = 0;
         }
@@ -152,17 +171,36 @@ void cExample::EventsHandler(unsigned int mess, void *data){
             arrow.SetRectByImage();
 
             mouse = Root.GetMouseStatus();
-            ObjManager.GetObj(this->GetObj(0),obj);
+            ObjManager.GetObj(CheckChecker,obj);
             int xr, yr;
             xr = mouse.x - obj.x;
             yr = mouse.y - obj.y;
             if(sqrt( pow(xr, 2.) + pow(yr, 2.)) >=  ((double)obj.GetWidth())/2){
                 CheckEnable = 2;
                 CreateArrow( arrow, obj.x, obj.y, mouse.x, mouse.y, obj.GetWidth()/2);
-//                arrows.push_back(arrow);
             }
         }
         break;
+    case ME_HITEVENT:
+    ID = *((IDn*)data);
+    ID2 = *((IDn*)data + 1);
+    if(!ObjManager.GetObj(ID, obj))
+        break;
+    if(!ObjManager.GetObj(ID2, obj2))
+        break;
+    if( obj.GetSubType() != GetSubType() || obj2.GetSubType() != GetSubType() )
+        break;
+    if( sqrt( pow(obj.x - obj2.x, 2.) + pow(obj.y - obj2.y, 2.) ) <= (obj.GetWidth()/2 + obj2.GetWidth()/2) ){
+        PhChecker ch1, ch2;
+        ObjToChecker( ch1, *((ObjChecker*)obj.GetSubStr()), obj.x, obj.y );
+        ObjToChecker( ch2, *((ObjChecker*)obj2.GetSubStr()), obj2.x, obj2.y );
+        Clash(ch1, ch2);
+        CheckerToObj( ch1, *((ObjChecker*)obj.GetSubStr()), obj.x, obj.y );
+        CheckerToObj( ch2, *((ObjChecker*)obj2.GetSubStr()), obj2.x, obj2.y );
+        ObjManager.ChangeObj(ID, obj);
+        ObjManager.ChangeObj(ID2, obj2);
+    }
+    break;
     }
 }
 void cExample::CreateArrow( CObj& arrow, double x_c, double y_c, double x_l,
