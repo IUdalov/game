@@ -138,7 +138,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
     case ME_MOUSECLICK:
         mouse = Root.GetMouseStatus();
         if(mouse.L == S_DOWN){
-            for( int i = 0; i < this->GetVolume(); i ++){
+            for( int i = 0; i < (int)this->GetVolume(); i ++){
                 ObjManager.GetObj(this->GetObj(i),obj);
                 pnt.x = mouse.x;
                 pnt.y = mouse.y;

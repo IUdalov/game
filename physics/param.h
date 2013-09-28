@@ -9,11 +9,11 @@ const Error OK = 0;
 const Real MIN_SPEED = 0.0000001;
 
 namespace Spring {
-    const Real inert = 0;
+    const Real inert = 0; // неупругий удар
     const Real soft = 0.7;
-    const Real normal = 1.0; //++купер - правильно сделал
+    const Real normal = 1.0; // абсолютно упругий удар
     const Real power = 1.5;
-    const Real superpower = 2;
+    const Real superpower = 2; // суперупругий
 }
 
 namespace Weight {
@@ -23,8 +23,8 @@ namespace Weight {
 }
 
 namespace Rub {
-    const Real low = 1.000001;
-    const Real normal = 1.5;//++тож купер
+    const Real low = 0.00001; // почти нет трения
+    const Real normal = 1.5;  // адекватное трение
     const Real high = 2.5;
 }
 
