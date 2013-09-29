@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QTimer *timRepaint = new QTimer(this);
     connect(timRepaint, SIGNAL(timeout()), this, SLOT(repaint()));
-    timRepaint->start(15);
+    timRepaint->start(10);
 
     QTimer *time = new QTimer(this);
     connect(time, SIGNAL(timeout()), this, SLOT(mainTimer()));

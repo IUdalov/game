@@ -17,7 +17,7 @@ static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y){
     ch.speed.x = obj.vSpeed.x;
     ch.speed.y = obj.vSpeed.y;
     ch.weight = obj.weight;
-    ch.rub = 1.;//Rub::normal;
+    ch.rub = 0.6;//Rub::normal;
     ch.spring = Spring::normal;
 }
 void AlignBetween( double& x, double width, double min, double max){
@@ -66,7 +66,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
         ObjManager.CreateObj(obj2, ID);
         ObjManager.AddToGrid(ID, false);
         ObjManager.GetObj(ID, obj2);
-        ((ObjChecker*)obj2.GetSubStr())->weight = Weight::huge;
+        ((ObjChecker*)obj2.GetSubStr())->weight = Weight::low;
         ((ObjChecker*)obj2.GetSubStr())->vSpeed.x =
                 ((ObjChecker*)obj2.GetSubStr())->vSpeed.y = 0;
         break;
