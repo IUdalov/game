@@ -1,10 +1,10 @@
 #include "graphics.h"
 
-int ScreenWidth = 0;
-int ScreenHeight = 0;
+//int ScreenWidth = 0;
+//int ScreenHeight = 0;
 
-int ScaleX = 0;
-int ScaleY = 0;
+//int ScaleX = 0;
+//int ScaleY = 0;
 
 QGLWidget* wndClass;
 

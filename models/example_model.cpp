@@ -42,7 +42,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
     switch(mess){
     case ME_CREATE:
         Root.AddTimer(1);
-        ObjManager.ReBuildGrid(ScreenWidth / 50 + 1, ScreenHeight / 50 + 1, 50, 50, 0);
+        ObjManager.ReBuildGrid(Root.GetScreenWidth() / 50 + 1, Root.GetScreenHeight() / 50 + 1, 50, 50, 0);
         Root.NumLevelDraw = 2;
         this->CreateSimpleObj(&obj);
         obj.x = 200;
@@ -94,14 +94,14 @@ void cExample::EventsHandler(unsigned int mess, void *data){
                 //--
                 // ++столкновения со стенами
                 wall.spring = Spring::normal;
-                if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > ScreenWidth) ){
-                    AlignBetween(obj.x, obj.GetWidth()/2, 0, ScreenWidth);
+                if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > Root.GetScreenWidth()) ){
+                    AlignBetween(obj.x, obj.GetWidth()/2, 0, Root.GetScreenWidth());
                     ObjToChecker(ch, *objch, obj.x, obj.y);
                     wall.phi = State::vertical;
                     Clash(ch, wall);
                 }
-                if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > ScreenHeight) ){
-                    AlignBetween(obj.y, obj.GetHeight() / 2, 0, ScreenHeight);
+                if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > Root.GetScreenHeight()) ){
+                    AlignBetween(obj.y, obj.GetHeight() / 2, 0, Root.GetScreenHeight());
                     ObjToChecker(ch, *objch, obj.x, obj.y);
                     wall.phi = State::horizontal;
                     Clash(ch, wall);

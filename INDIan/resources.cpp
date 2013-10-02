@@ -11,7 +11,7 @@ void cResources::EndBmpSystem(void){
     BmpDim.clear();
 }
 void cResources::Add_BMP(unsigned int ID_BMP, QString file_name, QString mask_filename, unsigned int Volume, unsigned int colums, unsigned int lines){
-    if(ID_BMP < 1 || ID_BMP >= BmpResCount)
+    if(ID_BMP < 1 || ID_BMP >= (unsigned int)BmpResCount)
         return;
     xBmp* New;
     if((BmpDim.size() > ID_BMP) && BmpDim[ID_BMP])
@@ -44,7 +44,7 @@ bool cResources::Init_Resource(void){
     return true;
 }
 xBmp* cResources::Get_BMP(unsigned int num){
-    if(num < 1 || num >= BmpResCount)
+    if(num < 1 || num >= (unsigned int)BmpResCount)
         return NULL;
     return	BmpDim[num];
 }

@@ -2,11 +2,14 @@
 //#include "root.h"
 //#include "graphics.h"
 
+#define ScreenResolutionX 1024
+#define ScreenResolutionY 768
+
 extern System_ROOT Root;
-extern int ScreenWidth;
-extern int ScreenHeight;
-extern int ScaleX;
-extern int ScaleY;
+//extern int ScreenWidth;
+//extern int ScreenHeight;
+//extern int ScaleX;
+//extern int ScaleY;
 extern QGLWidget* wndClass;
 extern cResources Resources;
 
@@ -35,10 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     wndClass = this;
 
-//    QGLFormat newFormat;
-//    newFormat.setDoubleBuffer(true);
-//   setFormat(newFormat);
-//    setFormat(QGLFormat(QGL::DoubleBuffer)); // Двойная буферизация
     glDepthFunc(GL_LEQUAL); // Буфер глубины
 
     QTimer *timRepaint = new QTimer(this);
@@ -49,9 +48,23 @@ MainWindow::MainWindow(QWidget *parent)
     connect(time, SIGNAL(timeout()), this, SLOT(mainTimer()));
     time->start(1);
 
-    QRect rect= QApplication::desktop()->screenGeometry();
-    int x1,y1;
-    rect.getCoords( &x1, &y1, &ScreenWidth, &ScreenHeight);
+    QRect rect = QApplication::desktop()->screenGeometry();
+    int x1,y1, x2, y2;
+    rect.getCoords( &x1, &y1, &x2, &y2);
+    if(x2 < y2){
+        Root.ScreenWidth = ScreenResolutionX;
+        double coef = x2 / ScreenResolutionX;
+        Root.ScreenHeight = ScreenResolutionY;
+        Root.ScreenHeight += (y2 - ScreenResolutionY * coef);
+    }
+    else{
+        Root.ScreenHeight = ScreenResolutionY;
+        double coef = (double)y2 / (double)ScreenResolutionY;
+        Root.ScreenWidth = ScreenResolutionX;
+        Root.ScreenWidth += (x2 - ScreenResolutionX * coef) + 1;
+    }
+    Root.WndScaleX = (double)Root.ScreenWidth / (double)x2;
+    Root.WndScaleY = (double)Root.ScreenHeight / (double)y2;
     QWidget::showFullScreen();
 
     setMouseTracking(true);
@@ -82,12 +95,10 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::initializeGL(){
-    ScaleX = ScreenWidth;
-    ScaleY = ScreenHeight;
     this->doubleBuffer();
-    glViewport(0, 0, ScreenWidth, ScreenHeight); //Adjust the viewport
+    glViewport(0, 0, Root.ScreenWidth, Root.ScreenHeight); //Adjust the viewport
     glMatrixMode(GL_PROJECTION); //Adjust the projection matrix
-    glOrtho(0, ScaleX, ScaleY, 0, 0, 1);
+    glOrtho(0, Root.ScreenWidth, Root.ScreenHeight, 0, 0, 1);
     glLoadIdentity();
     qglClearColor(Qt::black);
     //настройки для текстур
@@ -106,7 +117,7 @@ void MainWindow::paintGL(){
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-    glOrtho(0, ScaleX, ScaleY, 0, 0, 1);
+    glOrtho(0, Root.ScreenWidth, Root.ScreenHeight, 0, 0, 1);
     glEnable(GL_BLEND);       // Разрешение смешивания
     glDisable(GL_DEPTH_TEST); // Запрет теста глубины
 //    glTranslatef(0,0,-1);//(float)ScaleX/2., (float)ScaleY/2., -1.);

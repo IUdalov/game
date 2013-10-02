@@ -17,9 +17,9 @@ void Obj_Manager::DrawByGrid(int NumLev){
         StageDraw=!StageDraw;
 
     int left = Camera.x/((int)Width_Cell);
-    int right = (Camera.y+(int)ScreenWidth)/((int)Width_Cell);
+    int right = (Camera.y+(int)Root.GetScreenWidth())/((int)Width_Cell);
     int top = Camera.y/((int)Height_Cell);
-    int bottom = (Camera.y+(int)ScreenHeight)/((int)Height_Cell);
+    int bottom = (Camera.y+(int)Root.GetScreenHeight())/((int)Height_Cell);
 
     right=right>=(int)Width_Grid?(int)Width_Grid-1:right;
     bottom=bottom>=(int)Height_Grid?(int)Height_Grid-1:bottom;
@@ -61,9 +61,9 @@ bool Obj_Manager::isActual(IDn ID){
 Rect Obj_Manager::GetActualWindRect(){
     Rect    rect;
     rect.left=(unsigned int)(Camera.x/Width_Cell);
-    rect.right=(unsigned int)((Camera.x+ScreenWidth)/Width_Cell) + 1;
+    rect.right=(unsigned int)((Camera.x+Root.GetScreenWidth())/Width_Cell) + 1;
     rect.top=(unsigned int)(Camera.y/Height_Cell);
-    rect.bottom=(unsigned int)((Camera.y+ScreenHeight)/Height_Cell) + 1;
+    rect.bottom=(unsigned int)((Camera.y+Root.GetScreenHeight())/Height_Cell) + 1;
 
     rect.right=MIN((unsigned)rect.right,Width_Grid-1);
     rect.bottom=MIN((unsigned)rect.bottom,Height_Grid-1);

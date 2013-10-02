@@ -11,4 +11,11 @@ enum{
     ME_MOUSECLICK,
     ME_MOUSEMOVE
 };
+class MainWindow;
+class System_ROOT;
+class Model_Objects;
+class cResources;
+class xBmp;
+class Obj_Manager;
+
 #endif // TRANSPORT_H

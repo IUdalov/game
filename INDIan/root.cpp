@@ -175,8 +175,8 @@ MouseClick:
         return true;
 }
 bool System_ROOT::MouseMove(int x, int y){
-    Mouse.x = x;
-    Mouse.y = y;
+    Mouse.x = (int)((double)x * WndScaleX);
+    Mouse.y = (int)((double)y * WndScaleY);
     for(GLuint i=0;i<DimOfModel.size();i++){
         if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
             DimOfModel[i]->EventsHandler(ME_MOUSEMOVE,NULL);
@@ -254,5 +254,12 @@ void System_ROOT::CloseApp(){
 //    if(wndClass)
 //        wndClass->close();
 }
+int System_ROOT::GetScreenWidth(){
+    return ScreenWidth;
+}
+int System_ROOT::GetScreenHeight(){
+    return ScreenHeight;
+}
+
 
 

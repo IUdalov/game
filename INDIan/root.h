@@ -30,6 +30,10 @@ public:
     bool Pause, DrawMode;
     unsigned int NumLevelDraw;
 private:
+    int ScreenWidth;
+    int ScreenHeight;
+    double WndScaleX;
+    double WndScaleY;
     sMouse Mouse;
     vector<Model_Objects*> DimOfModel;
     vector<Model_Objects*> DimOfSysModel;
@@ -56,6 +60,9 @@ public:
     sMouse GetMouseStatus(void);
     void CloseApp();
     friend class Obj_Manager;
+    int GetScreenWidth();
+    int GetScreenHeight();
+    friend class MainWindow;
 };
 
 #endif // ROOT_H
