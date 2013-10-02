@@ -42,7 +42,7 @@ void cExample::EventsHandler(unsigned int mess, void *data){
     switch(mess){
     case ME_CREATE:
         Root.AddTimer(1);
-        ObjManager.ReBuildGrid(21, 12, 50, 50, 0);
+        ObjManager.ReBuildGrid(ScreenWidth / 50 + 1, ScreenHeight / 50 + 1, 50, 50, 0);
         Root.NumLevelDraw = 2;
         this->CreateSimpleObj(&obj);
         obj.x = 200;

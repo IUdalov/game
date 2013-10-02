@@ -7,12 +7,15 @@
 
 #define BEGIN		void
 #define INIT_BMP	cResources::AddBmpFiles(void){
+#define SETCOUNT BmpResCount=
+#define PLEASE  ;
 #define END			}
 
 class cResources{
 private:
     vector<xBmp*> BmpDim;
     bool fail;
+    int BmpResCount;
 public:
     cResources();
     ~cResources();

@@ -11,27 +11,4 @@ enum{
     ME_MOUSECLICK,
     ME_MOUSEMOVE
 };
-
-enum{
-    SE_MODECAMERAMOVE =	101,
-    SE_CLOSEAFTER,
-    SE_ADDVIRUS1,
-    SE_ADDVIRUS2,
-    SE_DELVIRUS,
-    SE_MOUSECLICK,
-    SE_VIRADDGOOD
-};
-
-enum{
-    STO_SYSTEM	=	0,
-    STO_CHEKERS
-};
-
-enum{
-    ID_BMP_EMPTY	=	0,
-    ID_BMP_BACKGROUND,
-    ID_BMP_ARROW,
-    NumBmpRes
-};
-
 #endif // TRANSPORT_H

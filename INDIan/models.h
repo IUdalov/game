@@ -1,3 +1,4 @@
+
 #ifndef MODELS_H
 #define MODELS_H
 
@@ -15,7 +16,7 @@ private:
     vector<IDn> ObjId;
     int SizeOfSubStr;
 private:
-    void Destroy(unsigned int num);
+    virtual void Destroy(unsigned int num);
     void Plus(IDn ID);
     void DeleteObj(IDn ID);
     void AddObj(IDn ID);

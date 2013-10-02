@@ -21,9 +21,9 @@ SOURCES += INDIan/main.cpp\
     INDIan/obj_manager.cpp \
     INDIan/object.cpp \
     INDIan/resources.cpp \
-    resources_declaretion.cpp \
-    example_model.cpp \
-    physics/physics.cpp
+    models/example_model.cpp \
+    physics/physics.cpp \
+    inits/resources_declarations.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
@@ -40,12 +40,14 @@ HEADERS  += \
     INDIan/root.h \
     INDIan/transport.h \
     INDIan/dependences.h \
-    example_model.h
+    models/example_model.h \
+    inits/declarations.h
+    inits/declarations.h
 
 OTHER_FILES += \
     ../README.txt \
-    Build/Images/Untitled.bmp \
-    Build/Images/mask.bmp \
+    images/Untitled.bmp \
+    images/mask.bmp \
     README.md \
-    Build/Images/arrow_mask.bmp \
-    Build/Images/arrow.bmp
+    images/arrow_mask.bmp \
+    images/arrow.bmp
