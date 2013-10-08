@@ -6,10 +6,6 @@
 #define ScreenResolutionY 768
 
 extern System_ROOT Root;
-//extern int ScreenWidth;
-//extern int ScreenHeight;
-//extern int ScaleX;
-//extern int ScaleY;
 extern QGLWidget* wndClass;
 extern cResources Resources;
 

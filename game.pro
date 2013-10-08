@@ -21,9 +21,10 @@ SOURCES += INDIan/main.cpp\
     INDIan/obj_manager.cpp \
     INDIan/object.cpp \
     INDIan/resources.cpp \
-    models/example_model.cpp \
     physics/physics.cpp \
-    inits/resources_declarations.cpp
+    inits/resources_declarations.cpp \
+    models/field.cpp \
+    models/checker_manager.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
@@ -40,8 +41,9 @@ HEADERS  += \
     INDIan/root.h \
     INDIan/transport.h \
     INDIan/dependences.h \
-    models/example_model.h \
-    inits/declarations.h
+    inits/declarations.h \
+    models/field.h \
+    models/checker_manager.h
     inits/declarations.h
 
 OTHER_FILES += \
@@ -50,4 +52,20 @@ OTHER_FILES += \
     images/mask.bmp \
     README.md \
     images/arrow_mask.bmp \
-    images/arrow.bmp
+    images/arrow.bmp \
+    images/cell_mask.bmp \
+    images/cell.bmp \
+    images/small_ch_mask.bmp \
+    images/small_checker2.bmp \
+    images/small_checker.bmp \
+    images/small_ch2_mask.bmp \
+    images/middle_ch_mask.bmp \
+    images/middle_checker2.bmp \
+    images/middle_checker.bmp \
+    images/middle_ch2_mask.bmp \
+    images/button_play_mask.bmp \
+    images/button_play.bmp \
+    images/big_ch_mask.bmp \
+    images/big_checker2.bmp \
+    images/big_checker.bmp \
+    images/big_ch2_mask.bmp

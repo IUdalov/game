@@ -144,7 +144,7 @@ Obj_Manager::~Obj_Manager(){
 
     }
     for(unsigned int i = 0; i < DimOfObj.size(); i++){
-        if(DimOfObj[i]->Obj.lpModel->SizeOfSubStr)
+        if( (DimOfObj[i]->Obj.lpModel->SizeOfSubStr) && (DimOfObj[i]->Status == OS_NORMAL))
             free(DimOfObj[i]->Obj.GetSubStr());
         delete DimOfObj[i];
     }
@@ -171,6 +171,7 @@ bool Obj_Manager::DeleteObj(IDn ID){
     if(!isActual(ID))
         return false;
 
+    DeleteFromGrid(ID);
     DimOfDel.push_back(ID.ID);
 
     if(DimOfObj[ID.ID]->Obj.lpModel->SizeOfSubStr){
@@ -207,7 +208,7 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
     Model_Objects* MO=obj->lpModel;
-    pntRect rect = obj->GetRect();
+    pntRect rect = obj->GetPntRect();
 
     int left = (MinXPntRect(rect) / (int)Width_Cell);
     int right = (MaxXPntRect(rect) / (int)Width_Cell);
@@ -278,7 +279,7 @@ bool Obj_Manager::DeleteFromGrid(IDn ID){
 
     CObj* obj=&(DimOfObj[ID.ID]->Obj);
 
-    pntRect rect=obj->GetRect();
+    pntRect rect=obj->GetPntRect();
 
     int left = (MinXPntRect(rect) / (int)Width_Cell);
     int right = (MaxXPntRect(rect) / (int)Width_Cell);

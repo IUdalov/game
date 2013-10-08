@@ -26,7 +26,8 @@ private:
 public:
     CObj(void);
     CObj(const CObj& str);
-    pntRect GetRect();
+    pntRect GetPntRect();
+    Rect GetRect();
     void Draw(void);
     void Draw(unsigned int _x,unsigned int _y);
     void DrawWithMove(int xm,int ym);

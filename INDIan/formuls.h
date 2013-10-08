@@ -61,4 +61,11 @@ struct SysTimer{
 bool HitRectRect(const QRect& rect1,const QRect& rect2);
 bool HitRectCrd(const QRect& rect,int  x, int y);
 
+bool HitRectRect(const Rect& rect1,const Rect& rect2);
+
+dCoord vect_norm(dCoord crd);
+dCoord vect_mult_d(dCoord crd, double d);
+dCoord vect_null(void);
+dCoord vect_min(dCoord crd1, dCoord crd2);
+
 #endif // FORMULS_H

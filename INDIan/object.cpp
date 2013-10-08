@@ -32,7 +32,15 @@ CObj::CObj(const CObj& str){
     Width = str.Width;
     Height = str.Height;
 }
-pntRect CObj::GetRect(){
+Rect CObj::GetRect(){
+    Rect r;
+    r.left = x + rect.x1.x;
+    r.right = x + rect.x2.x;
+    r.top = y + rect.x1.y;
+    r.bottom = y + rect.x3.y;
+    return r;
+}
+pntRect CObj::GetPntRect(){
     pntRect r;
 
     r.x1.x = x + rect.x1.x;
@@ -52,7 +60,7 @@ pntRect CObj::GetRect(){
 void CObj::Draw(void){
     if(BMP){
         pntRect r;
-        r = GetRect();
+        r = GetPntRect();
         Resources.Get_BMP(BMP)->Draw(image, r.x1, r.x2, r.x3, r.x4);
     }
 }
@@ -158,7 +166,7 @@ bool CObj::HitPoint(Coord pnt){
         return false;
 
     Rect r;
-    pntRect prect = GetRect();
+    pntRect prect = GetPntRect();
     r.left = prect.x1.x;
     r.right = prect.x2.x;
     r.top = prect.x1.y;
