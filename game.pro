@@ -68,4 +68,10 @@ OTHER_FILES += \
     images/big_ch_mask.bmp \
     images/big_checker2.bmp \
     images/big_checker.bmp \
-    images/big_ch2_mask.bmp
+    images/big_ch2_mask.bmp \
+    images/selector_small_mask.bmp \
+    images/selector_small.bmp \
+    images/selector_middle_mask.bmp \
+    images/selector_middle.bmp \
+    images/selector_big_mask.bmp \
+    images/selector_big.bmp

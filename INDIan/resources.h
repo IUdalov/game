@@ -7,8 +7,8 @@
 
 #define BEGIN		void
 #define INIT_BMP	cResources::AddBmpFiles(void){
-#define SETCOUNT BmpResCount=
-#define PLEASE  ;
+#define SETCOUNT     SetBmpCount(
+#define PLEASE  );
 #define END			}
 
 class cResources{
@@ -27,6 +27,7 @@ public:
     xBmp* Get_BMP(unsigned int num);
     int GetBmpCount();
     void DisResources();
+    void SetBmpCount(int size);
 };
 
 #endif // CRESOURCE_H

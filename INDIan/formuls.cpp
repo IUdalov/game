@@ -60,6 +60,12 @@ dCoord vect_min(dCoord crd1, dCoord crd2){
     res.y = crd1.y - crd2.y;
     return res;
 }
+dCoord vect_sum(dCoord crd1, dCoord crd2){
+    dCoord res;
+    res.x = crd1.x + crd2.x;
+    res.y = crd1.y + crd2.y;
+    return res;
+}
 
 
 

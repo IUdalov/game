@@ -40,24 +40,31 @@ public:
     short CheckEnable;
     vector<CObj> arrows;
     IDn CheckChecker;
-    Coord point_to;
-    bool NeedFlyToPos;
+    int CurNumMoveCh;
+    bool ChangeProgressAfterStop;
 
     //++параметры поля
     Rect FieldRect;
     int FieldMiddle;
     //--
 
+    //++параметры расстановщика
     PosManager selector;
+    Coord point_to;
+    bool NeedFlyToPos;
+    //--
 
+    //++общие параметры игры
     GameParam game_param;
-
     int game_part;
     int players_progress;
+    int points_1st;
+    int points_2nd;
+    //--
 
     CheckerManager();
     ~CheckerManager();
-    void CreateArrow( CObj& arrow, double x_c, double y_c, double x_l, double y_l, double length );
+    void CreateArrow( CObj& arrow, double x_c, double y_c, double x_l, double y_l, double length, int max_num_arrow = 10);
     virtual void EventsHandler(unsigned int mess, void *data);
 
     void LocateSelector(void);
@@ -65,6 +72,7 @@ public:
     void ClearSelector(void);
 
     bool RectInField(Rect r);
+    bool RectOutField(Rect r);
 
     void Disposal_Timer(void *data);
     void Disposal_MouseClick(void);

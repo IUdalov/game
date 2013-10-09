@@ -14,7 +14,13 @@ void cResources::Add_BMP(unsigned int ID_BMP, QString file_name, QString mask_fi
     if(ID_BMP < 1 || ID_BMP >= (unsigned int)BmpResCount)
         return;
     xBmp* New;
-    if((BmpDim.size() > ID_BMP) && BmpDim[ID_BMP])
+    if(BmpDim[ID_BMP]){
+        New = BmpDim[ID_BMP];
+    }
+    else{
+        BmpDim[ID_BMP] = New = new xBmp;
+    }
+/*    if((BmpDim.size() > ID_BMP) && BmpDim[ID_BMP])
         New = BmpDim[ID_BMP];
     else{
         New = new xBmp;
@@ -22,7 +28,7 @@ void cResources::Add_BMP(unsigned int ID_BMP, QString file_name, QString mask_fi
             BmpDim.push_back(New);
         else
             BmpDim[ID_BMP] = New;
-    }
+    }*/
     if(!New->Create(file_name,mask_filename,Volume,colums,lines)){
         delete New;
         New = NULL;
@@ -32,9 +38,9 @@ void cResources::Add_BMP(unsigned int ID_BMP, QString file_name, QString mask_fi
 }
 bool cResources::StartBmpSystem(void){
     EndBmpSystem();
-    BmpDim.resize(1);
-    for(unsigned int i = 0 ; i < BmpDim.size(); i++)
-        BmpDim[i] = NULL;
+//    BmpDim.resize(1);
+//    for(unsigned int i = 0 ; i < BmpDim.size(); i++)
+//        BmpDim[i] = NULL;
     AddBmpFiles();
     return !fail;
 }
@@ -54,4 +60,9 @@ int cResources::GetBmpCount(){
 void cResources::DisResources(){
     EndBmpSystem();
 }
+void cResources::SetBmpCount(int size){
+    BmpResCount = size;
+    BmpDim.resize(BmpResCount, NULL);
+}
+
 

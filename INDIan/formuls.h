@@ -67,5 +67,6 @@ dCoord vect_norm(dCoord crd);
 dCoord vect_mult_d(dCoord crd, double d);
 dCoord vect_null(void);
 dCoord vect_min(dCoord crd1, dCoord crd2);
+dCoord vect_sum(dCoord crd1, dCoord crd2);
 
 #endif // FORMULS_H
