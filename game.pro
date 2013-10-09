@@ -24,7 +24,8 @@ SOURCES += INDIan/main.cpp\
     physics/physics.cpp \
     inits/resources_declarations.cpp \
     models/field.cpp \
-    models/checker_manager.cpp
+    models/checker_manager.cpp \
+    models/menu.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
@@ -43,7 +44,8 @@ HEADERS  += \
     INDIan/dependences.h \
     inits/declarations.h \
     models/field.h \
-    models/checker_manager.h
+    models/checker_manager.h \
+    models/menu.h
     inits/declarations.h
 
 OTHER_FILES += \
