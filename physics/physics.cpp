@@ -57,22 +57,48 @@ Error Clash(PhChecker& ch, PhWall& w) {
 }
 
 Error Clash(PhChecker& ch1, PhChecker& ch2) {
-    // корректировка скорости в зависимости от упругости
-    Real _s = ch1.spring * ch2.spring;
 
-    ch1.speed.x *= _s;
-    ch1.speed.y *= _s;
-    ch2.speed.x *= _s;
-    ch2.speed.y *= _s;
-
+    Real spring = ch1.spring * ch2.spring;
     Real m1 = ch1.weight, m2 = ch2.weight;
-    Real v1x = ch1.speed.x, v1y = ch1.speed.y;
-    Real v2x = ch2.speed.x, v2y = ch2.speed.y;
+    Real vx1 = ch1.speed.x;
+    Real vy1 = ch1.speed.y;
+    Real vx2 = ch2.speed.x;
+    Real vy2 = ch2.speed.y;
 
-    ch1.speed.x = ((m1 - m2) * v1x + 2 * m2 * v2x) / (m1 + m2);
-    ch1.speed.y = ((m1 - m2) * v1y + 2 * m2 * v2y) / (m1 + m2);
+    Real m21, dvx2, a, x21, y21, vx21, vy21, fy21, sign, vx_cm, vy_cm;
 
-    ch2.speed.x = (2 * m1 * v1x + (m2 - m1) * v2x) / (m1 + m2);
-    ch2.speed.y = (2 * m1 * v1y + (m2 - m1) * v2y) / (m1 + m2);
+    m21 = m2 / m1;
+    x21 = ch2.coord.x - ch1.coord.x;
+    y21 = ch2.coord.y - ch1.coord.y;
+    vx21 = vx2 - vx1;
+    vy21 = vy2 - vy1;
+
+    vx_cm = (m1 * vx1 + m2 * vx2) / (m1 + m2) ;
+    vy_cm = (m1 * vy1 + m2 * vy2)/(m1 + m2) ;
+
+    //     *** I have inserted the following statements to avoid a zero divide;
+    //         (for single precision calculations,
+    //          1.0E-12 should be replaced by a larger value). **************
+    // так хитро избегоаем перехода через 0, захардкожени точность дабла
+    fy21 = 1.0E-12 * fabs(y21);
+    if ( fabs(x21) < fy21 ) {
+        if (x21 < 0) { sign=-1; } else { sign=1;}
+        x21=fy21 * sign;
+    }
+
+    //     ***  update velocities ***
+    a = y21 / x21;
+    dvx2 = -2 * (vx21 + a * vy21) / (( 1 + a * a) * (1 + m21));
+    vx2 = vx2 + dvx2;
+    vy2 = vy2 + a * dvx2;
+    vx1 = vx1 - m21 * dvx2;
+    vy1 = vy1 - a * m21 * dvx2;
+
+    //     ***  velocity correction for inelastic collisions ***
+    ch1.speed.x = (vx1 - vx_cm) * spring + vx_cm;
+    ch1.speed.y = (vy1 - vy_cm) * spring + vy_cm;
+    ch2.speed.x = (vx2 - vx_cm) * spring + vx_cm;
+    ch2.speed.y = (vy2 - vy_cm) * spring + vy_cm;
+
     return OK;
 }

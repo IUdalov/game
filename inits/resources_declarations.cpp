@@ -14,4 +14,6 @@ BEGIN INIT_BMP SETCOUNT NumBmpRes PLEASE
     Resources.Add_BMP(ID_BMP_BTNPLAY, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_ARROW, QString("../images/arrow.bmp"), QString("../images/arrow_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_CELL, QString("../images/cell.bmp"), QString("../images/cell_mask.bmp"), 1, 1, 1);
+
+    Resources.Add_BMP(ID_BMP_MENU_PLAY, QString("../images/arrow.bmp"), QString("../images/arrow_mask.bmp"), 1, 1, 1);
 END

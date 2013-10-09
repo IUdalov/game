@@ -12,7 +12,8 @@ enum{
 enum{
     STO_SYSTEM	=	0,
     STO_CHEKERS,
-    STO_FIELD
+    STO_FIELD,
+    STO_MENU
 };
 
 enum{
@@ -26,6 +27,7 @@ enum{
     ID_BMP_ARROW,
     ID_BMP_CELL,
     ID_BMP_BTNPLAY,
+    ID_BMP_MENU_PLAY,
     NumBmpRes
 };
 
