@@ -16,7 +16,11 @@ public:
     Menu();
     virtual ~Menu();
 
-    virtual void EventsHandler(unsigned int mess, void *data);
+    virtual void EventsHandler(unsigned int mess, void*);
+
+private:
+    void CreateMenu();
+    void RemoveStartMenu();
 
 };
 

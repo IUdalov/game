@@ -18,5 +18,14 @@ BEGIN INIT_BMP SETCOUNT NumBmpRes PLEASE
     Resources.Add_BMP(ID_BMP_ARROW, QString("../images/arrow.bmp"), QString("../images/arrow_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_CELL, QString("../images/cell.bmp"), QString("../images/cell_mask.bmp"), 1, 1, 1);
 
-    Resources.Add_BMP(ID_BMP_MENU_PLAY, QString("../images/arrow.bmp"), QString("../images/arrow_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_MENU_PLAY, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_RULES, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_OPTIONS, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_EXIT, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_BACK, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_PLAY, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_PAUSE, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_RESUME, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+    Resources.Add_BMP(ID_BMP_RESTART, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
+
 END

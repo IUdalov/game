@@ -1,8 +1,8 @@
 #include "physics.h"
 
-inline Real RoundConPi(Real phi) {
+/*inline Real RoundConPi(Real phi) {
     return phi; //- M_PI * trunc(phi / M_PI);
-}
+}*/
 
 // вроде работает, от скуки можно пооптимизировать
 Error Move(PhChecker& ch, Real time) {
@@ -25,11 +25,10 @@ Error Move(PhChecker& ch, Real time) {
     return OK;
 }
 
-
-Error Clash(PhChecker& ch, Real _phi) {
+Error Clash(PhChecker& ch, Real phi) {
 
     Real v = sqrt(pow(ch.speed.x, 2) + pow(ch.speed.y, 2));
-    Real phi = RoundConPi(_phi);
+    //Real phi = RoundConPi(_phi);
 
     Real ksi;
     if (fabs(ch.speed.x) > MIN_SPEED) {

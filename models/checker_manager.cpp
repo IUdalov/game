@@ -64,19 +64,12 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         }
         break;
     case ME_CREATE:
-        gameparam = (GameParam*)Root.PutEventToQueue(sizeof(GameParam), SE_STARTGAME, this->GetSubType());
-        gameparam->FieldWidth = gameparam->FieldHeight = 8;
-        gameparam->big_num = 4;
-        gameparam->midle_num = 4;
-        gameparam->small_num = 4;
         break;
     case SE_STARTGAME:
         if(!data)
             return;
         gameparam = (GameParam*)data;
         Root.AddTimer(1);
-        ObjManager.ReBuildGrid(Root.GetScreenWidth() / 50 + 1, Root.GetScreenHeight() / 50 + 1, 50, 50, 0);
-        Root.NumLevelDraw = 4;
 
         game_part = Disposal;
         int *param;
@@ -669,7 +662,7 @@ void CheckerManager::Game_Timer(void *data){
             PhChecker ch;
             ObjToChecker(ch, *objch, obj.x, obj.y);
             //++движение
-            Move(ch, *((int*)data));
+            Move(ch, (double)(*((int*)data)));
             //--
             // ++столкновения со стенами
             /*PhWall wall;
