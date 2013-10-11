@@ -47,6 +47,8 @@ enum{
     ID_BMP_RESUME,
     ID_BMP_RESTART,
 
+//    ID_BMP_EXAMPLE,
+
     NumBmpRes
 };
 

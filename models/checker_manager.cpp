@@ -211,6 +211,12 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         break;
     case ME_DRAW:
         if(*((int*)data) == 1){
+/*            obj.BMP = ID_BMP_EXAMPLE;
+            obj.image = 0;
+            obj.SetRectByImage();
+            obj.x = Root.GetScreenWidth()/2;
+            obj.y = Root.GetScreenHeight()/2;
+            obj.Draw();*/
             if(CheckEnable > 0){
                 {
                 CObj selector;
