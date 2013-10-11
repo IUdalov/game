@@ -18,15 +18,19 @@ public:
     Real spring;         // упругость
     Real weight;         // вес
     Real rub;            //  трение
+    Real angle;
+    Real angle_speed;
+    Real radius;
 
 public:
-    PhChecker(Vect _coord = Vect(0, 0), Vect _speed = Vect(0, 0), Real _weight = 0, Real _spring = 0, Real _rub = 0)
+    PhChecker(Vect _coord = Vect(0, 0), Vect _speed = Vect(0, 0), Real _weight = 0,
+              Real _spring = 0, Real _rub = 0, Real _angle = 0, Real _angle_speed = 0, Real _radius = 0)
         : coord(_coord), speed(_speed), spring(_spring),
-          weight(_weight), rub(_rub) {
+          weight(_weight), rub(_rub), angle(_angle), angle_speed(_angle_speed), radius(_radius) {
     }
     PhChecker(const PhChecker& init)
         : coord(init.coord), speed(init.speed), spring(init.spring),
-          weight(init.weight), rub(init.rub) {
+          weight(init.weight), rub(init.rub), angle(init.angle), angle_speed(init.angle_speed), radius(init.radius) {
     }
 
 };

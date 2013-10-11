@@ -31,6 +31,7 @@ enum{
     ID_BMP_CELL,
     ID_BMP_BTNPLAY,
 
+    // должны идти по порядку
     ID_BMP_MENU_PLAY, // осн плей
     ID_BMP_RULES,
     ID_BMP_OPTIONS,

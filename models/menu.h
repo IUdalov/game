@@ -17,7 +17,8 @@ public:
     virtual ~Menu();
 
     virtual void EventsHandler(unsigned int mess, void*);
-
+private:
+    vector<IDn> main_menu;
 private:
     void CreateMenu();
     void RemoveStartMenu();

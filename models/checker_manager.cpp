@@ -786,5 +786,3 @@ void CheckerManager::Game_HitChToCh(void* data){
     ObjManager.ChangeObj(ID, obj);
     ObjManager.ChangeObj(ID2, obj2);
 }
-
-

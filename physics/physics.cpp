@@ -1,37 +1,49 @@
 #include "physics.h"
 
-/*inline Real RoundConPi(Real phi) {
-    return phi; //- M_PI * trunc(phi / M_PI);
-}*/
+inline Real RoundConPi(Real phi) {
+    return - M_PI * trunc(phi / M_PI);
+}
 
 // вроде работает, от скуки можно пооптимизировать
 Error Move(PhChecker& ch, Real time) {
-    Real v = sqrt( pow( ch.speed.x, 2.) + pow( ch.speed.y, 2.) );
-    if (v <= ch.rub) {
-        ch.speed.x = 0.;
-        ch.speed.y = 0.;
-        return OK;
+    // angle speed
+    Real rub = ch.rub * ANGLE_RUB_COEF;
+    if (fabs(ch.angle_speed) > rub ) {
+        ch.angle_speed = ch.angle_speed > 0 ? ch.angle_speed - rub : ch.angle_speed + rub;
+        ch.angle += ch.angle_speed * time;
+    } else {
+        ch.angle_speed = 0;
     }
 
-    v -= ch.rub;
+    // line speed
+    Real v = sqrt( pow( ch.speed.x, 2.) + pow( ch.speed.y, 2.) );
+    if (v >= ch.rub) {
+        v -= ch.rub;
 
-    Real dir = ch.speed.x > 0 ? atan(ch.speed.y / ch.speed.x) : atan(ch.speed.y / ch.speed.x) + M_PI;
+        Real dir = ch.speed.x > 0 ? atan(ch.speed.y / ch.speed.x) : atan(ch.speed.y / ch.speed.x) + M_PI;
 
-    ch.speed.x = v * cos(dir);
-    ch.speed.y = v * sin(dir);
+        ch.speed.x = v * cos(dir);
+        ch.speed.y = v * sin(dir);
 
-    ch.coord.x += ch.speed.x * time;
-    ch.coord.y += ch.speed.y * time;
+        ch.coord.x += ch.speed.x * time;
+        ch.coord.y += ch.speed.y * time;
+
+    } else {
+        ch.speed.x = 0.;
+        ch.speed.y = 0.;
+    }
+
     return OK;
 }
 
 Error Clash(PhChecker& ch, Real phi) {
 
+    // линейная скорость
     Real v = sqrt(pow(ch.speed.x, 2) + pow(ch.speed.y, 2));
     //Real phi = RoundConPi(_phi);
 
     Real ksi;
-    if (fabs(ch.speed.x) > MIN_SPEED) {
+    if (fabs(ch.speed.x) > MIN_REAL) {
         ksi = atan(ch.speed.y / ch.speed.x);
     } else {
         ksi = 112358;

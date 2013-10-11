@@ -6,8 +6,8 @@ typedef int Error;
 
 const Error OK = 0;
 
-const Real MIN_SPEED = 0.0000001;
-
+const Real MIN_REAL = 0.0000001;
+const Real ANGLE_RUB_COEF = 0.0;
 namespace Spring {
     const Real inert = 0; // неупругий удар
     const Real soft = 0.7;
@@ -32,6 +32,12 @@ namespace State {
     const Real vertical = M_PI / 2;
     const Real horizontal = 0;
     const Real rotated = M_PI / 4;
+}
+
+namespace Radius {
+    const Real small = 10;
+    const Real normal = 15;
+    const Real big = 20;
 }
 
 #endif // PARAM_H
