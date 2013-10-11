@@ -19,6 +19,7 @@ public:
     virtual void EventsHandler(unsigned int mess, void*);
 private:
     vector<IDn> main_menu;
+    bool isCreated;
 private:
     void CreateMenu();
     void RemoveStartMenu();

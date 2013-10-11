@@ -176,6 +176,7 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             points_1st = points_2nd = 0;
             alive_che1_count = alive_che2_count = 0;
             players_progress = _1st;
+            CheckEnable = 0;
             while(this->GetVolume())
                 ObjManager.DeleteObj(this->GetObj(0));
         }

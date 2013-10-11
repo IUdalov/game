@@ -4,6 +4,7 @@ Menu menu;
 
 Menu::Menu() : Model_Objects(STO_MENU, 0) {
     main_menu.reserve(ID_BMP_EXIT - ID_BMP_MENU_PLAY + 1);
+    isCreated = false;
 }
 Menu::~Menu(){
 }
@@ -18,10 +19,11 @@ void Menu::EventsHandler(unsigned int mess, void*) {
 
         //CreateMenu();
     }
-        //break; //// WARNING!!!
+        break; //// WARNING!!!
     case ME_MOUSECLICK:
     {
-        if (1) {
+        if (!isCreated) {
+        isCreated = true;
         // RemoveStartMenu();
 
         GameParam* gameparam;
