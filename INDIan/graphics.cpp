@@ -61,8 +61,8 @@ int xBmp::GetHeight(){ return Height; }
 int xBmp::GetVolume(){ return Volume; }
 
 void xBmp::Draw(int num,  Coord x1, Coord x2, Coord x3, Coord x4){
-    float stepx = 1./Columns;
-    float stepy = 1./Lines;
+    float stepx = 1./((float)Columns);
+    float stepy = 1./((float)Lines);
 
     if(useMask){
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
@@ -97,7 +97,7 @@ GLuint xBmp::GetTextID(){
     return TextureID;
 }
 
-int xBmp::nnx(int num){ return num - (num / Columns); }
+int xBmp::nnx(int num){ return num - Lines * (num / Columns); }
 int xBmp::nny(int num){ return (num / Columns); }
 
 bool HitImgImg(xBmp bmp1, QRect rect1, xBmp bmp2, QRect rect2){

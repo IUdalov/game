@@ -17,9 +17,9 @@ namespace Spring {
 }
 
 namespace Weight {
-    const Real low = 10;
-    const Real normal = 50;
-    const Real huge =  100;
+    const Real low = 1;
+    const Real normal = 2.25;
+    const Real huge =  4;
 }
 
 namespace Rub {

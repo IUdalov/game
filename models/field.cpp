@@ -28,14 +28,57 @@ void Field::EventsHandler(unsigned int mess, void *data){
         obj.image = 0;
         obj.SetRectByImage();
         obj.LevelOfDraw = 0;
+        obj.y = y + (int)(0.5 * (double)height);
         for(int i = 0 ; i < PoleWidth; i ++){
+            if(i == 0){
+                obj.image = 6;
+            }
+            else if(i == PoleWidth - 1){
+                obj.image = 8;
+            }
+            else{
+                obj.image = 7;
+            }
+            obj.x = x + ((double)i + 0.5) * width;
+            ObjManager.CreateObj(obj, id);
+            ObjManager.AddToGrid(id, false);
+        }
+        obj.y = y + height * PoleHeight - 0.5 *height;
+        for(int i = 0 ; i < PoleWidth; i ++){
+            if(i == 0){
+                obj.image = 0;
+            }
+            else if(i == PoleWidth - 1){
+                obj.image = 2;
+            }
+            else{
+                obj.image = 1;
+            }
+            obj.x = x + ((double)i + 0.5) * width;
+            ObjManager.CreateObj(obj, id);
+            ObjManager.AddToGrid(id, false);
+        }
+        for(int i = 0 ; i < (PoleHeight - 2); i ++){
+            obj.image = 3;
+            obj.x = x + 0.5 * width;
+            obj.y = y + (1.5 + (float)i) *height;
+            ObjManager.CreateObj(obj, id);
+            ObjManager.AddToGrid(id, false);
+
+            obj.image = 5;
+            obj.x = x + width* PoleWidth - 0.5 * width;
+            obj.y = y + (1.5 + (float)i) *height;
+            ObjManager.CreateObj(obj, id);
+            ObjManager.AddToGrid(id, false);
+        }
+/*        for(int i = 0 ; i < PoleWidth; i ++){
             for(int j = 0 ; j < PoleHeight; j ++){
                 obj.x = x + ((double)i + 0.5) * width;
                 obj.y = y + ((double)j + 0.5) * height;
                 ObjManager.CreateObj(obj, id);
                 ObjManager.AddToGrid(id, false);
             }
-        }
+        }*/
         r = (Rect*)Root.PutEventToQueue(sizeof(Rect), SE_FIELDPARAM, STO_CHEKERS);
         r->left = x;
         r->right = x + PoleWidth * width;

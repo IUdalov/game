@@ -31,8 +31,10 @@ enum PlayersProgress{
     _2nd
 };
 enum GamePart{
-    Disposal = 1,
-    Game
+    Start = 1,
+    Disposal,
+    Game,
+    End,
 };
 
 class CheckerManager : Model_Objects{
@@ -60,6 +62,8 @@ public:
     int players_progress;
     int points_1st;
     int points_2nd;
+    int alive_che1_count;
+    int alive_che2_count;
     //--
 
     CheckerManager();
@@ -83,6 +87,8 @@ public:
     void Game_MouseClick(void);
     void Game_MouseMove(void);
     void Game_HitChToCh(void* data);
+
+    void RecalcActualAliveCheCount();
 };
 
 #endif // EXAMPLE_MODEL_H
