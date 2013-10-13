@@ -28,7 +28,7 @@ void Field::EventsHandler(unsigned int mess, void *data){
         obj.image = 0;
         obj.SetRectByImage();
         obj.LevelOfDraw = 0;
-        obj.y = y + (int)(0.5 * (double)height);
+        obj.y = y + 0.5 * height;
         for(int i = 0 ; i < PoleWidth; i ++){
             if(i == 0){
                 obj.image = 6;
@@ -39,11 +39,11 @@ void Field::EventsHandler(unsigned int mess, void *data){
             else{
                 obj.image = 7;
             }
-            obj.x = x + ((double)i + 0.5) * width;
+            obj.x = x + i * (width) + 0.5 * width;
             ObjManager.CreateObj(obj, id);
             ObjManager.AddToGrid(id, false);
         }
-        obj.y = y + height * PoleHeight - 0.5 *height;
+        obj.y = y + (height) * (PoleHeight - 1 ) + 0.5 * height;
         for(int i = 0 ; i < PoleWidth; i ++){
             if(i == 0){
                 obj.image = 0;
@@ -54,20 +54,20 @@ void Field::EventsHandler(unsigned int mess, void *data){
             else{
                 obj.image = 1;
             }
-            obj.x = x + ((double)i + 0.5) * width;
+            obj.x = x + i * (width) + 0.5 * width;
             ObjManager.CreateObj(obj, id);
             ObjManager.AddToGrid(id, false);
         }
         for(int i = 0 ; i < (PoleHeight - 2); i ++){
             obj.image = 3;
             obj.x = x + 0.5 * width;
-            obj.y = y + (1.5 + (float)i) *height;
+            obj.y = y + height * 0.5 + ( i + 1) * (height);
             ObjManager.CreateObj(obj, id);
             ObjManager.AddToGrid(id, false);
 
             obj.image = 5;
-            obj.x = x + width* PoleWidth - 0.5 * width;
-            obj.y = y + (1.5 + (float)i) *height;
+            obj.x = x + (width) * (PoleWidth - 1)  + 0.5 * width;
+            obj.y = y + .5 * height + (i + 1) * (height);
             ObjManager.CreateObj(obj, id);
             ObjManager.AddToGrid(id, false);
         }

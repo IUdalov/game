@@ -64,7 +64,7 @@ void CObj::Draw(void){
         Resources.Get_BMP(BMP)->Draw(image, r.x1, r.x2, r.x3, r.x4);
     }
 }
-void CObj::Draw(unsigned int _x,unsigned int _y){
+void CObj::Draw( int _x,int _y){
     if(BMP){
         double old_x = x;
         double old_y = y;
@@ -144,33 +144,37 @@ void CObj::SetWidthHeight(int width, int height){
 void CObj::SetDefaultAngle(void){
     isTurned = false;
 
-    int width2 = Width / 2;
-    int height2 = Height / 2;
-    int width1 = (Width % 2 == 0) ? width2 - 1 : width2;
-    int height1 = (Height % 2 == 0) ? height2 - 1 : height2;
+    int width1 = Width / 2;
+    int height1 = Height / 2;
+    int width2 = (Width % 2 == 0) ? width1: width1 + 1;
+    int height2 = (Height % 2 == 0) ? height1: height1 + 1;
 
-    rect.x1.x = - width1;
-    rect.x1.y = - height1;
+    rect.x1.x = - width2;
+    rect.x1.y = - height2;
 
-    rect.x2.x = width2;
-    rect.x2.y = - height1;
+    rect.x2.x = width1;
+    rect.x2.y = - height2;
 
-    rect.x3.x = width2;
-    rect.x3.y = height2;
+    rect.x3.x = width1;
+    rect.x3.y = height1;
 
-    rect.x4.x = - width1;
-    rect.x4.y = height2;
+    rect.x4.x = - width2;
+    rect.x4.y = height1;
 }
 bool CObj::HitPoint(Coord pnt){
     if(isTurned)
         return false;
 
     Rect r;
-    pntRect prect = GetPntRect();
-    r.left = prect.x1.x;
-    r.right = prect.x2.x;
-    r.top = prect.x1.y;
-    r.bottom = prect.x3.y;
+    int width2 = Width / 2;
+    int height2 = Height / 2;
+    int width1 = (Width % 2 == 0) ? width2 - 1 : width2;
+    int height1 = (Height % 2 == 0) ? height2 - 1 : height2;
+
+    r.left = x - width1;
+    r.right = x + width2;
+    r.top = y - height1;
+    r.bottom = y + height2;
 
     if( (pnt.x >= r.left) && (pnt.x <= r.right) && (pnt.y >= r.top) &&  (pnt.y <= r.bottom))
         return true;

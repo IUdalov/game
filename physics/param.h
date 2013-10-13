@@ -7,7 +7,7 @@ typedef int Error;
 const Error OK = 0;
 
 const Real MIN_REAL = 0.0000001;
-const Real ANGLE_RUB_COEF = 0.0;
+const Real ANGLE_RUB_COEF = 0.01;
 namespace Spring {
     const Real inert = 0; // неупругий удар
     const Real soft = 0.7;

@@ -17,8 +17,11 @@ static void CheckerToObj(PhChecker ch, ObjChecker& obj, double& x, double& y){
     obj.vSpeed.x = ch.speed.x;
     obj.vSpeed.y = ch.speed.y;
     obj.weight = ch.weight;
+
+    obj.angle = ch.angle;
+    obj.angle_speed = ch.angle_speed;
 }
-static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y){
+static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y, int radius){
     ch.coord.x = x;
     ch.coord.y = y;
     ch.speed.x = obj.vSpeed.x;
@@ -26,6 +29,10 @@ static void ObjToChecker(PhChecker& ch, ObjChecker obj, double x, double y){
     ch.weight = obj.weight;
     ch.rub = 0.13;//Rub::normal;
     ch.spring = Spring::normal;
+
+    ch.angle = obj.angle;
+    ch.angle_speed = obj.angle_speed;
+    ch.radius = radius;
 }
 void AlignBetween( double& x, double width, double min, double max){
     if( (x - width) <= min)
@@ -121,6 +128,7 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
 
         ClearSelector();
 
+        ObjChecker* obj_ch;
         for(int i = 0 ; i < game_param.big_num; i ++){
             obj.BMP = img1;
             obj.SetRectByImage();
@@ -128,11 +136,13 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             obj.y = selector.pnt[0].y;
             ObjManager.CreateObj(obj, ID);
             ObjManager.GetObj(ID, obj);
-            ((ObjChecker*)obj.GetSubStr())->master = players_progress;
-            ((ObjChecker*)obj.GetSubStr())->weight = Weight::huge;
-            ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-                    ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
-            ((ObjChecker*)obj.GetSubStr())->type = big;
+            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            obj_ch->master = players_progress;
+            obj_ch->weight = Weight::huge;
+            obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+            obj_ch->type = big;
+            obj_ch->angle = 0;
+            obj_ch->angle_speed = 0.;
             selector.big_chs.push_back(ID);
         }
         for(int i = 0 ; i < game_param.midle_num; i ++){
@@ -142,11 +152,13 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             obj.y = selector.pnt[1].y;
             ObjManager.CreateObj(obj, ID);
             ObjManager.GetObj(ID, obj);
-            ((ObjChecker*)obj.GetSubStr())->master = players_progress;
-            ((ObjChecker*)obj.GetSubStr())->weight = Weight::normal;
-            ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-                    ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
-            ((ObjChecker*)obj.GetSubStr())->type = middle;
+            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            obj_ch->master = players_progress;
+            obj_ch->weight = Weight::normal;
+            obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+            obj_ch->type = middle;
+            obj_ch->angle = 0;
+            obj_ch->angle_speed = 0.;
             selector.middle_chs.push_back(ID);
         }
         for(int i = 0 ; i < game_param.small_num; i ++){
@@ -156,11 +168,13 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             obj.y = selector.pnt[2].y;
             ObjManager.CreateObj(obj, ID);
             ObjManager.GetObj(ID, obj);
-            ((ObjChecker*)obj.GetSubStr())->master = players_progress;
-            ((ObjChecker*)obj.GetSubStr())->weight = Weight::low;
-            ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-                    ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
-            ((ObjChecker*)obj.GetSubStr())->type = small;
+            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            obj_ch->master = players_progress;
+            obj_ch->weight = Weight::low;
+            obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+            obj_ch->type = small;
+            obj_ch->angle = 0;
+            obj_ch->angle_speed = 0.;
             selector.small_chs.push_back(ID);
         }
         selector.busy[0] = false;
@@ -658,8 +672,14 @@ void CheckerManager::Game_Timer(void *data){
         for( int i = 0; i < (int)this->GetVolume(); i ++){
             ObjManager.GetObj(this->GetObj(i),obj);
             ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-            if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0) ){
-                if(RectOutField(obj.GetRect())){
+            if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0)
+                    && (objch->angle_speed == 0.)){
+                Rect r;
+                r.left = obj.x - Resources.Get_BMP(obj.BMP)->GetWidth()/2 + 1 ;
+                r.right = obj.x + Resources.Get_BMP(obj.BMP)->GetWidth()/2 - 1;
+                r.top = obj.y - Resources.Get_BMP(obj.BMP)->GetHeight()/2 + 1;
+                r.bottom = obj.y + Resources.Get_BMP(obj.BMP)->GetHeight()/2 - 1;
+                if(RectOutField(r)){
                     int points;
                     switch(objch->type){
                     case big:
@@ -691,7 +711,7 @@ void CheckerManager::Game_Timer(void *data){
             CurNumMoveCh++;
             ObjManager.DeleteFromGrid(this->GetObj(i));
             PhChecker ch;
-            ObjToChecker(ch, *objch, obj.x, obj.y);
+            ObjToChecker(ch, *objch, obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth() / 2);
             //++движение
             Move(ch, (double)(*((int*)data)));
             //--
@@ -712,6 +732,10 @@ void CheckerManager::Game_Timer(void *data){
             }*/
             // --столкновения со стенами
             CheckerToObj(ch, *objch, obj.x, obj.y);
+            if(objch->angle){
+                objch->angle = RoundConPi(objch->angle);
+                obj.TurnImage(objch->angle);
+            }
             ObjManager.ChangeObj(this->GetObj(i), obj);
             ObjManager.AddToGrid(this->GetObj(i), true);
         }
@@ -814,11 +838,21 @@ void CheckerManager::Game_HitChToCh(void* data){
     ObjManager.ChangeObj(ID, obj);
     ObjManager.AddToGrid(ID, false);
     PhChecker ch1, ch2;
-    ObjToChecker( ch1, *((ObjChecker*)obj.GetSubStr()), obj.x, obj.y );
-    ObjToChecker( ch2, *((ObjChecker*)obj2.GetSubStr()), obj2.x, obj2.y );
+    ObjToChecker( ch1, *((ObjChecker*)obj.GetSubStr()),
+                  obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth() / 2 );
+    ObjToChecker( ch2, *((ObjChecker*)obj2.GetSubStr()),
+                  obj2.x, obj2.y, Resources.Get_BMP(obj2.BMP)->GetWidth() / 2);
     Clash(ch1, ch2);
     CheckerToObj( ch1, *((ObjChecker*)obj.GetSubStr()), obj.x, obj.y );
     CheckerToObj( ch2, *((ObjChecker*)obj2.GetSubStr()), obj2.x, obj2.y );
+
+    //костыль чтоб крутилось
+    //((ObjChecker*)obj.GetSubStr())->angle_speed = M_PI /10;
+    //
+    if(((ObjChecker*)obj.GetSubStr())->angle)
+        obj.TurnImage(((ObjChecker*)obj.GetSubStr())->angle);
+    if(((ObjChecker*)obj2.GetSubStr())->angle)
+        obj.TurnImage(((ObjChecker*)obj2.GetSubStr())->angle);
     ObjManager.ChangeObj(ID, obj);
     ObjManager.ChangeObj(ID2, obj2);
 }

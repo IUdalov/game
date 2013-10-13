@@ -16,6 +16,8 @@ struct ObjChecker{
     dCoord vSpeed;
     int type;
     int master;
+    double angle;
+    double angle_speed;
 };
 
 struct PosManager{

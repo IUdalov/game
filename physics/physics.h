@@ -6,7 +6,7 @@
 #include "data.h"
 
 //
-inline Real RoundConPi(Real phi);
+Real RoundConPi(Real phi);
 
 // передвинуть за время
 Error Move(PhChecker& ch, Real time);

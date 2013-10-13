@@ -1,7 +1,7 @@
 #include "physics.h"
 
-inline Real RoundConPi(Real phi) {
-    return - M_PI * trunc(phi / M_PI);
+Real RoundConPi(Real phi) {
+    return phi - 2 *M_PI * trunc(phi / (2 * M_PI));
 }
 
 // вроде работает, от скуки можно пооптимизировать

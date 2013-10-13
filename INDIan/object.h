@@ -29,7 +29,7 @@ public:
     pntRect GetPntRect();
     Rect GetRect();
     void Draw(void);
-    void Draw(unsigned int _x,unsigned int _y);
+    void Draw( int _x, int _y);
     void DrawWithMove(int xm,int ym);
     CObj& operator=(const CObj& str);
     Model_Objects* GetLpModel(void);
