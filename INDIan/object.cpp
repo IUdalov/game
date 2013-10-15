@@ -191,6 +191,12 @@ int CObj::GetWidth(){
 int CObj::GetHeight(){
     return Height;
 }
+void CObj::SetBmp(unsigned int id_bmp, bool setRectByImage){
+    BMP = id_bmp;
+    if(setRectByImage)
+        SetRectByImage();
+}
+
 
 
 
