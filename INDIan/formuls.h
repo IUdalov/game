@@ -14,7 +14,13 @@
 struct IDn{
     unsigned int ID;
     unsigned int DateBorn;
+    bool operator==(const IDn& id){
+        if( (ID == id.ID) && (DateBorn == id.DateBorn) )
+            return true;
+        return false;
+    }
 };
+
 
 struct dCoord{
     double x,y;

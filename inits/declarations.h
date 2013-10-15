@@ -7,7 +7,8 @@ enum{
     SE_FIELDPARAM,
     SE_INITSELECTOR,
     SE_NEXTGAMEPART,
-    SE_REPLAY
+    SE_REPLAY,
+    SE_ENDGAME
 };
 
 enum{

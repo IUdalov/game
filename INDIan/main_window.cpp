@@ -38,11 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     QTimer *timRepaint = new QTimer(this);
     connect(timRepaint, SIGNAL(timeout()), this, SLOT(repaint()));
-    timRepaint->start(10);
+    timRepaint->start(15);
 
     QTimer *time = new QTimer(this);
     connect(time, SIGNAL(timeout()), this, SLOT(mainTimer()));
-    time->start(1);
+    time->start(5);
 
     QRect rect = QApplication::desktop()->screenGeometry();
     int x1,y1, x2, y2;

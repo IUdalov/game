@@ -43,6 +43,7 @@ public:
     bool HitRect(Rect rect);
     int GetWidth();
     int GetHeight();
+    void SetBmp(unsigned int id_bmp, bool setRectByImage = true );
     friend class Model_Objects;
     friend class System_ROOT;
     friend class Obj_Manager;

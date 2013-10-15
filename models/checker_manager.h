@@ -56,6 +56,7 @@ public:
     PosManager selector;
     Coord point_to;
     bool NeedFlyToPos;
+    dCoord vMoveAfterHit;
     //--
 
     //++общие параметры игры
@@ -78,7 +79,11 @@ public:
     void ClearSelector(void);
 
     bool RectInField(Rect r);
+    bool RectInRect(Rect r, Rect rf);
     bool RectOutField(Rect r);
+    bool RectOutRect(Rect r1, Rect r2);
+    bool CheckerOutRect(dCoord crd, double radius, Rect r);
+    bool CheckerInPartOfField(Rect rect, short part);
 
     void Disposal_Timer(void *data);
     void Disposal_MouseClick(void);
