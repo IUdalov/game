@@ -11,9 +11,6 @@ Real RoundConPi(Real phi);
 // передвинуть за время
 Error Move(PhChecker& ch, Real time);
 
-// столкнуть упруго с плоскостью под углом фи
-Error Clash(PhChecker& ch, Real _phi);
-
 // столкнуть со стеной
 Error Clash(PhChecker& ch, PhWall& w);
 

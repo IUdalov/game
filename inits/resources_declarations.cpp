@@ -25,7 +25,6 @@ BEGIN INIT_BMP SETCOUNT NumBmpRes PLEASE
     Resources.Add_BMP(ID_BMP_BACK, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_PLAY, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_PAUSE, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
-    Resources.Add_BMP(ID_BMP_RESUME, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_RESTART, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
 
 //    Resources.Add_BMP(ID_BMP_EXAMPLE, QString("../images/triangle.jpg"), QString(""), 1, 1, 1);

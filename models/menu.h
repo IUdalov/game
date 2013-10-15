@@ -11,19 +11,47 @@ extern int ScreenHeight;
 extern cResources Resources;
 extern Obj_Manager ObjManager;
 
+enum {
+    Start = 0,
+    Position,
+    Option,
+    Rules,
+    Pause,
+    GameActive,
+    GameSuspend
+};
+typedef map<int, IDn> MenuItems;
+
 class Menu : public Model_Objects {
 public:
     Menu();
     virtual ~Menu();
-
     virtual void EventsHandler(unsigned int mess, void*);
-private:
-    vector<IDn> main_menu;
-    bool isCreated;
-private:
-    void CreateMenu();
-    void RemoveStartMenu();
 
+private:
+    MenuItems menuItems;
+    int currMenu;
+
+private:
+    void InitMenuItems();
+    void ShowMenuItem(int);
+    void HideMenuItem(int);
+
+    void ShowStartMenu();
+    void HideStartMenu();
+    void ShowPositionMenu();
+    void HidePositionMenu();
+    void ShowOptionMenu();
+    void HideOptionMenu();
+    void ShowRulesMenu();
+    void HideRulesMenu();
+    void ShowPauseMenu();
+    void HidePauseMenu();
+    void ShowGameMenu();
+    void HideGameMenu();
+
+private:
+    void MouseClick();
 };
 
 #endif // MENU_H

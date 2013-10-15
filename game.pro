@@ -25,7 +25,8 @@ SOURCES += INDIan/main.cpp\
     inits/resources_declarations.cpp \
     models/field.cpp \
     models/checker_manager.cpp \
-    models/menu.cpp
+    models/menu.cpp \
+    models/show_menu.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \

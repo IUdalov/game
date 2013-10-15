@@ -6,6 +6,7 @@ Real RoundConPi(Real phi) {
 
 // вроде работает, от скуки можно пооптимизировать
 Error Move(PhChecker& ch, Real time) {
+
     // angle speed
     Real rub = ch.rub * ANGLE_RUB_COEF;
     if (fabs(ch.angle_speed) > rub ) {
@@ -36,7 +37,11 @@ Error Move(PhChecker& ch, Real time) {
     return OK;
 }
 
-Error Clash(PhChecker& ch, Real phi) {
+// с вращением не тестировалась
+Error Clash(PhChecker& ch, PhWall& w) {
+
+    ch.speed.x *= ch.spring * w.spring;
+    ch.speed.y *= ch.spring * w.spring;
 
     // линейная скорость
     Real v = sqrt(pow(ch.speed.x, 2) + pow(ch.speed.y, 2));
@@ -49,21 +54,13 @@ Error Clash(PhChecker& ch, Real phi) {
         ksi = 112358;
     }
     // над этим можно подумать
-    Real dir = (ch.speed.x > 0) ? (2 * phi - ksi) : (2 * phi - (ksi + M_PI));
+    Real dir = (ch.speed.x > 0) ? (2 * w.phi - ksi) : (2 * w.phi - (ksi + M_PI));
 
     ch.speed.x = v * cos(dir);
     ch.speed.y = v * sin(dir);
 
-    return 0;
-}
-
-Error Clash(PhChecker& ch, PhWall& w) {
-
-    ch.speed.x *= ch.spring * w.spring;
-    ch.speed.y *= ch.spring * w.spring;
-
-    Clash(ch, w.phi);
-
+    // угловая скорость
+    ch.angle_speed += (ch.speed.x * cos(w.phi) - ch.speed.y * sin(w.phi)) / ch.radius;
     return OK;
 }
 
@@ -110,6 +107,13 @@ Error Clash(PhChecker& ch1, PhChecker& ch2) {
     ch1.speed.y = (vy1 - vy_cm) * spring + vy_cm;
     ch2.speed.x = (vx2 - vx_cm) * spring + vx_cm;
     ch2.speed.y = (vy2 - vy_cm) * spring + vy_cm;
+
+    // угловая скорость
+    Real tan_a = atan(a);
+    bool is_first_up = ch1.coord.y > ch2.coord.y;
+    Real point_on_circle = (ch1.speed.x - ch2.speed.x) * cos(tan_a) - (ch1.speed.y - ch2.speed.y) * sin(tan_a);
+    ch1.angle_speed += is_first_up ? point_on_circle / ch1.radius : point_on_circle / ch1.radius;
+    ch2.angle_speed += is_first_up ? point_on_circle / ch2.radius : point_on_circle / ch2.radius;
 
     return OK;
 }
