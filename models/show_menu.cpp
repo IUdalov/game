@@ -36,14 +36,14 @@ void Menu::InitMenuItems() {
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_EXIT] = id;
 
-    obj.x = Root.GetScreenWidth() / 8;
+    obj.x = Root.GetScreenWidth() / 9;
     obj.y = Root.GetScreenHeight() * 7 / 8;
     obj.BMP = ID_BMP_BACK;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_BACK] = id;
 
-    obj.x = Root.GetScreenWidth() * 7 / 8;
+    obj.x = Root.GetScreenWidth() * 8 / 9;
     obj.y = Root.GetScreenHeight() * 7 / 8;
     obj.BMP = ID_BMP_PLAY;
     obj.SetRectByImage();
@@ -57,7 +57,7 @@ void Menu::InitMenuItems() {
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_PAUSE] = id;
 
-    obj.x = Root.GetScreenWidth() / 8;
+    obj.x = Root.GetScreenWidth() / 9;
     obj.y = Root.GetScreenHeight() / 8;
     obj.BMP = ID_BMP_RESTART;
     obj.SetRectByImage();

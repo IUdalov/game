@@ -70,7 +70,7 @@ void Menu::MouseClick() {
                 break;
 
             case ID_BMP_EXIT:
-                exit(0); // надо бы по нормальному выходить
+                Root.CloseApp();
                 break;
 
             case ID_BMP_BACK:
@@ -86,7 +86,7 @@ void Menu::MouseClick() {
                     break;
                 case GameSuspend:
                     HidePauseMenu();
-                    Root.PutEventToQueue(SE_DELETEFIELD, STO_CHEKERS);
+                    Root.PutEventToQueue(0, SE_ENDGAME, STO_CHEKERS);
                     break;
                 default:
                     ;
@@ -100,13 +100,13 @@ void Menu::MouseClick() {
                 if (currMenu == Position) {
                     HidePositionMenu();
                     currMenu = GameActive;
-                    ShowGameMenu();
                     GameParam* gameparam;
                     gameparam = (GameParam*)Root.PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
                     gameparam->FieldWidth = gameparam->FieldHeight = 8;
                     gameparam->big_num = 4;
                     gameparam->midle_num = 4;
                     gameparam->small_num = 4;
+                    ShowGameMenu();
                 }
 
                 if (currMenu == GameSuspend) {
@@ -124,7 +124,7 @@ void Menu::MouseClick() {
                 break;
 
             case ID_BMP_RESTART:
-                HideGameMenu();;
+                HidePauseMenu();;
                 currMenu = GameActive;
                 ShowGameMenu();
                 Root.PutEventToQueue(0, SE_REPLAY, STO_CHEKERS);

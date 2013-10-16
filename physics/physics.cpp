@@ -109,11 +109,10 @@ Error Clash(PhChecker& ch1, PhChecker& ch2) {
     ch2.speed.y = (vy2 - vy_cm) * spring + vy_cm;
 
     // угловая скорость
-    Real tan_a = atan(a);
-    bool is_first_up = ch1.coord.y > ch2.coord.y;
+    Real tan_a = atan(a) + M_PI;
     Real point_on_circle = (ch1.speed.x - ch2.speed.x) * cos(tan_a) - (ch1.speed.y - ch2.speed.y) * sin(tan_a);
-    ch1.angle_speed += is_first_up ? point_on_circle / ch1.radius : point_on_circle / ch1.radius;
-    ch2.angle_speed += is_first_up ? point_on_circle / ch2.radius : point_on_circle / ch2.radius;
+    ch1.angle_speed += point_on_circle / ch1.radius;
+    ch2.angle_speed -= point_on_circle / ch2.radius;
 
     return OK;
 }
