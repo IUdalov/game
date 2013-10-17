@@ -23,6 +23,18 @@ bool HitRectCrd(const QRect& rect,int  x, int y){
         return true;
     return false;
 }
+bool HitRectCrd(const Rect& rect,int  x, int y){
+    if( (x >= rect.left) && (x <= rect.right)
+            && (y >= rect.top) && (y <= rect.bottom) )
+        return true;
+    return false;
+}
+bool HitCircleCrd(int xc, int yc, int radius, int  xp, int yp){
+    if( sqrt( pow( xc - xp,2.) + pow( yc - yp,2.) ) <= radius)
+        return true;
+    return false;
+}
+
 double MinXPntRect(pntRect r){
     return MIN( r.x1.x, MIN( r.x2.x, MIN(r.x3.x, r.x4.x)));
 }

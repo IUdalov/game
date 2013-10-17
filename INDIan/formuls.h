@@ -68,6 +68,8 @@ bool HitRectRect(const QRect& rect1,const QRect& rect2);
 bool HitRectCrd(const QRect& rect,int  x, int y);
 
 bool HitRectRect(const Rect& rect1,const Rect& rect2);
+bool HitRectCrd(const Rect& rect,int  x, int y);
+bool HitCircleCrd(int xc, int yc, int radius, int  xp, int yp);
 
 dCoord vect_norm(dCoord crd);
 dCoord vect_mult_d(dCoord crd, double d);

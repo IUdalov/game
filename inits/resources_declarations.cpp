@@ -17,6 +17,9 @@ BEGIN INIT_BMP SETCOUNT NumBmpRes PLEASE
     Resources.Add_BMP(ID_BMP_BTNPLAY, QString("../images/button_play.bmp"), QString("../images/button_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_ARROW, QString("../images/arrow.bmp"), QString("../images/arrow_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_CELL, QString("../images/cell.bmp"), QString("../images/cell_mask.bmp"), 9, 3, 3);
+    Resources.Add_BMP(ID_BMP_CELL_SHINE1, QString("../images/cell_shine1.bmp"), QString("../images/cell_shine1_mask.bmp"), 9, 3, 3);
+    Resources.Add_BMP(ID_BMP_CELL_SHINE2, QString("../images/cell_shine2.bmp"), QString("../images/cell_shine2_mask.bmp"), 9, 3, 3);
+    Resources.Add_BMP(ID_BMP_CELL_SHINE3, QString("../images/cell_shine3.bmp"), QString("../images/cell_shine3_mask.bmp"), 9, 3, 3);
 
     Resources.Add_BMP(ID_BMP_MENU_PLAY, QString("../images/button_menu_play.bmp"), QString("../images/button_menu_play_mask.bmp"), 1, 1, 1);
     Resources.Add_BMP(ID_BMP_RULES, QString("../images/button_rules.bmp"), QString("../images/button_rules_mask.bmp"), 1, 1, 1);

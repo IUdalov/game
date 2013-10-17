@@ -52,28 +52,33 @@ void Menu::MouseClick() {
             switch (obj.BMP) {
 
             case ID_BMP_MENU_PLAY:
+                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
                 HideStartMenu();
                 currMenu = Position;
                 ShowPositionMenu();
                 break;
 
             case ID_BMP_RULES:
+                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
                 HideStartMenu();
                 currMenu = Rules;
                 ShowRulesMenu();
                 break;
 
             case ID_BMP_OPTIONS:
+                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
                 HideStartMenu();
                 currMenu = Option;
                 ShowOptionMenu();
                 break;
 
             case ID_BMP_EXIT:
+                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
                 Root.CloseApp();
                 break;
 
             case ID_BMP_BACK:
+                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
                 switch (currMenu) { // руки мне за это оторвать
                 case Option:
                     HideOptionMenu();
@@ -96,6 +101,7 @@ void Menu::MouseClick() {
                 break;
 
             case ID_BMP_PLAY:
+                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
             {
                 if (currMenu == Position) {
                     HidePositionMenu();
@@ -118,12 +124,14 @@ void Menu::MouseClick() {
                 break;
 
             case ID_BMP_PAUSE:
+                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
                 HideGameMenu();
                 currMenu = GameSuspend;
                 ShowPauseMenu();
                 break;
 
             case ID_BMP_RESTART:
+                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
                 HidePauseMenu();;
                 currMenu = GameActive;
                 ShowGameMenu();

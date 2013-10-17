@@ -1,7 +1,6 @@
 #include "menu.h"
 
 void Menu::InitMenuItems() {
-
     IDn id;
     CObj obj;
     this->CreateSimpleObj(&obj);
@@ -36,29 +35,29 @@ void Menu::InitMenuItems() {
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_EXIT] = id;
 
-    obj.x = Root.GetScreenWidth() / 9;
-    obj.y = Root.GetScreenHeight() * 7 / 8;
+    obj.x = Resources.Get_BMP(ID_BMP_BACK)->GetWidth() / 2;//Root.GetScreenWidth() / 9;
+    obj.y = Root.GetScreenHeight() - Resources.Get_BMP(ID_BMP_BACK)->GetHeight() / 2;//* 7 / 8;
     obj.BMP = ID_BMP_BACK;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_BACK] = id;
 
-    obj.x = Root.GetScreenWidth() * 8 / 9;
-    obj.y = Root.GetScreenHeight() * 7 / 8;
+    obj.x = Root.GetScreenWidth() - Resources.Get_BMP(ID_BMP_PLAY)->GetWidth() / 2;//Root.GetScreenWidth() * 8 / 9;
+    obj.y = Root.GetScreenHeight() - Resources.Get_BMP(ID_BMP_PLAY)->GetHeight() / 2;//Root.GetScreenHeight() * 7 / 8;
     obj.BMP = ID_BMP_PLAY;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_PLAY] = id;
 
-    obj.x = Root.GetScreenWidth() / 8;
-    obj.y = Root.GetScreenHeight() / 8;
+    obj.x = Resources.Get_BMP(ID_BMP_PAUSE)->GetWidth() / 2;//Root.GetScreenWidth() / 8;
+    obj.y = Resources.Get_BMP(ID_BMP_PAUSE)->GetHeight() / 2;//Root.GetScreenHeight() / 8;
     obj.BMP = ID_BMP_PAUSE;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_PAUSE] = id;
 
-    obj.x = Root.GetScreenWidth() / 9;
-    obj.y = Root.GetScreenHeight() / 8;
+    obj.x = Resources.Get_BMP(ID_BMP_RESTART)->GetWidth() / 2;//Root.GetScreenWidth() / 9;
+    obj.y = Resources.Get_BMP(ID_BMP_RESTART)->GetHeight() / 2;//Root.GetScreenHeight() / 8;
     obj.BMP = ID_BMP_RESTART;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);

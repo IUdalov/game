@@ -199,15 +199,19 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             alive_che1_count = alive_che2_count = 0;
             players_progress = _1st;
             CheckEnable = 0;
+            Root.PutEventToQueue( 0, SE_FIELD_SHINE_LEFT, STO_FIELD);
             while(this->GetVolume())
                 ObjManager.DeleteObj(this->GetObj(0));
         }
         else if(game_part == Disposal){
             if(players_progress == _1st){
                 players_progress = _2nd;
+                Root.PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
+                Root.PutEventToQueue( 0, SE_FIELD_SHINE_RIGHT, STO_FIELD);
                 Root.PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
             }
             else if(players_progress == _2nd){
+                Root.PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
                 ClearSelector();
                 players_progress = _1st;
                 game_part = Game;
@@ -787,7 +791,7 @@ void CheckerManager::Game_Timer(void *data){
             PhChecker ch;
             ObjToChecker(ch, *objch, obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth() / 2);
             //++движение
-            Move(ch, (double)(*((int*)data)));
+            Move(ch, 1./(double)(*((int*)data)));
             //--
             // ++столкновения со стенами
             /*PhWall wall;
