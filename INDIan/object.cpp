@@ -17,6 +17,8 @@ CObj::CObj(void){
     isTurned = false;
     Width = 0;
     Height = 0;
+    geo.pre_processor = NULL;
+    geo.type = GEO_NONE;
 }
 CObj::CObj(const CObj& str){
     x = str.x;
@@ -31,6 +33,8 @@ CObj::CObj(const CObj& str){
     isTurned = str.isTurned;
     Width = str.Width;
     Height = str.Height;
+    geo.pre_processor = str.geo.pre_processor;
+    geo.type = str.geo.type;
 }
 Rect CObj::GetRect(){
     Rect r;
@@ -96,6 +100,8 @@ CObj& CObj::operator=(const CObj& str){
         LevelOfDraw = str.LevelOfDraw;
         Width = str.Width;
         Height = str.Height;
+        geo.pre_processor = str.geo.pre_processor;
+        geo.type = str.geo.type;
         return *this;
 }
 Model_Objects* CObj::GetLpModel(void){

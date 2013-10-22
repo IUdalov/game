@@ -51,7 +51,7 @@ private:
     void HideGameMenu();
 
 private:
-    void MouseClick();
+    void MouseClick(IDn, sMouse);
 };
 
 #endif // MENU_H

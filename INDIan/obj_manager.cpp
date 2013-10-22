@@ -205,10 +205,9 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     if(!Grid)
         return false;
 
-    CObj* obj=&(DimOfObj[ID.ID]->Obj);
+    CObj obj = DimOfObj[ID.ID]->Obj;
 
-    Model_Objects* MO=obj->lpModel;
-    pntRect rect = obj->GetPntRect();
+    pntRect rect = obj.GetPntRect();
 
     int left = (MinXPntRect(rect) / (int)Width_Cell);
     int right = (MaxXPntRect(rect) / (int)Width_Cell);
@@ -222,53 +221,53 @@ bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
     if( (left > (int)Width_Grid) || (top > (int)Height_Grid) || (bottom < 0) || (right < 0))
         return false;
 
-    Cell copy;
+    vector<IDn> v_id;
+    vector<CObj> v_obj;
 
     for( int i = left; i <= right; i++){
         for( int j = top; j <= bottom; j++){
-            if(SendHit){
-                for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
-                    IDn ID2 = Grid[i][j].Objects[k];
-                    CObj* obj2 = &(DimOfObj[ID2.ID]->Obj);
-                    Model_Objects* MO2 = obj2->lpModel;
-
-                    bool next = false;
-                    for( int p=0;p < (int)copy.Objects.size(); p++){
-                        if( (copy.Objects[p].ID == ID2.ID) && (copy.Objects[p].DateBorn == ID2.DateBorn))
-                            next = true;
-                        if(next)
-                            break;
-                    }
-                    if(next)
-                        continue;
-
-
-                    copy.Objects.push_back(ID2);
-
-                    IDn* data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO->GetSubType());
-                    *data = ID;
-                    data++;
-                    *data = ID2;
-                    if(MO != MO2){
-                        data = (IDn*)Root.PutEventToQueue(sizeof(IDn)*2, ME_HITEVENT,MO2->GetSubType());
-                        data = &ID2;
-                        data++;
-                        data = &ID;
-                    }
-                }
-            }
             unsigned int NewNum = Grid[i][j].Objects.size();
-            unsigned int LevDr = DimOfObj[ID.ID]->Obj.LevelOfDraw;
+            unsigned int LevDr = obj.LevelOfDraw;
+            bool check_level_draw = false;
             for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
-                if(DimOfObj[Grid[i][j].Objects[k].ID]->Obj.LevelOfDraw>LevDr){
+                IDn ID2 = Grid[i][j].Objects[k];
+                CObj obj2 = DimOfObj[ID2.ID]->Obj;
+
+                if(SendHit){
+                    if(!find_in_vector(v_id, ID2)){
+                        v_id.push_back(ID2);
+                        v_obj.push_back(obj2);
+                    }
+                }
+                if( (!check_level_draw) && (obj2.LevelOfDraw > LevDr) ){
+                    check_level_draw = true;
                     NewNum = k;
-                    break;
                 }
             }
-            Grid[i][j].Objects.insert(Grid[i][j].Objects.begin()+NewNum,ID);
+            Grid[i][j].Objects.insert(Grid[i][j].Objects.begin() + NewNum,ID);
         }
     }
-    copy.Objects.clear();
+    GeoScaner geo_scan;
+    CObj obj_for_geo = obj;
+    CObj obj2;
+    IDn ID2;
+    geo_scan.init(GST_BREP_BREP, v_obj, &obj_for_geo, sizeof(CObj));
+    GEO_SCAN_ANS gs_answer;
+    while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+        if( gs_answer == GSA_OK ){
+            obj2 = geo_scan.GetCurrElem();
+            ID2 = v_id[geo_scan.GetCurrElemNum()];
+
+            OED_Clash* data = (OED_Clash*)Root.PutEventToQueue(sizeof(OED_Clash), OE_CLASH, obj.GetSubType());
+            data->id_dest = ID;
+            data->id_src = ID2;
+            if(obj.GetSubType() != obj2.GetSubType()){
+                OED_Clash* data = (OED_Clash*)Root.PutEventToQueue(sizeof(OED_Clash), OE_CLASH, obj2.GetSubType());
+                data->id_dest = ID2;
+                data->id_src = ID;
+            }
+        }
+    }
     return true;
 }
 bool Obj_Manager::DeleteFromGrid(IDn ID){
@@ -345,6 +344,39 @@ void Obj_Manager::ChangeCrdByCamera(unsigned int& x, unsigned int& y){
     x += Camera.x;
     y += Camera.y;
 }
+void Obj_Manager::HandleMouseEvents(long mess){
+    sMouse ms = Root.GetMouseStatus();
+    vector<IDn>* vCell = GetVObjByCrd(ms.x, ms.y);
+    vector<CObj> vObj;
+    vector<IDn> vId;
+    CObj obj;
+    if((!vCell) || (!vCell->size()))
+        return;
+
+    for(int i = (int)vCell->size() - 1; i >= 0; i--)
+        if(GetObj((*vCell)[i], obj)){
+            vObj.push_back(obj);
+            vId.push_back((*vCell)[i]);
+        }
+
+    dCoord mouseCrd = {ms.x, ms.y};
+    GeoScaner geo_scan;
+    IDn id;
+    GEO_SCAN_ANS gs_answer;
+    geo_scan.init(GST_BREP_PNT, vObj, &mouseCrd, sizeof(dCoord));
+    while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+        if( gs_answer == GSA_OK ){
+            obj = geo_scan.GetCurrElem();
+            id = vId[geo_scan.GetCurrElemNum()];
+
+            OED_Mouse* data = (OED_Mouse*)Root.PutEventToQueue(sizeof(OED_Mouse), mess, obj.GetSubType());
+            data->idObj = id;
+            data->mouse = ms;
+        }
+    }
+
+}
+
 
 
 cObjectsManager::cObjectsManager():Model_Objects(0,0){
@@ -356,9 +388,24 @@ void cObjectsManager::EventsHandler(unsigned int mess,void* data){
                 ObjManager.NewDraw = true;
             ObjManager.DrawByGrid(*((unsigned int*)data));
             break;
+        case ME_MOUSECLICK:
+            ObjManager.HandleMouseEvents(OE_MOUSECLICK);
+            break;
+        case ME_MOUSEMOVE:
+            ObjManager.HandleMouseEvents(OE_MOUSEMOVE);
+            break;
         default:
             break;
     }
 }
 
+bool find_in_vector(vector<IDn>& vect, IDn elem){
+    vector<IDn>::iterator iter;
+    for(iter = vect.begin(); iter != vect.end(); iter++){
+        if(*iter == elem){
+            return true;
+        }
+    }
+    return false;
+}
 

@@ -13,6 +13,7 @@ public:
     double x,y;
     unsigned int image;
     unsigned int BMP;
+    Geo geo;
 private:
     pntRect rect;
     int Width, Height;

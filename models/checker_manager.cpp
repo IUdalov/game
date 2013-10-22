@@ -133,6 +133,8 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         this->CreateSimpleObj(&obj);
         obj.LevelOfDraw = 2;
         obj.image = 0;
+        obj.geo.type = GEO_BREP;
+        obj.geo.pre_processor = gps_for_checker;
 
         ClearSelector();
 
@@ -304,13 +306,27 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             break;
         }
         break;
+    case OE_MOUSECLICK:
+        switch(game_part){
+        case Disposal:
+            Disposal_MouseDown(((OED_Mouse*)data)->idObj,
+                                ((OED_Mouse*)data)->mouse);
+            break;
+        case Game:
+            Game_MouseDown(((OED_Mouse*)data)->idObj,
+                                ((OED_Mouse*)data)->mouse);
+            break;
+        default:
+            break;
+        }
+        break;
     case ME_MOUSECLICK:
         switch(game_part){
         case Disposal:
-            Disposal_MouseClick();
+            Disposal_MouseUp();
             break;
         case Game:
-            Game_MouseClick();
+            Game_MouseUp();
             break;
         default:
             break;
@@ -328,9 +344,9 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             break;
         }
         break;
-    case ME_HITEVENT:
-    ID = *((IDn*)data);
-    ID2 = *((IDn*)data + 1);
+    case OE_CLASH:
+    ID = ((OED_Clash*)data)->id_dest;
+    ID2 = ((OED_Clash*)data)->id_src;
     if(!ObjManager.GetObj(ID, obj))
         break;
     if(!ObjManager.GetObj(ID2, obj2))
@@ -638,40 +654,35 @@ void CheckerManager::Disposal_Timer(void *data){
         ObjManager.AddToGrid(CheckChecker, true);
     }
 }
-void CheckerManager::Disposal_MouseClick(void){
+void CheckerManager::Disposal_MouseDown(IDn id, sMouse mouse){
     CObj obj;
+    if(!ObjManager.GetObj(id, obj))
+        return;
     Coord pnt;
-    vector<IDn>* vObj;
-    Rect rect;
-    sMouse mouse;
-    mouse = Root.GetMouseStatus();
     if(NeedFlyToPos)
         return;
     if(mouse.L == S_DOWN){
-        vObj = ObjManager.GetVObjByCrd(mouse.x, mouse.y);
-        for( int i = 0; i < (int)vObj->size(); i ++){
-            ObjManager.GetObj((*vObj)[i],obj);
-            if(obj.GetSubType() != STO_CHEKERS)
-                continue;
-            if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
-                continue;
-            pnt.x = mouse.x;
-            pnt.y = mouse.y;
-            if(obj.HitPoint(pnt)){
-                CheckEnable = 1;
-                CheckChecker = (*vObj)[i];
-                ObjManager.GetObj(CheckChecker, obj);
-                int type = ((ObjChecker*)obj.GetSubStr())->type;
-                ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-                        ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
-                if((selector.busy[type] == true)
-                        && ((*vObj)[i].ID == selector.checker[type].ID)
-                        && ((*vObj)[i].DateBorn == selector.checker[type].DateBorn)){
-                    selector.busy[type] = false;
-                }
-            }
+        if(obj.GetSubType() != STO_CHEKERS)
+            return;
+        if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
+            return;
+        pnt.x = mouse.x;
+        pnt.y = mouse.y;
+        CheckEnable = 1;
+        CheckChecker = id;
+        ObjManager.GetObj(CheckChecker, obj);
+        int type = ((ObjChecker*)obj.GetSubStr())->type;
+        ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
+           ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
+        if((selector.busy[type] == true)
+                && (id == selector.checker[type])){
+            selector.busy[type] = false;
         }
     }
+}
+void CheckerManager::Disposal_MouseUp(void){
+    sMouse mouse = Root.GetMouseStatus();
+    CObj obj;
     if(mouse.L == S_UP){
         if(CheckEnable > 0){
             ObjManager.GetObj(CheckChecker,obj);
@@ -708,6 +719,7 @@ void CheckerManager::Disposal_MouseClick(void){
         CheckEnable = 0;
     }
 }
+
 void CheckerManager::Disposal_MouseMove(){
     //CObj obj;
     //sMouse mouse;
@@ -823,41 +835,38 @@ void CheckerManager::Game_Timer(void *data){
         }
     }
 }
-void CheckerManager::Game_MouseClick(void){
+void CheckerManager::Game_MouseDown(IDn id, sMouse mouse){
     CObj obj;
     Coord pnt;
-    vector<IDn>* vObj;
-    sMouse mouse;
-    mouse = Root.GetMouseStatus();
+    if(!ObjManager.GetObj(id, obj))
+        return;
     if(CurNumMoveCh || (game_part == End))
         return;
     if(mouse.L == S_DOWN){
-        vObj = ObjManager.GetVObjByCrd(mouse.x, mouse.y);
-        for( int i = 0; i < (int)vObj->size(); i ++){
-            ObjManager.GetObj((*vObj)[i],obj);
-            if(obj.GetSubType() != STO_CHEKERS)
-                continue;
-            if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
-                continue;
-            pnt.x = mouse.x;
-            pnt.y = mouse.y;
-            if(obj.HitPoint(pnt)){
-                CheckEnable = 1;
-                CheckChecker = (*vObj)[i];
-                ObjManager.GetObj(CheckChecker, obj);
-                ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-                        ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
-            }
-        }
+        if(obj.GetSubType() != STO_CHEKERS)
+            return;
+        if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
+            return;
+        pnt.x = mouse.x;
+        pnt.y = mouse.y;
+        CheckEnable = 1;
+        CheckChecker = id;
+        ObjManager.GetObj(CheckChecker, obj);
+        ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
+        ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
     }
-    else if(mouse.L == S_UP){
+}
+void CheckerManager::Game_MouseUp(){
+    CObj obj;
+    sMouse mouse = Root.GetMouseStatus();
+    if(mouse.L == S_UP){
         if(CheckEnable == 2){
             if(!arrows.size()){
                 CheckEnable = 0;
                 return;
             }
             mouse = Root.GetMouseStatus();
-            ObjManager.GetObj(CheckChecker,obj);
+            ObjManager.GetObj(CheckChecker, obj);
             ObjChecker* obj_checker = ((ObjChecker*)obj.GetSubStr());
             double coef = ( arrows.size() );
             dCoord v1 = {(double)mouse.x, (double)mouse.y}, v2 = {obj.x, obj.y};
@@ -866,7 +875,7 @@ void CheckerManager::Game_MouseClick(void){
             v1 = vect_mult_d(v1, coef);
             obj_checker->vSpeed.x = v1.x;
             obj_checker->vSpeed.y = v1.y;
-            ObjManager.ChangeObj(CheckChecker,obj);
+            ObjManager.ChangeObj(CheckChecker, obj);
             ChangeProgressAfterStop = true;
         }
         CheckEnable = 0;

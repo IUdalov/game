@@ -6,10 +6,12 @@ void Menu::InitMenuItems() {
     this->CreateSimpleObj(&obj);
     obj.image = 0;
     obj.LevelOfDraw = DRAW_MENU;
+    obj.geo.type = GEO_BREP;
 
     obj.x = Root.GetScreenWidth() / 2;
     obj.y = Root.GetScreenHeight() / 5;
     obj.BMP = ID_BMP_MENU_PLAY;
+    obj.geo.pre_processor = gps_for_menu_rect;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_MENU_PLAY] = id;
@@ -17,6 +19,7 @@ void Menu::InitMenuItems() {
     obj.x = Root.GetScreenWidth() / 2;
     obj.y = Root.GetScreenHeight() * 2 / 5;
     obj.BMP = ID_BMP_RULES;
+    obj.geo.pre_processor = gps_for_menu_rect;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_RULES] = id;
@@ -24,6 +27,7 @@ void Menu::InitMenuItems() {
     obj.x = Root.GetScreenWidth() / 2;
     obj.y = Root.GetScreenHeight() * 3 / 5;
     obj.BMP = ID_BMP_OPTIONS;
+    obj.geo.pre_processor = gps_for_menu_rect;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_OPTIONS] = id;
@@ -31,6 +35,7 @@ void Menu::InitMenuItems() {
     obj.x = Root.GetScreenWidth() / 2;
     obj.y = Root.GetScreenHeight() * 4 / 5;
     obj.BMP = ID_BMP_EXIT;
+    obj.geo.pre_processor = gps_for_menu_rect;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_EXIT] = id;
@@ -38,6 +43,7 @@ void Menu::InitMenuItems() {
     obj.x = Resources.Get_BMP(ID_BMP_BACK)->GetWidth() / 2;//Root.GetScreenWidth() / 9;
     obj.y = Root.GetScreenHeight() - Resources.Get_BMP(ID_BMP_BACK)->GetHeight() / 2;//* 7 / 8;
     obj.BMP = ID_BMP_BACK;
+    obj.geo.pre_processor = gps_for_menu_circle;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_BACK] = id;
@@ -45,6 +51,7 @@ void Menu::InitMenuItems() {
     obj.x = Root.GetScreenWidth() - Resources.Get_BMP(ID_BMP_PLAY)->GetWidth() / 2;//Root.GetScreenWidth() * 8 / 9;
     obj.y = Root.GetScreenHeight() - Resources.Get_BMP(ID_BMP_PLAY)->GetHeight() / 2;//Root.GetScreenHeight() * 7 / 8;
     obj.BMP = ID_BMP_PLAY;
+    obj.geo.pre_processor = gps_for_menu_circle;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_PLAY] = id;
@@ -52,6 +59,7 @@ void Menu::InitMenuItems() {
     obj.x = Resources.Get_BMP(ID_BMP_PAUSE)->GetWidth() / 2;//Root.GetScreenWidth() / 8;
     obj.y = Resources.Get_BMP(ID_BMP_PAUSE)->GetHeight() / 2;//Root.GetScreenHeight() / 8;
     obj.BMP = ID_BMP_PAUSE;
+    obj.geo.pre_processor = gps_for_menu_circle;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_PAUSE] = id;
@@ -59,6 +67,7 @@ void Menu::InitMenuItems() {
     obj.x = Resources.Get_BMP(ID_BMP_RESTART)->GetWidth() / 2;//Root.GetScreenWidth() / 9;
     obj.y = Resources.Get_BMP(ID_BMP_RESTART)->GetHeight() / 2;//Root.GetScreenHeight() / 8;
     obj.BMP = ID_BMP_RESTART;
+    obj.geo.pre_processor = gps_for_menu_circle;
     obj.SetRectByImage();
     ObjManager.CreateObj(obj, id);
     menuItems[ID_BMP_RESTART] = id;

@@ -86,12 +86,14 @@ public:
     bool CheckerInPartOfField(Rect rect, short part);
 
     void Disposal_Timer(void *data);
-    void Disposal_MouseClick(void);
+    void Disposal_MouseDown(IDn,sMouse);
+    void Disposal_MouseUp(void);
     void Disposal_MouseMove(void);
     void Disposal_HitChToCh(void* data);
 
     void Game_Timer(void *data);
-    void Game_MouseClick(void);
+    void Game_MouseDown(IDn,sMouse);
+    void Game_MouseUp(void);
     void Game_MouseMove(void);
     void Game_HitChToCh(void* data);
 

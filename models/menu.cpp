@@ -7,7 +7,7 @@ Menu::Menu() : Model_Objects(STO_MENU, 0), currMenu(Start) {
 Menu::~Menu(){
 }
 
-void Menu::EventsHandler(unsigned int mess, void*) {
+void Menu::EventsHandler(unsigned int mess, void* data) {
     switch(mess){
     case ME_CREATE:
     {
@@ -19,11 +19,9 @@ void Menu::EventsHandler(unsigned int mess, void*) {
         currMenu = Start;
     }
         break;
-    case ME_MOUSECLICK:
+    case OE_MOUSECLICK:
     {
-
-        MouseClick();
-
+        MouseClick(((OED_Mouse*)data)->idObj, ((OED_Mouse*)data)->mouse);
     }
         break;
     default:
@@ -42,108 +40,96 @@ void Menu::HideMenuItem(int item) {
     return;
 }
 
-void Menu::MouseClick() {
+void Menu::MouseClick(IDn objId, sMouse mouse) {
     CObj obj;
-    sMouse mouse = Root.GetMouseStatus();
+    if(!ObjManager.GetObj(objId, obj))
+        return;
+
     if(mouse.L == S_DOWN) {
-        vector<IDn>* vObj = ObjManager.GetVObjByCrd(mouse.x, mouse.y);
-        for(size_t i = 0; i < vObj->size(); i++) {
-            ObjManager.GetObj((*vObj)[i], obj);
-            switch (obj.BMP) {
+        switch (obj.BMP) {
+        case ID_BMP_MENU_PLAY:
+            HideStartMenu();
+            currMenu = Position;
+            ShowPositionMenu();
+            break;
 
-            case ID_BMP_MENU_PLAY:
-                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
-                HideStartMenu();
-                currMenu = Position;
-                ShowPositionMenu();
+        case ID_BMP_RULES:
+            HideStartMenu();
+            currMenu = Rules;
+            ShowRulesMenu();
+            break;
+
+        case ID_BMP_OPTIONS:
+            HideStartMenu();
+            currMenu = Option;
+            ShowOptionMenu();
+            break;
+
+        case ID_BMP_EXIT:
+            Root.CloseApp();
+            break;
+
+        case ID_BMP_BACK:
+            switch (currMenu) { // руки мне за это оторвать
+            case Option:
+                HideOptionMenu();
                 break;
-
-            case ID_BMP_RULES:
-                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
-                HideStartMenu();
-                currMenu = Rules;
-                ShowRulesMenu();
+            case Rules:
+                HideRulesMenu();
                 break;
-
-            case ID_BMP_OPTIONS:
-                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
-                HideStartMenu();
-                currMenu = Option;
-                ShowOptionMenu();
+            case Position:
+                HidePositionMenu();
                 break;
-
-            case ID_BMP_EXIT:
-                if(!HitRectCrd(obj.GetRect(), mouse.x, mouse.y)) return;
-                Root.CloseApp();
+            case GameSuspend:
+                HidePauseMenu();
+                Root.PutEventToQueue(0, SE_ENDGAME, STO_CHEKERS);
                 break;
-
-            case ID_BMP_BACK:
-                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
-                switch (currMenu) { // руки мне за это оторвать
-                case Option:
-                    HideOptionMenu();
-                    break;
-                case Rules:
-                    HideRulesMenu();
-                    break;
-                case Position:
-                    HidePositionMenu();
-                    break;
-                case GameSuspend:
-                    HidePauseMenu();
-                    Root.PutEventToQueue(0, SE_ENDGAME, STO_CHEKERS);
-                    break;
-                default:
-                    ;
-                }
-                currMenu = Start;
-                ShowStartMenu();
-                break;
-
-            case ID_BMP_PLAY:
-                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
-            {
-                if (currMenu == Position) {
-                    HidePositionMenu();
-                    currMenu = GameActive;
-                    GameParam* gameparam;
-                    gameparam = (GameParam*)Root.PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
-                    gameparam->FieldWidth = gameparam->FieldHeight = 8;
-                    gameparam->big_num = 4;
-                    gameparam->midle_num = 4;
-                    gameparam->small_num = 4;
-                    ShowGameMenu();
-                }
-
-                if (currMenu == GameSuspend) {
-                    HidePauseMenu();
-                    currMenu = GameActive;
-                    ShowGameMenu();
-                }
-            }
-                break;
-
-            case ID_BMP_PAUSE:
-                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
-                HideGameMenu();
-                currMenu = GameSuspend;
-                ShowPauseMenu();
-                break;
-
-            case ID_BMP_RESTART:
-                if(!HitCircleCrd(obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth()/2, mouse.x, mouse.y)) return;
-                HidePauseMenu();;
-                currMenu = GameActive;
-                ShowGameMenu();
-                Root.PutEventToQueue(0, SE_REPLAY, STO_CHEKERS);
-                break;
-
             default:
                 ;
             }
+            currMenu = Start;
+            ShowStartMenu();
+            break;
+
+        case ID_BMP_PLAY:{
+            if (currMenu == Position) {
+                HidePositionMenu();
+                currMenu = GameActive;
+                GameParam* gameparam;
+                gameparam = (GameParam*)Root.PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+                gameparam->FieldWidth = gameparam->FieldHeight = 8;
+                gameparam->big_num = 4;
+                gameparam->midle_num = 4;
+                gameparam->small_num = 4;
+                ShowGameMenu();
+            }
+
+            if (currMenu == GameSuspend) {
+                HidePauseMenu();
+                currMenu = GameActive;
+                ShowGameMenu();
+            }
+            }
+            break;
+
+        case ID_BMP_PAUSE:
+            HideGameMenu();
+            currMenu = GameSuspend;
+            ShowPauseMenu();
+            break;
+
+        case ID_BMP_RESTART:
+            HidePauseMenu();;
+            currMenu = GameActive;
+            ShowGameMenu();
+            Root.PutEventToQueue(0, SE_REPLAY, STO_CHEKERS);
+            break;
+
+        default:
+            ;
         }
-       // delete
     }
+// delete
     return;
 }
 

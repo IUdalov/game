@@ -2,6 +2,7 @@
 #define FORMULS_H
 
 #include "dependences.h"
+//#include "transport.h"
 
 #define MAX(a, b)			( (a) > (b) ? (a) : (b) )
 #define MIN(a, b)			( (a) < (b) ? (a) :(b) )
@@ -10,6 +11,11 @@
 //class Model_Objects;
 //class System_ROOT;
 //class Obj_Manager;
+
+struct sMouse{
+    short L,R,M;
+    GLuint x,y;
+};
 
 struct IDn{
     unsigned int ID;
@@ -20,7 +26,6 @@ struct IDn{
         return false;
     }
 };
-
 
 struct dCoord{
     double x,y;

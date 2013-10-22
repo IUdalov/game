@@ -1,5 +1,8 @@
 #ifndef MODELS_DECLARATIONS
 #define MODELS_DECLARATIONS
+
+#include "../INDIan/core_includes.h"
+
 enum{
     SE_STARTGAME = 101,
     SE_CREATEFIELD,
@@ -79,5 +82,10 @@ enum CheckersType{
     middle,
     small
 };
+
+
+GEO_SCAN_STATUS gps_for_menu_rect(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
+GEO_SCAN_STATUS gps_for_menu_circle(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
+GEO_SCAN_STATUS gps_for_checker(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
 
 #endif

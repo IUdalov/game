@@ -20,11 +20,6 @@ enum{
     S_DBLCLK
 };
 
-struct sMouse{
-    short L,R,M;
-    GLuint x,y;
-};
-
 class System_ROOT{
 public:
     bool Pause, DrawMode;

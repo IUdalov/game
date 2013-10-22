@@ -5,11 +5,13 @@
 #include "root.h"
 #include "models.h"
 #include "object.h"
-
+#include "geo.h"
 
 #define OS_NORMAL	 1
 #define OS_DELETE	 2
 #define OS_NOTACTUAL 3
+
+bool find_in_vector(vector<IDn>& vector, IDn elem);
 
 struct GridParam{
     unsigned int Width_Grid,Height_Grid,Width_Cell,Height_Cell;
@@ -37,6 +39,7 @@ private:
     unsigned int Width_Grid, Height_Grid, Width_Cell, Height_Cell;
 private:
     void DrawByGrid(int NumLev);
+    void HandleMouseEvents(long mess);
 public:
     bool isActual(IDn ID);
     Rect GetActualWindRect();
