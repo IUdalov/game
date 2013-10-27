@@ -5,28 +5,24 @@
 #include "../INDIan/core_includes.h"
 #include "../physics/physics.h"
 
-extern System_ROOT Root;
-extern int ScreenWidth;
-extern int ScreenHeight;
-extern cResources Resources;
-extern Obj_Manager ObjManager;
+using namespace INDIan;
 
-enum {
-    Start = 0,
-    Position,
-    Option,
-    Rules,
-    Pause,
-    GameActive,
-    GameSuspend
-};
 typedef map<int, IDn> MenuItems;
 
-class Menu : public Model_Objects {
+class Menu : public Model {
+    enum {
+        Start = 0,
+        Position,
+        Option,
+        Rules,
+        Pause,
+        GameActive,
+        GameSuspend
+    };
 public:
     Menu();
     virtual ~Menu();
-    virtual void EventsHandler(unsigned int mess, void*);
+    virtual void EventsHandler(int mess, void*);
 
 private:
     MenuItems menuItems;
@@ -51,7 +47,7 @@ private:
     void HideGameMenu();
 
 private:
-    void MouseClick(IDn, sMouse);
+    void MouseClick(IDn, SMouse);
 };
 
 #endif // MENU_H

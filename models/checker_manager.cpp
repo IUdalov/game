@@ -1,7 +1,5 @@
 #include "checker_manager.h"
 
-CheckerManager Example;
-
 #define MaxArrowsCount 15
 
 #define POINTS_FOR_BIG_CH 4
@@ -42,7 +40,7 @@ void AlignBetween( double& x, double width, double min, double max){
 }
 
 
-CheckerManager::CheckerManager() : Model_Objects( STO_CHEKERS, sizeof(ObjChecker)){
+CheckerManager::CheckerManager() : Model( STO_CHEKERS, sizeof(ObjChecker)){
     CheckEnable = 0;
     memset(&FieldRect, 0 , sizeof(Rect));
     FieldMiddle = 0;
@@ -58,28 +56,28 @@ CheckerManager::CheckerManager() : Model_Objects( STO_CHEKERS, sizeof(ObjChecker
 CheckerManager::~CheckerManager(){
 
 }
-void CheckerManager::EventsHandler(unsigned int mess, void *data){
-    CObj obj, obj2;
+void CheckerManager::EventsHandler(int mess, void *data){
+    Object obj, obj2;
     IDn ID, ID2;
     GameParam* gameparam;
     switch(mess){
     case ME_KEYDOWN:
         if(*((int*)data) == Qt::Key_Return){
-            Root.PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
+            Root::PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
         }
         else if(*((int*)data) == Qt::Key_F2){
             if(game_part == End){
-                gameparam = (GameParam*)Root.PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+                gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
                 memcpy(gameparam, &game_param, sizeof(GameParam));
             }
             else
-                Root.PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
+                Root::PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
         }
         else if(*((int*)data) == Qt::Key_Escape){
-            Root.CloseApp();
+            Root::CloseApp();
         }
         else if(*((int*)data) == Qt::Key_F1){
-            Root.PutEventToQueue( 0, SE_REPLAY, STO_CHEKERS);
+            Root::PutEventToQueue( 0, SE_REPLAY, STO_CHEKERS);
         }
         break;
     case ME_CREATE:
@@ -88,10 +86,10 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         if(!data)
             return;
         gameparam = (GameParam*)data;
-        Root.AddTimer(1);
+        Root::AddTimer(1);
 
         int *param;
-        param = (int*)Root.PutEventToQueue(sizeof(int) * 2, SE_CREATEFIELD, STO_FIELD);
+        param = (int*)Root::PutEventToQueue(sizeof(int) * 2, SE_CREATEFIELD, STO_FIELD);
         if(param){
             *param = gameparam->FieldWidth;
             *(param + 1) = gameparam->FieldHeight;
@@ -102,7 +100,7 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
     case SE_FIELDPARAM:
         FieldRect = *((Rect*)data);
         FieldMiddle = (FieldRect.right + FieldRect.left) / 2;
-        Root.PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
+        Root::PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
         break;
     case SE_INITSELECTOR:
         int yStep, xStep;
@@ -110,11 +108,11 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         switch(players_progress){
         case _1st:
             img1 = ID_BMP_BIG_CHEKER; img2 = ID_BMP_MID_CHEKER; img3 = ID_BMP_SMALL_CHEKER;
-            xStep = FieldRect.left - Resources.Get_BMP(ID_BMP_BIG_CHEKER)->GetWidth();
+            xStep = FieldRect.left - Resources::GetTile(ID_BMP_BIG_CHEKER)->GetWidth();
             break;
         case _2nd:
             img1 = ID_BMP_BIG_CHEKER2; img2 = ID_BMP_MID_CHEKER2; img3 = ID_BMP_SMALL_CHEKER2;
-            xStep = FieldRect.right + Resources.Get_BMP(ID_BMP_BIG_CHEKER2)->GetWidth();
+            xStep = FieldRect.right + Resources::GetTile(ID_BMP_BIG_CHEKER2)->GetWidth();
             break;
         default:
             return;
@@ -130,23 +128,25 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         selector.pnt[2].x = xStep;
         selector.pnt[2].y = (yStep * 5) / 2 + FieldRect.top;
 
-        this->CreateSimpleObj(&obj);
-        obj.LevelOfDraw = 2;
+        obj.subType = STO_CHEKERS;
+        obj.sizeOfSubStr = sizeof(ObjChecker);
+        obj.levelOfDraw = 2;
         obj.image = 0;
         obj.geo.type = GEO_BREP;
-        obj.geo.pre_processor = gps_for_checker;
+        obj.geo.preScaner = gps_for_checker;
 
         ClearSelector();
 
         ObjChecker* obj_ch;
         for(int i = 0 ; i < game_param.big_num; i ++){
-            obj.BMP = img1;
+            obj.tileId = img1;
             obj.SetRectByImage();
             obj.x = selector.pnt[0].x;
             obj.y = selector.pnt[0].y;
-            ObjManager.CreateObj(obj, ID);
-            ObjManager.GetObj(ID, obj);
-            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            ObjManager::CreateObj(obj, ID);
+            this->SaveObj(ID);
+            ObjManager::GetObj(ID, obj);
+            obj_ch = ((ObjChecker*)obj.subStr);
             obj_ch->master = players_progress;
             obj_ch->weight = Weight::huge;
             obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
@@ -156,13 +156,14 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             selector.big_chs.push_back(ID);
         }
         for(int i = 0 ; i < game_param.midle_num; i ++){
-            obj.BMP = img2;
+            obj.tileId = img2;
             obj.SetRectByImage();
             obj.x = selector.pnt[1].x;
             obj.y = selector.pnt[1].y;
-            ObjManager.CreateObj(obj, ID);
-            ObjManager.GetObj(ID, obj);
-            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            ObjManager::CreateObj(obj, ID);
+            this->SaveObj(ID);
+            ObjManager::GetObj(ID, obj);
+            obj_ch = ((ObjChecker*)obj.subStr);
             obj_ch->master = players_progress;
             obj_ch->weight = Weight::normal;
             obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
@@ -172,13 +173,14 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
             selector.middle_chs.push_back(ID);
         }
         for(int i = 0 ; i < game_param.small_num; i ++){
-            obj.BMP = img3;
+            obj.tileId = img3;
             obj.SetRectByImage();
             obj.x = selector.pnt[2].x;
             obj.y = selector.pnt[2].y;
-            ObjManager.CreateObj(obj, ID);
-            ObjManager.GetObj(ID, obj);
-            obj_ch = ((ObjChecker*)obj.GetSubStr());
+            ObjManager::CreateObj(obj, ID);
+            this->SaveObj(ID);
+            ObjManager::GetObj(ID, obj);
+            obj_ch = ((ObjChecker*)obj.subStr);
             obj_ch->master = players_progress;
             obj_ch->weight = Weight::low;
             obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
@@ -195,25 +197,25 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         break;
     case SE_NEXTGAMEPART:
         if(game_part == Start){
-            Root.PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
+            Root::PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
             game_part = Disposal;
             points_1st = points_2nd = 0;
             alive_che1_count = alive_che2_count = 0;
             players_progress = _1st;
             CheckEnable = 0;
-            Root.PutEventToQueue( 0, SE_FIELD_SHINE_LEFT, STO_FIELD);
+            Root::PutEventToQueue( 0, SE_FIELD_SHINE_LEFT, STO_FIELD);
             while(this->GetVolume())
-                ObjManager.DeleteObj(this->GetObj(0));
+                ObjManager::DeleteObj(this->GetObj(0));
         }
         else if(game_part == Disposal){
             if(players_progress == _1st){
                 players_progress = _2nd;
-                Root.PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
-                Root.PutEventToQueue( 0, SE_FIELD_SHINE_RIGHT, STO_FIELD);
-                Root.PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
+                Root::PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
+                Root::PutEventToQueue( 0, SE_FIELD_SHINE_RIGHT, STO_FIELD);
+                Root::PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
             }
             else if(players_progress == _2nd){
-                Root.PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
+                Root::PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
                 ClearSelector();
                 players_progress = _1st;
                 game_part = Game;
@@ -235,8 +237,8 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         }
         break;
     case SE_REPLAY:
-        Root.PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
-        gameparam = (GameParam*)Root.PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+        Root::PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
+        gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
         memcpy(gameparam, &game_param, sizeof(GameParam));
         break;
     case SE_ENDGAME:
@@ -250,31 +252,34 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         points_2nd = 0;
         alive_che1_count = 0;
         alive_che2_count = 0;
-        Root.PutEventToQueue(0, SE_DELETEFIELD, STO_FIELD);
-        while(this->GetVolume())
-            ObjManager.DeleteObj(this->GetObj(0));
+        Root::PutEventToQueue(0, SE_DELETEFIELD, STO_FIELD);
+        while(this->GetVolume()){
+            ObjManager::DeleteObj(this->GetObj(0));
+            this->DeleteObj(0);
+        }
         break;
     case ME_DRAW:
         if(*((int*)data) == 1){
-/*            obj.BMP = ID_BMP_EXAMPLE;
+/*            obj.tileId = ID_BMP_EXAMPLE;
             obj.image = 0;
             obj.SetRectByImage();
-            obj.x = Root.GetScreenWidth()/2;
-            obj.y = Root.GetScreenHeight()/2;
+            obj.x = GLWindow::GetScreenWidth()
+/2;
+            obj.y = GLWindow::GetScreenHeight()/2;
             obj.Draw();*/
             if(CheckEnable > 0){
                 {
-                CObj selector;
-                ObjManager.GetObj(CheckChecker, obj2);
-                switch(((ObjChecker*)obj2.GetSubStr())->type){
+                Object selector;
+                ObjManager::GetObj(CheckChecker, obj2);
+                switch(((ObjChecker*)obj2.subStr)->type){
                 case big:
-                    selector.BMP = ID_BMP_SELECTOR_BIG;
+                    selector.tileId = ID_BMP_SELECTOR_BIG;
                     break;
                 case middle:
-                    selector.BMP = ID_BMP_SELECTOR_MIDDLE;
+                    selector.tileId = ID_BMP_SELECTOR_MIDDLE;
                     break;
                 case small:
-                    selector.BMP = ID_BMP_SELECTOR_SMALL;
+                    selector.tileId = ID_BMP_SELECTOR_SMALL;
                     break;
                 default:
                     break;
@@ -309,12 +314,12 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
     case OE_MOUSECLICK:
         switch(game_part){
         case Disposal:
-            Disposal_MouseDown(((OED_Mouse*)data)->idObj,
-                                ((OED_Mouse*)data)->mouse);
+            Disposal_MouseDown(((OEDMouse*)data)->idObj,
+                                ((OEDMouse*)data)->mouse);
             break;
         case Game:
-            Game_MouseDown(((OED_Mouse*)data)->idObj,
-                                ((OED_Mouse*)data)->mouse);
+            Game_MouseDown(((OEDMouse*)data)->idObj,
+                                ((OEDMouse*)data)->mouse);
             break;
         default:
             break;
@@ -345,13 +350,13 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
         }
         break;
     case OE_CLASH:
-    ID = ((OED_Clash*)data)->id_dest;
-    ID2 = ((OED_Clash*)data)->id_src;
-    if(!ObjManager.GetObj(ID, obj))
+    ID = ((OEDClash*)data)->idDest;
+    ID2 = ((OEDClash*)data)->idSrc;
+    if(!ObjManager::GetObj(ID, obj))
         break;
-    if(!ObjManager.GetObj(ID2, obj2))
+    if(!ObjManager::GetObj(ID2, obj2))
         break;
-    if( obj.GetSubType() != GetSubType() || obj2.GetSubType() != GetSubType() )
+    if( obj.subType != GetSubType() || obj2.subType != GetSubType() )
         break;
     if( sqrt( pow(obj.x - obj2.x, 2.) + pow(obj.y - obj2.y, 2.) ) <= (obj.GetWidth()/2 + obj2.GetWidth()/2) ){
         switch(game_part){
@@ -368,7 +373,7 @@ void CheckerManager::EventsHandler(unsigned int mess, void *data){
     break;
     }
 }
-void CheckerManager::CreateArrow( CObj& arrow, double x_c, double y_c, double x_l,
+void CheckerManager::CreateArrow( Object& arrow, double x_c, double y_c, double x_l,
                              double y_l, double length, int max_num_arrow ){
 
     double a, b, bs, as, cs;
@@ -458,23 +463,35 @@ void CheckerManager::CreateArrow( CObj& arrow, double x_c, double y_c, double x_
     }
 }
 void CheckerManager::ClearSelector(void){
-    if(selector.busy[0])
-        ObjManager.DeleteObj(selector.checker[0]);
-    if(selector.busy[1])
-        ObjManager.DeleteObj(selector.checker[1]);
-    if(selector.busy[2])
-        ObjManager.DeleteObj(selector.checker[2]);
+    if(selector.busy[0]){
+        this->DeleteObj(selector.checker[0]);
+        ObjManager::DeleteObj(selector.checker[0]);
+    }
+    if(selector.busy[1]){
+        this->DeleteObj(selector.checker[1]);
+        ObjManager::DeleteObj(selector.checker[1]);
+    }
+    if(selector.busy[2]){
+        this->DeleteObj(selector.checker[2]);
+        ObjManager::DeleteObj(selector.checker[2]);
+    }
 
-    for(int i = 0; i < (int)selector.big_chs.size(); i++)
-        ObjManager.DeleteObj(selector.big_chs[i]);
+    for(int i = 0; i < (int)selector.big_chs.size(); i++){
+        ObjManager::DeleteObj(selector.big_chs[i]);
+        this->DeleteObj(selector.big_chs[i]);
+    }
     selector.big_chs.clear();
 
-    for(int i = 0; i < (int)selector.middle_chs.size(); i++)
-        ObjManager.DeleteObj(selector.middle_chs[i]);
+    for(int i = 0; i < (int)selector.middle_chs.size(); i++){
+        ObjManager::DeleteObj(selector.middle_chs[i]);
+        this->DeleteObj(selector.middle_chs[i]);
+    }
     selector.middle_chs.clear();
 
-    for(int i = 0; i < (int)selector.small_chs.size(); i++)
-        ObjManager.DeleteObj(selector.small_chs[i]);
+    for(int i = 0; i < (int)selector.small_chs.size(); i++){
+        ObjManager::DeleteObj(selector.small_chs[i]);
+        this->DeleteObj(selector.small_chs[i]);
+    }
     selector.small_chs.clear();
 }
 void CheckerManager::PrepareForReturn(int type){
@@ -492,7 +509,7 @@ void CheckerManager::PrepareForReturn(int type){
             selector.small_chs.push_back(id);
             break;
         }
-        ObjManager.DeleteFromGrid(id);
+        ObjManager::DeleteFromGrid(id);
     }
 }
 void CheckerManager::LocateSelector(void){
@@ -501,7 +518,7 @@ void CheckerManager::LocateSelector(void){
             selector.busy[0] = true;
             selector.checker[0] = selector.big_chs[selector.big_chs.size() - 1];
             selector.big_chs.pop_back();
-            ObjManager.AddToGrid(selector.checker[0], false);
+            ObjManager::AddToGrid(selector.checker[0], false);
         }
     }
     if(!selector.busy[1]){
@@ -509,7 +526,7 @@ void CheckerManager::LocateSelector(void){
             selector.busy[1] = true;
             selector.checker[1] = selector.middle_chs[selector.middle_chs.size() - 1];
             selector.middle_chs.pop_back();
-            ObjManager.AddToGrid(selector.checker[1], false);
+            ObjManager::AddToGrid(selector.checker[1], false);
         }
     }
     if(!selector.busy[2]){
@@ -517,7 +534,7 @@ void CheckerManager::LocateSelector(void){
             selector.busy[2] = true;
             selector.checker[2] = selector.small_chs[selector.small_chs.size() - 1];
             selector.small_chs.pop_back();
-            ObjManager.AddToGrid(selector.checker[2], false);
+            ObjManager::AddToGrid(selector.checker[2], false);
         }
     }
 }
@@ -577,7 +594,7 @@ bool CheckerManager::CheckerInPartOfField(Rect rect, short part){
     }
     return RectInRect(rect, r);
 }
-bool CheckerManager::CheckerOutRect(dCoord crd, double radius, Rect rf){
+bool CheckerManager::CheckerOutRect(DCoord crd, double radius, Rect rf){
     Rect r;
     r.left = crd.x - radius;
     r.right = crd.x + radius;
@@ -613,15 +630,15 @@ bool CheckerManager::CheckerOutRect(dCoord crd, double radius, Rect rf){
     return false;
 }
 void CheckerManager::Disposal_Timer(void *data){
-    CObj obj;
-    sMouse mouse;
-    dCoord dcrd;
+    Object obj;
+    SMouse mouse;
+    DCoord dcrd;
     if(*((int*)data) != 1)
         return;
     if(NeedFlyToPos){
-        ObjManager.GetObj(CheckChecker,obj);
-        ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-        ObjManager.DeleteFromGrid(CheckChecker);
+        ObjManager::GetObj(CheckChecker,obj);
+        ObjChecker* objch = (ObjChecker*)obj.subStr;
+        ObjManager::DeleteFromGrid(CheckChecker);
         dcrd = objch->vSpeed;
         obj.x += dcrd.x;
         obj.y += dcrd.y;
@@ -633,47 +650,44 @@ void CheckerManager::Disposal_Timer(void *data){
             selector.busy[objch->type] = true;
             selector.checker[objch->type] = CheckChecker;
         }
-        ObjManager.ChangeObj(CheckChecker, obj);
-        ObjManager.AddToGrid(CheckChecker, false);
+        ObjManager::ChangeObj(CheckChecker, obj);
+        ObjManager::AddToGrid(CheckChecker, false);
     }
     else if( CheckEnable > 0 ){
-        ObjManager.GetObj(CheckChecker,obj);
-        ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
-        mouse = Root.GetMouseStatus();
+        ObjManager::GetObj(CheckChecker,obj);
+        ObjChecker* objch = (ObjChecker*)obj.subStr;
+        mouse = Root::GetMouseStatus();
         if(sqrt( pow( obj.x - mouse.x, 2.) + pow( obj.y - mouse.y, 2.) )
             <= sqrt( pow( objch->vSpeed.x, 2.) + pow(objch->vSpeed.y, 2.)) ){
             objch->vSpeed.x = objch->vSpeed.y = 0;
             return;
         }
-        ObjManager.DeleteFromGrid(CheckChecker);
+        ObjManager::DeleteFromGrid(CheckChecker);
         objch->vSpeed.x = (mouse.x - obj.x) / 10;
         objch->vSpeed.y = (mouse.y - obj.y) / 10;
         obj.x += objch->vSpeed.x;
         obj.y += objch->vSpeed.y;
-        ObjManager.ChangeObj(CheckChecker, obj);
-        ObjManager.AddToGrid(CheckChecker, true);
+        ObjManager::ChangeObj(CheckChecker, obj);
+        ObjManager::AddToGrid(CheckChecker, true);
     }
 }
-void CheckerManager::Disposal_MouseDown(IDn id, sMouse mouse){
-    CObj obj;
-    if(!ObjManager.GetObj(id, obj))
+void CheckerManager::Disposal_MouseDown(IDn id, SMouse mouse){
+    Object obj;
+    if(!ObjManager::GetObj(id, obj))
         return;
-    Coord pnt;
     if(NeedFlyToPos)
         return;
-    if(mouse.L == S_DOWN){
-        if(obj.GetSubType() != STO_CHEKERS)
+    if(mouse.L == Root::S_DOWN){
+        if(obj.subType != STO_CHEKERS)
             return;
-        if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
+        if(((ObjChecker*)obj.subStr)->master != players_progress)
             return;
-        pnt.x = mouse.x;
-        pnt.y = mouse.y;
         CheckEnable = 1;
         CheckChecker = id;
-        ObjManager.GetObj(CheckChecker, obj);
-        int type = ((ObjChecker*)obj.GetSubStr())->type;
-        ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-           ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
+        ObjManager::GetObj(CheckChecker, obj);
+        int type = ((ObjChecker*)obj.subStr)->type;
+        ((ObjChecker*)obj.subStr)->vSpeed.x =
+           ((ObjChecker*)obj.subStr)->vSpeed.y = 0;
         if((selector.busy[type] == true)
                 && (id == selector.checker[type])){
             selector.busy[type] = false;
@@ -681,20 +695,20 @@ void CheckerManager::Disposal_MouseDown(IDn id, sMouse mouse){
     }
 }
 void CheckerManager::Disposal_MouseUp(void){
-    sMouse mouse = Root.GetMouseStatus();
-    CObj obj;
-    if(mouse.L == S_UP){
+    SMouse mouse = Root::GetMouseStatus();
+    Object obj;
+    if(mouse.L == Root::S_UP){
         if(CheckEnable > 0){
-            ObjManager.GetObj(CheckChecker,obj);
-            ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
+            ObjManager::GetObj(CheckChecker,obj);
+            ObjChecker* objch = (ObjChecker*)obj.subStr;
             objch->vSpeed.x = 0;
             objch->vSpeed.y = 0;
             Rect r = obj.GetRect();
-            if(CheckerInPartOfField(r, ((ObjChecker*)obj.GetSubStr())->master)){
+            if(CheckerInPartOfField(r, ((ObjChecker*)obj.subStr)->master)){
                 LocateSelector();
             }
             else{
-                switch(((ObjChecker*)obj.GetSubStr())->type){
+                switch(((ObjChecker*)obj.subStr)->type){
                 case big:
                     point_to = selector.pnt[0];
                     break;
@@ -707,11 +721,11 @@ void CheckerManager::Disposal_MouseUp(void){
                 default:
                     break;
                 }
-                ObjManager.GetObj(CheckChecker,obj);
-                ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
+                ObjManager::GetObj(CheckChecker,obj);
+                ObjChecker* objch = (ObjChecker*)obj.subStr;
                 objch->vSpeed.x = (point_to.x - obj.x) / 10;
                 objch->vSpeed.y = (point_to.y - obj.y) / 10;
-                int type = ((ObjChecker*)obj.GetSubStr())->type;
+                int type = ((ObjChecker*)obj.subStr)->type;
                 NeedFlyToPos = true;
                 PrepareForReturn(type);
             }
@@ -721,38 +735,38 @@ void CheckerManager::Disposal_MouseUp(void){
 }
 
 void CheckerManager::Disposal_MouseMove(){
-    //CObj obj;
-    //sMouse mouse;
+    //Object obj;
+    //SMouse mouse;
     if(CheckEnable > 0){
         //тут был пересчет скорости выбраной шашки
     }
 }
 void CheckerManager::Disposal_HitChToCh(void *data){
-    CObj obj, obj2;
+    Object obj, obj2;
     IDn ID = *((IDn*)data);
     IDn ID2 = *((IDn*)data + 1);
 
     ObjChecker* ch1;
-    ObjManager.GetObj(ID, obj);
-    ObjManager.GetObj(ID2, obj2);
-    ObjManager.DeleteFromGrid(ID);
-    ch1 = ((ObjChecker*)obj.GetSubStr());
-    //ch2 = ((ObjChecker*)obj2.GetSubStr());
-    int t_length = Resources.Get_BMP(obj.BMP)->GetWidth() / 2 + Resources.Get_BMP(obj2.BMP)->GetWidth() / 2;
+    ObjManager::GetObj(ID, obj);
+    ObjManager::GetObj(ID2, obj2);
+    ObjManager::DeleteFromGrid(ID);
+    ch1 = ((ObjChecker*)obj.subStr);
+    //ch2 = ((ObjChecker*)obj2.subStr);
+    int t_length = Resources::GetTile(obj.tileId)->GetWidth() / 2 + Resources::GetTile(obj2.tileId)->GetWidth() / 2;
     int r_length = sqrt( pow( obj.x - obj2.x, 2.) + pow( obj.y - obj2.y, 2.) );
     double d = r_length - t_length;
-    dCoord c1, c2;
+    DCoord c1, c2;
     c1.x = obj.x; c1.y = obj.y;
     c2.x = obj2.x; c2.y = obj2.y;
-    dCoord v = vect_min(c2,c1);
+    DCoord v = vect_min(c2,c1);
     ch1->vSpeed = v;
     ch1->vSpeed = vect_norm(ch1->vSpeed);
     ch1->vSpeed = vect_mult_d(ch1->vSpeed, d);
     obj.x += ch1->vSpeed.x;
     obj.y += ch1->vSpeed.y;
     ch1->vSpeed = vect_null();
-    ObjManager.ChangeObj(ID, obj);
-    ObjManager.AddToGrid(ID, true);
+    ObjManager::ChangeObj(ID, obj);
+    ObjManager::AddToGrid(ID, true);
 }
 
 
@@ -760,16 +774,16 @@ void CheckerManager::Disposal_HitChToCh(void *data){
 
 
 void CheckerManager::Game_Timer(void *data){
-    CObj obj;
+    Object obj;
     if(*((int*)data) == 1){
         CurNumMoveCh = 0;
         for( int i = 0; i < (int)this->GetVolume(); i ++){
-            ObjManager.GetObj(this->GetObj(i),obj);
-            ObjChecker* objch = (ObjChecker*)obj.GetSubStr();
+            ObjManager::GetObj(this->GetObj(i),obj);
+            ObjChecker* objch = (ObjChecker*)obj.subStr;
             if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0)
                     && (objch->angle_speed == 0.)){
-                dCoord crd = {obj.x, obj.y};
-                if(!CheckerOutRect(crd, Resources.Get_BMP(obj.BMP)->GetWidth()/2, FieldRect)){
+                DCoord crd = {obj.x, obj.y};
+                if(!CheckerOutRect(crd, Resources::GetTile(obj.tileId)->GetWidth()/2, FieldRect)){
                     int points;
                     switch(objch->type){
                     case big:
@@ -794,28 +808,31 @@ void CheckerManager::Game_Timer(void *data){
                     default:
                         break;
                     }
-                    ObjManager.DeleteObj(this->GetObj(i));
+                    ObjManager::DeleteObj(this->GetObj(i));
+                    this->DeleteObj(this->GetObj(i));
                 }
                 continue;
             }
             CurNumMoveCh++;
-            ObjManager.DeleteFromGrid(this->GetObj(i));
+            ObjManager::DeleteFromGrid(this->GetObj(i));
             PhChecker ch;
-            ObjToChecker(ch, *objch, obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth() / 2);
+            ObjToChecker(ch, *objch, obj.x, obj.y, Resources::GetTile(obj.tileId)->GetWidth() / 2);
             //++движение
             Move(ch, 1./(double)(*((int*)data)));
             //--
             // ++столкновения со стенами
             /*PhWall wall;
             wall.spring = Spring::normal;
-            if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > Root.GetScreenWidth()) ){
-                AlignBetween(obj.x, obj.GetWidth()/2, 0, Root.GetScreenWidth());
+            if( ((obj.x - obj.GetWidth() / 2) < 0) || ( (obj.x + obj.GetWidth() / 2) > GLWindow::GetScreenWidth()
+) ){
+                AlignBetween(obj.x, obj.GetWidth()/2, 0, GLWindow::GetScreenWidth()
+);
                 ObjToChecker(ch, *objch, obj.x, obj.y);
                 wall.phi = State::vertical;
                 Clash(ch, wall);
             }
-            if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > Root.GetScreenHeight()) ){
-                AlignBetween(obj.y, obj.GetHeight() / 2, 0, Root.GetScreenHeight());
+            if( ((obj.y - obj.GetHeight() / 2) < 0) || ((obj.y + obj.GetHeight() / 2) > GLWindow::GetScreenHeight()) ){
+                AlignBetween(obj.y, obj.GetHeight() / 2, 0, GLWindow::GetScreenHeight());
                 ObjToChecker(ch, *objch, obj.x, obj.y);
                 wall.phi = State::horizontal;
                 Clash(ch, wall);
@@ -826,74 +843,71 @@ void CheckerManager::Game_Timer(void *data){
                 objch->angle = RoundConPi(objch->angle);
                 obj.TurnImage(objch->angle);
             }
-            ObjManager.ChangeObj(this->GetObj(i), obj);
-            ObjManager.AddToGrid(this->GetObj(i), true);
+            ObjManager::ChangeObj(this->GetObj(i), obj);
+            ObjManager::AddToGrid(this->GetObj(i), true);
         }
         if((!CurNumMoveCh) && ChangeProgressAfterStop){
-            Root.PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
+            Root::PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
             ChangeProgressAfterStop = false;
         }
     }
 }
-void CheckerManager::Game_MouseDown(IDn id, sMouse mouse){
-    CObj obj;
-    Coord pnt;
-    if(!ObjManager.GetObj(id, obj))
+void CheckerManager::Game_MouseDown(IDn id, SMouse mouse){
+    Object obj;
+    if(!ObjManager::GetObj(id, obj))
         return;
     if(CurNumMoveCh || (game_part == End))
         return;
-    if(mouse.L == S_DOWN){
-        if(obj.GetSubType() != STO_CHEKERS)
+    if(mouse.L == Root::S_DOWN){
+        if(obj.subType != STO_CHEKERS)
             return;
-        if(((ObjChecker*)obj.GetSubStr())->master != players_progress)
+        if(((ObjChecker*)obj.subStr)->master != players_progress)
             return;
-        pnt.x = mouse.x;
-        pnt.y = mouse.y;
         CheckEnable = 1;
         CheckChecker = id;
-        ObjManager.GetObj(CheckChecker, obj);
-        ((ObjChecker*)obj.GetSubStr())->vSpeed.x =
-        ((ObjChecker*)obj.GetSubStr())->vSpeed.y = 0;
+        ObjManager::GetObj(CheckChecker, obj);
+        ((ObjChecker*)obj.subStr)->vSpeed.x =
+        ((ObjChecker*)obj.subStr)->vSpeed.y = 0;
     }
 }
 void CheckerManager::Game_MouseUp(){
-    CObj obj;
-    sMouse mouse = Root.GetMouseStatus();
-    if(mouse.L == S_UP){
+    Object obj;
+    SMouse mouse = Root::GetMouseStatus();
+    if(mouse.L == Root::S_UP){
         if(CheckEnable == 2){
             if(!arrows.size()){
                 CheckEnable = 0;
                 return;
             }
-            mouse = Root.GetMouseStatus();
-            ObjManager.GetObj(CheckChecker, obj);
-            ObjChecker* obj_checker = ((ObjChecker*)obj.GetSubStr());
+            mouse = Root::GetMouseStatus();
+            ObjManager::GetObj(CheckChecker, obj);
+            ObjChecker* obj_checker = ((ObjChecker*)obj.subStr);
             double coef = ( arrows.size() );
-            dCoord v1 = {(double)mouse.x, (double)mouse.y}, v2 = {obj.x, obj.y};
+            DCoord v1 = {(double)mouse.x, (double)mouse.y}, v2 = {obj.x, obj.y};
             v1 = vect_min(v1, v2);
             v1 = vect_norm(v1);
             v1 = vect_mult_d(v1, coef);
             obj_checker->vSpeed.x = v1.x;
             obj_checker->vSpeed.y = v1.y;
-            ObjManager.ChangeObj(CheckChecker, obj);
+            ObjManager::ChangeObj(CheckChecker, obj);
             ChangeProgressAfterStop = true;
         }
         CheckEnable = 0;
     }
 }
 void CheckerManager::Game_MouseMove(){
-    CObj obj;
-    sMouse mouse;
+    Object obj;
+    SMouse mouse;
     if(game_part == End)
             return;
     if(CheckEnable > 0){
-        CObj arrow;
-        arrow.BMP = ID_BMP_ARROW;
+        Object arrow;
+        arrow.tileId = ID_BMP_ARROW;
         arrow.image = 0;
         arrow.SetRectByImage();
 
-        mouse = Root.GetMouseStatus();
-        ObjManager.GetObj(CheckChecker,obj);
+        mouse = Root::GetMouseStatus();
+        ObjManager::GetObj(CheckChecker,obj);
         int xr, yr;
         xr = mouse.x - obj.x;
         yr = mouse.y - obj.y;
@@ -907,49 +921,49 @@ void CheckerManager::Game_MouseMove(){
     }
 }
 void CheckerManager::Game_HitChToCh(void* data){
-    CObj obj, obj2;
+    Object obj, obj2;
     IDn ID = *((IDn*)data);
     IDn ID2 = *((IDn*)data + 1);
-    ObjManager.GetObj(ID, obj);
-    ObjManager.GetObj(ID2, obj2);
-    ObjManager.DeleteFromGrid(ID);
-    dCoord v1,v2, v3;
+    ObjManager::GetObj(ID, obj);
+    ObjManager::GetObj(ID2, obj2);
+    ObjManager::DeleteFromGrid(ID);
+    DCoord v1,v2, v3;
     v1.x = obj.x; v1.y = obj.y;
     v2.x = obj2.x; v2.y = obj2.y;
     v3 = vect_min(v1, v2);
     v3 = vect_norm(v3);
-    v3 = vect_mult_d(v3, Resources.Get_BMP(obj.BMP)->GetWidth() / 2 + Resources.Get_BMP(obj2.BMP)->GetWidth() / 2);
+    v3 = vect_mult_d(v3, Resources::GetTile(obj.tileId)->GetWidth() / 2 + Resources::GetTile(obj2.tileId)->GetWidth() / 2);
     v3 = vect_sum(v2, v3);
     obj.x = v3.x;
     obj.y = v3.y;
-    ObjManager.ChangeObj(ID, obj);
-    ObjManager.AddToGrid(ID, false);
+    ObjManager::ChangeObj(ID, obj);
+    ObjManager::AddToGrid(ID, false);
     PhChecker ch1, ch2;
-    ObjToChecker( ch1, *((ObjChecker*)obj.GetSubStr()),
-                  obj.x, obj.y, Resources.Get_BMP(obj.BMP)->GetWidth() / 2 );
-    ObjToChecker( ch2, *((ObjChecker*)obj2.GetSubStr()),
-                  obj2.x, obj2.y, Resources.Get_BMP(obj2.BMP)->GetWidth() / 2);
+    ObjToChecker( ch1, *((ObjChecker*)obj.subStr),
+                  obj.x, obj.y, Resources::GetTile(obj.tileId)->GetWidth() / 2 );
+    ObjToChecker( ch2, *((ObjChecker*)obj2.subStr),
+                  obj2.x, obj2.y, Resources::GetTile(obj2.tileId)->GetWidth() / 2);
     Clash(ch1, ch2);
-    CheckerToObj( ch1, *((ObjChecker*)obj.GetSubStr()), obj.x, obj.y );
-    CheckerToObj( ch2, *((ObjChecker*)obj2.GetSubStr()), obj2.x, obj2.y );
+    CheckerToObj( ch1, *((ObjChecker*)obj.subStr), obj.x, obj.y );
+    CheckerToObj( ch2, *((ObjChecker*)obj2.subStr), obj2.x, obj2.y );
 
     //костыль чтоб крутилось
-    //((ObjChecker*)obj.GetSubStr())->angle_speed = M_PI /10;
+    //((ObjChecker*)obj.subStr)->angle_speed = M_PI /10;
     //
-    if(((ObjChecker*)obj.GetSubStr())->angle)
-        obj.TurnImage(((ObjChecker*)obj.GetSubStr())->angle);
-    if(((ObjChecker*)obj2.GetSubStr())->angle)
-        obj.TurnImage(((ObjChecker*)obj2.GetSubStr())->angle);
-    ObjManager.ChangeObj(ID, obj);
-    ObjManager.ChangeObj(ID2, obj2);
+    if(((ObjChecker*)obj.subStr)->angle)
+        obj.TurnImage(((ObjChecker*)obj.subStr)->angle);
+    if(((ObjChecker*)obj2.subStr)->angle)
+        obj.TurnImage(((ObjChecker*)obj2.subStr)->angle);
+    ObjManager::ChangeObj(ID, obj);
+    ObjManager::ChangeObj(ID2, obj2);
 }
 
 void CheckerManager::RecalcActualAliveCheCount(){
-    CObj obj;
+    Object obj;
     alive_che1_count = alive_che2_count = 0;
     for( int i = 0; i < (int)this->GetVolume(); i++){
-        if(ObjManager.GetObj(this->GetObj(i), obj)){
-            switch(((ObjChecker*)obj.GetSubStr())->master){
+        if(ObjManager::GetObj(this->GetObj(i), obj)){
+            switch(((ObjChecker*)obj.subStr)->master){
             case _1st:
                 alive_che1_count++;
                 break;

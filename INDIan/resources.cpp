@@ -1,68 +1,82 @@
 #include "resources.h"
 
-cResources Resources;
 
-cResources::cResources(){ fail = false; BmpResCount = 0;}
-cResources::~cResources(){}
-void cResources::EndBmpSystem(void){
-    for(unsigned int i=0;i<BmpDim.size();i++)
-        if(BmpDim[i])
-            delete BmpDim[i];
-    BmpDim.clear();
-}
-void cResources::Add_BMP(unsigned int ID_BMP, QString file_name, QString mask_filename, unsigned int Volume, unsigned int colums, unsigned int lines){
-    if(ID_BMP < 1 || ID_BMP >= (unsigned int)BmpResCount)
-        return;
-    xBmp* New;
-    if(BmpDim[ID_BMP]){
-        New = BmpDim[ID_BMP];
-    }
-    else{
-        BmpDim[ID_BMP] = New = new xBmp;
-    }
-/*    if((BmpDim.size() > ID_BMP) && BmpDim[ID_BMP])
-        New = BmpDim[ID_BMP];
-    else{
-        New = new xBmp;
-        if(BmpDim.size() <= ID_BMP)
-            BmpDim.push_back(New);
-        else
-            BmpDim[ID_BMP] = New;
-    }*/
-    if(!New->Create(file_name,mask_filename,Volume,colums,lines)){
-        delete New;
-        New = NULL;
-        fail = true;
-        BmpDim[ID_BMP] = NULL;
-    }
-}
-bool cResources::StartBmpSystem(void){
-    EndBmpSystem();
-//    BmpDim.resize(1);
-//    for(unsigned int i = 0 ; i < BmpDim.size(); i++)
-//        BmpDim[i] = NULL;
-    AddBmpFiles();
-    return !fail;
-}
-bool cResources::Init_Resource(void){
-    if(!StartBmpSystem())
-        return false;
-    return true;
-}
-xBmp* cResources::Get_BMP(unsigned int num){
-    if(num < 1 || num >= (unsigned int)BmpResCount)
-        return NULL;
-    return	BmpDim[num];
-}
-int cResources::GetBmpCount(){
-    return BmpDim.size();
-}
-void cResources::DisResources(){
-    EndBmpSystem();
-}
-void cResources::SetBmpCount(int size){
-    BmpResCount = size;
-    BmpDim.resize(BmpResCount, NULL);
-}
+namespace INDIan{
+    namespace Resources{
+        vector<Tile*> tileDim;
+        bool fail = false;
+        int tilesResCount = 0;
+        void (*UserTilesLoader)(void) = NULL;
 
+        void EndTileSystem(void){
+            for(int i = 0; i < (int)tileDim.size(); i++)
+                if(tileDim[i])
+                    delete tileDim[i];
+            tileDim.clear();
+        }
+        void AddTile(int idTile, QString fileName, QString maskFileName, int volume, int colums, int lines){
+            if(idTile < 1 || idTile >= (int)tilesResCount)
+                return;
+            Tile* New;
+            if(tileDim[idTile]){
+                New = tileDim[idTile];
+            }
+            else{
+                tileDim[idTile] = New = new Tile;
+            }
+            if(!New->Create(fileName, maskFileName,volume,colums,lines)){
+                delete New;
+                New = NULL;
+                fail = true;
+                tileDim[idTile] = NULL;
+            }
+        }
+        bool StartTileSystem(void){
+            EndTileSystem();
+            if(UserTilesLoader)
+                UserTilesLoader();
+            return !fail;
+        }
+        bool InitResource(void){
+            if(!StartTileSystem())
+                return false;
+            return true;
+        }
+        Tile* GetTile( int num){
+            if(num < 1 || num >= tilesResCount)
+                return NULL;
+            return	tileDim[num];
+        }
+        int GetTileCount(){
+            return tileDim.size();
+        }
+        void DisableResources(){
+            EndTileSystem();
+        }
+        void SetTileCount(int size){
+            tilesResCount = size;
+            tileDim.resize(tilesResCount, NULL);
+        }
 
+        class ResourcesModel : public Model{
+        public:
+            ResourcesModel() : Model(0, 0){
+                Root::AccessModel(this);
+            }
+            ~ResourcesModel(){
+            }
+            void EventsHandler(int mess,void* data){
+                switch(mess){
+                case ME_CREATE:
+                    InitResource();
+                    break;
+                case ME_DESTROY:
+                    DisableResources();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }ResModel;
+    }
+}

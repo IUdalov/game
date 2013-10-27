@@ -1,49 +1,46 @@
 #include "models.h"
 
-vector<Model_Objects*> DimOfModels;
-
-void Model_Objects::Destroy(unsigned int num){
-    ObjId.erase(ObjId.begin()+num);
-}
-void Model_Objects::Plus(IDn ID){
-    ObjId.push_back(ID);
-}
-void Model_Objects::DeleteObj(IDn ID){
-    for(unsigned int i = 0; i < ObjId.size(); i++){
-        if((ObjId[i].ID == ID.ID)&&(ObjId[i].DateBorn == ID.DateBorn)){
-            Destroy(i);
-            return;
+namespace INDIan{
+    void Model::Destroy(int num){
+        objId.erase(objId.begin()+num);
+    }
+    void Model::DeleteObj(IDn ID){
+        for(int i = 0; i < (int)objId.size(); i++){
+            if(objId[i] == ID){
+                Destroy(i);
+                return;
+            }
         }
     }
+    void Model::DeleteObj(int i){
+        if( (i >= 0) && (i < (int)objId.size())){
+           Destroy(i);
+        }
+    }
+    int Model::SaveObj(IDn ID){
+        objId.push_back(ID);
+        return objId.size() - 1;
+    }
+    Model::Model(int _subType,int _sizeOfSubStr){
+        subType = _subType;
+        sizeOfSubStr = _sizeOfSubStr;
+        onlyDraw = notPaused = false;
+    }
+    Model::~Model(void){
+        objId.clear();
+    }
+    void Model::EventsHandler(int mess,void* data){
+    }
+    int Model::GetVolume(void){
+        return objId.size();
+    }
+    int Model::GetSubType(){
+        return subType;
+    }
+    IDn Model::operator[](int num){
+        return objId[num];
+    }
+    IDn Model::GetObj(int num){
+        return objId[num];
+    }
 }
-void Model_Objects::AddObj(IDn ID){
-    Plus(ID);
-}
-Model_Objects::Model_Objects(unsigned int _SubType,int _SizeOfSubStr){
-    SubType = _SubType;
-    SizeOfSubStr = _SizeOfSubStr;
-    OnlyDraw = NotPaused = false;
-    DimOfModels.push_back(this);
-}
-Model_Objects::~Model_Objects(void){
-    ObjId.clear();
-}
-void Model_Objects::CreateSimpleObj(CObj* obj){
-    obj->lpModel = this;
-    obj->SubType = SubType;
-}
-void Model_Objects::EventsHandler(unsigned int mess,void* data){
-}
-unsigned int Model_Objects::GetVolume(void){
-    return ObjId.size();
-}
-unsigned int Model_Objects::GetSubType(){
-    return SubType;
-}
-IDn Model_Objects::operator[](unsigned int num){
-    return ObjId[num];
-}
-IDn Model_Objects::GetObj(unsigned int num){
-    return ObjId[num];
-}
-

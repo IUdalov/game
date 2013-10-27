@@ -1,18 +1,17 @@
 #include "menu.h"
 
-Menu menu;
-
-Menu::Menu() : Model_Objects(STO_MENU, 0), currMenu(Start) {
+Menu::Menu() : Model(STO_MENU, 0), currMenu(Start) {
 }
 Menu::~Menu(){
 }
 
-void Menu::EventsHandler(unsigned int mess, void* data) {
+void Menu::EventsHandler(int mess, void* data) {
     switch(mess){
     case ME_CREATE:
     {
-        ObjManager.ReBuildGrid(Root.GetScreenWidth() / 50 + 1, Root.GetScreenHeight() / 50 + 1, 50, 50, 0);
-        Root.NumLevelDraw = DRAW_LEVELS;
+        ObjManager::ReBuildGrid(GLWindow::GetScreenWidth() / 50 + 1,
+                                GLWindow::GetScreenHeight() / 50 + 1, 50, 50, 0);
+        Root::numLevelDraw = DRAW_LEVELS;
 
         InitMenuItems();
         ShowStartMenu();
@@ -21,7 +20,7 @@ void Menu::EventsHandler(unsigned int mess, void* data) {
         break;
     case OE_MOUSECLICK:
     {
-        MouseClick(((OED_Mouse*)data)->idObj, ((OED_Mouse*)data)->mouse);
+        MouseClick(((OEDMouse*)data)->idObj, ((OEDMouse*)data)->mouse);
     }
         break;
     default:
@@ -31,22 +30,22 @@ void Menu::EventsHandler(unsigned int mess, void* data) {
 }
 
 void Menu::ShowMenuItem(int item) {
-     ObjManager.AddToGrid((*menuItems.find(item)).second, false);
+     ObjManager::AddToGrid((*menuItems.find(item)).second, false);
      return;
 }
 
 void Menu::HideMenuItem(int item) {
-    ObjManager.DeleteFromGrid((*menuItems.find(item)).second);
+    ObjManager::DeleteFromGrid((*menuItems.find(item)).second);
     return;
 }
 
-void Menu::MouseClick(IDn objId, sMouse mouse) {
-    CObj obj;
-    if(!ObjManager.GetObj(objId, obj))
+void Menu::MouseClick(IDn objId, SMouse mouse) {
+    Object obj;
+    if(!ObjManager::GetObj(objId, obj))
         return;
 
-    if(mouse.L == S_DOWN) {
-        switch (obj.BMP) {
+    if(mouse.L == Root::S_DOWN) {
+        switch (obj.tileId) {
         case ID_BMP_MENU_PLAY:
             HideStartMenu();
             currMenu = Position;
@@ -66,7 +65,7 @@ void Menu::MouseClick(IDn objId, sMouse mouse) {
             break;
 
         case ID_BMP_EXIT:
-            Root.CloseApp();
+            Root::CloseApp();
             break;
 
         case ID_BMP_BACK:
@@ -82,7 +81,7 @@ void Menu::MouseClick(IDn objId, sMouse mouse) {
                 break;
             case GameSuspend:
                 HidePauseMenu();
-                Root.PutEventToQueue(0, SE_ENDGAME, STO_CHEKERS);
+                Root::PutEventToQueue(0, SE_ENDGAME, STO_CHEKERS);
                 break;
             default:
                 ;
@@ -96,7 +95,7 @@ void Menu::MouseClick(IDn objId, sMouse mouse) {
                 HidePositionMenu();
                 currMenu = GameActive;
                 GameParam* gameparam;
-                gameparam = (GameParam*)Root.PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+                gameparam = (GameParam*)Root::PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
                 gameparam->FieldWidth = gameparam->FieldHeight = 8;
                 gameparam->big_num = 4;
                 gameparam->midle_num = 4;
@@ -122,7 +121,7 @@ void Menu::MouseClick(IDn objId, sMouse mouse) {
             HidePauseMenu();;
             currMenu = GameActive;
             ShowGameMenu();
-            Root.PutEventToQueue(0, SE_REPLAY, STO_CHEKERS);
+            Root::PutEventToQueue(0, SE_REPLAY, STO_CHEKERS);
             break;
 
         default:

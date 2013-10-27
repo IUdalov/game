@@ -1,74 +1,40 @@
 #ifndef OBJ_MANAGER_H
 #define OBJ_MANAGER_H
 
-#include "dependences.h"
-#include "root.h"
-#include "models.h"
-#include "object.h"
+//#include "dependences.h"
+//#include "models.h"
+//#include "object.h"
 #include "geo.h"
-
-#define OS_NORMAL	 1
-#define OS_DELETE	 2
-#define OS_NOTACTUAL 3
-
-bool find_in_vector(vector<IDn>& vector, IDn elem);
-
-struct GridParam{
-    unsigned int Width_Grid,Height_Grid,Width_Cell,Height_Cell;
-    Cell** lpGrid;
-};
-struct ObjRoom{
-    CObj		Obj;
-    CObj	 OldObj;
-    unsigned int	 Status;
-    bool	WasDraw;
-    unsigned int  DateBorn;
-};
-
-class Obj_Manager{
-public:
-    Coord Camera;
-private:
-    bool StageDraw;
-    vector<ObjRoom*> DimOfObj;
-    vector<unsigned int>	 DimOfDel;
-    Cell** Grid;
-    bool GridBgIsFull;
-    bool NewDraw;
-    unsigned int CurDate;
-    unsigned int Width_Grid, Height_Grid, Width_Cell, Height_Cell;
-private:
-    void DrawByGrid(int NumLev);
-    void HandleMouseEvents(long mess);
-public:
-    bool isActual(IDn ID);
-    Rect GetActualWindRect();
-    void ReBuildGrid(unsigned int _Width_Grid,unsigned int _Height_Grid,unsigned int _Width_Cell, unsigned int _Height_Cell,int SizeOfBg = 0);
-    Obj_Manager();
-    ~Obj_Manager();
-    bool CreateObj(CObj obj, IDn& _ID);
-    bool DeleteObj(IDn ID);
-    bool GetObj(IDn ID,CObj& Obj);
-    bool ChangeObj(IDn ID,CObj Obj);
-    int GetObjStatus(IDn ID);
-    bool AddToGrid(IDn ID,bool SendHit = false);
-    bool DeleteFromGrid(IDn ID);
-    vector<IDn>* GetVObjByCrd(unsigned int _x, unsigned int _y);
-    vector<IDn>* GetVObjByNum(unsigned int x,unsigned int y);
-    void* GetBGByNum(unsigned int x,unsigned int y);
-    bool GetGridStatus(void);
-    bool GetGridParam(GridParam& gp);
-    void ChangeCrdByCamera(unsigned int& x, unsigned int& y);
-    friend class cObjectsManager;
-};
+//#include "root.h"
+#include "main_window.h"
 
 
-class cObjectsManager:Model_Objects{
-public:
-    cObjectsManager();
-    virtual void EventsHandler(unsigned int mess,void* data);
-};
+namespace INDIan{
+    namespace ObjManager{
+        struct GridParam{
+            int widthGrid, heightGrid, widthCell, heightCell;
+            Cell** lpGrid;
+        };
 
+        extern Coord Camera;
 
+        bool IsActual(IDn ID);
+        Rect GetActualWindRect();
+        void ReBuildGrid(int _widthGrid,int _heightGrid,int _widthCell, int _heightCell,int sizeOfBg = 0);
+        bool CreateObj(Object obj, IDn& id);
+        bool DeleteObj(IDn id);
+        bool GetObj(IDn id,Object& obj);
+        bool ChangeObj(IDn id,Object obj);
+        int GetObjStatus(IDn id);
+        bool AddToGrid(IDn id,bool sendHit = false);
+        bool DeleteFromGrid(IDn id);
+        vector<IDn>* GetVObjByCrd(int _x, int _y);
+        vector<IDn>* GetVObjByNum(int x, int y);
+        void* GetBGByNum(int x, int y);
+        bool GetGridStatus(void);
+        bool GetGridParam(GridParam& gp);
+        void ChangeCrdByCamera(int& x, int& y);
+    }
+}
 
 #endif // OBJ_MANAGER_H

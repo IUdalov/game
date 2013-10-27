@@ -1,264 +1,280 @@
 #include "root.h"
 
 extern QGLWidget* wndClass;
-extern vector<Model_Objects*> DimOfModels;
-extern cResources Resources;
-System_ROOT Root;
 
-void System_ROOT::MakeQueueEvents(void){
-    GLuint k = 0;
-    bool next = false;
-    while(EQ.size()&&k<EQ.size()){
-        if(EQ[k].To){
-            for(GLuint i=0;i<DimOfModel.size();i++){
-                if(DimOfModel[i]->GetSubType() == EQ[k].To){
-                    if(Pause){
-                        if(DimOfModel[i]->NotPaused){
-                            DimOfModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
-                        }
-                        else{
-                            k++;
-                            next = true;
-                            break;
+namespace INDIan{
+    namespace Root{
+        bool pause = false, drawMode = false;
+        int numLevelDraw = 0;
+
+        SMouse mouse;
+        vector<Model*> dimOfModel;
+        vector<Model*> dimOfSysModel;
+        vector<SysTimer*> timers;
+        vector<Message> messageQueue;
+
+        void MakeQueueEvents(void);
+        void TimerPlus();
+        Model* FindModel(int type){
+            for(int i = 0; i < (int)dimOfModel.size(); i++){
+                if( ((int)dimOfModel[i]->GetSubType()) == type)
+                    return dimOfModel[i];
+            }
+            return NULL;
+        }
+
+        void MakeQueueEvents(void){
+            int k = 0;
+            bool next = false;
+            while((messageQueue.size()) && (k < (int)messageQueue.size())){
+                if(messageQueue[k].to){
+                    for(int i = 0; i < (int)dimOfModel.size(); i++){
+                        if(dimOfModel[i]->GetSubType() == messageQueue[k].to){
+                            if(pause){
+                                if(dimOfModel[i]->notPaused){
+                                    dimOfModel[i]->EventsHandler(messageQueue[k].mess,messageQueue[k].data);
+                                }
+                                else{
+                                    k++;
+                                    next = true;
+                                    break;
+                                }
+                            }
+                            else{
+                                dimOfModel[i]->EventsHandler(messageQueue[k].mess,messageQueue[k].data);
+                            }
                         }
                     }
-                    else{
-                        DimOfModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
+                    if(next)
+                        continue;
+                }
+                else{
+                    for(int i = 0; i < (int)dimOfModel.size(); i++){
+                        if(pause){
+                            if(dimOfModel[i]->notPaused)
+                                dimOfModel[i]->EventsHandler(messageQueue[k].mess,messageQueue[k].data);
+                        }
+                        else
+                            dimOfModel[i]->EventsHandler(messageQueue[k].mess,messageQueue[k].data);
+                    }
+                    for(int i = 0; i < (int)dimOfSysModel.size(); i++){
+                            dimOfSysModel[i]->EventsHandler(messageQueue[k].mess,messageQueue[k].data);
+                    }
+                }
+                if(messageQueue[k].dataFull)
+                    free(messageQueue[k].data);
+                messageQueue.erase(messageQueue.begin() + k);
+            }
+        }
+        void TimerPlus(){
+            int Num;
+            int* get = new int;
+            for(int i = 0; i < (int)timers.size(); i++){
+                timers[i]->CurTime++;
+                if(timers[i]->CurTime >= timers[i]->MaxTime){
+                    Num = timers[i]->MaxTime;
+                    timers[i]->CurTime = 0;
+                    for(int i = 0; i < (int)dimOfModel.size(); i++){
+                        if(pause&&!dimOfModel[i]->notPaused)
+                            continue;
+                        *get = (int)Num;
+                        dimOfModel[i]->EventsHandler(ME_TIMER, get);
+                    }
+                    for(int i = 0; i < (int)dimOfSysModel.size(); i++){
+                        *get = (int)Num;
+                        dimOfSysModel[i]->EventsHandler(ME_TIMER, get);
                     }
                 }
             }
-            if(next)
-                continue;
+            delete get;
+            MakeQueueEvents();
         }
-        else{
-            for(GLuint i=0;i<DimOfModel.size();i++){
-                if(Pause){
-                    if(DimOfModel[i]->NotPaused)
-                        DimOfModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
+        bool Create(void){
+            srand((unsigned)time(0));
+            QDebug debug(QtDebugMsg);
+            debug<<"-----------------------------------------------------";
+
+            for(int i = 0; i < (int)dimOfSysModel.size(); i++)
+                dimOfSysModel[i]->EventsHandler(ME_CREATE, NULL);
+
+            for(int i = 0; i < (int)dimOfModel.size(); i++)
+                dimOfModel[i]->EventsHandler(ME_CREATE, NULL);
+
+            return true;
+        }
+        bool Draw(void){
+            int *nl;
+            nl = new int;
+            for(int i = 0; i < (int)numLevelDraw; i++){
+                for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                    *nl = i;
+                    dimOfSysModel[k]->EventsHandler(ME_DRAW, nl);
                 }
-                else
-                    DimOfModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
+                for(int j = 0; j < (int)dimOfModel.size(); j++){
+                    *nl = i;
+                    if((dimOfModel[j]->onlyDraw && drawMode) || (!drawMode))
+                        dimOfModel[j]->EventsHandler(ME_DRAW, nl);
+                }
             }
-            for(GLuint i=0;i<DimOfSysModel.size();i++){
-                    DimOfSysModel[i]->EventsHandler(EQ[k].Mess,EQ[k].Data);
+            delete nl;
+            return true;
+        }
+        bool Timer(){
+            TimerPlus();
+            return true;
+        }
+        bool MouseUp(int mButton){
+               switch(mButton){
+            case Qt::LeftButton:
+                mouse.L = S_UP;
+                goto MouseClick;
+            case Qt::RightButton:
+                mouse.R = S_UP;
+                goto MouseClick;
+            case Qt::MiddleButton:
+                mouse.M = S_UP;
+                goto MouseClick;
             }
+        MouseClick:
+                int TypeEvent =  ME_MOUSECLICK;
+                for(int i = 0; i < (int)dimOfModel.size(); i++){
+                    if((dimOfModel[i]->notPaused && pause) || (!pause))
+                        dimOfModel[i]->EventsHandler(TypeEvent, NULL);
+                }
+                for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                    dimOfSysModel[k]->EventsHandler(TypeEvent, NULL);
+                }
+                mouse.L = mouse.R = mouse.M = 0;
+                return true;
+
         }
-        if(EQ[k].DataFull)
-            free(EQ[k].Data);
-        EQ.erase(EQ.begin()+k);
-    }
-}
-void System_ROOT::TimerPlus(){
-    GLuint Num;
-    GLuint* get = new GLuint;
-    for(GLuint i=0;i<Timers.size();i++){
-        Timers[i]->CurTime++;
-        if(Timers[i]->CurTime>=Timers[i]->MaxTime){
-            Num=Timers[i]->MaxTime;
-            Timers[i]->CurTime=0;
-            for(GLuint i=0;i<DimOfModel.size();i++){
-                if(Pause&&!DimOfModel[i]->NotPaused)
-                    continue;
-                *get=(GLuint)Num;
-                DimOfModel[i]->EventsHandler(ME_TIMER,get);
+        bool MouseDown(int mButton){
+            switch(mButton){
+            case Qt::LeftButton:
+                mouse.L = S_DOWN;
+                goto MouseClick;
+            case Qt::RightButton:
+                mouse.R = S_DOWN;
+                goto MouseClick;
+            case Qt::MiddleButton:
+                mouse.M = S_DOWN;
+                goto MouseClick;
             }
-            for(GLuint i=0;i<DimOfSysModel.size();i++){
-                *get=(GLuint)Num;
-                DimOfSysModel[i]->EventsHandler(ME_TIMER,get);
+        MouseClick:
+                int TypeEvent =  ME_MOUSECLICK;
+                for(int i = 0; i < (int)dimOfModel.size(); i++){
+                    if((dimOfModel[i]->notPaused && pause) || (!pause))
+                        dimOfModel[i]->EventsHandler(TypeEvent, NULL);
+                }
+                for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                    dimOfSysModel[k]->EventsHandler(TypeEvent, NULL);
+                }
+                mouse.L = mouse.R = mouse.M = 0;
+                return true;
+        }
+        bool MouseMove(int x, int y){
+            mouse.x = x;
+            mouse.y = y;
+            for(int i = 0; i < (int)dimOfModel.size(); i++){
+                if((dimOfModel[i]->notPaused && pause) || (!pause))
+                    dimOfModel[i]->EventsHandler(ME_MOUSEMOVE, NULL);
             }
+            for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                dimOfSysModel[k]->EventsHandler(ME_MOUSEMOVE, NULL);
+            }
+            return true;
+        }
+        bool KeyDown(int key){
+            int num;
+            for(int i = 0; i < (int)dimOfModel.size(); i++){
+                num = key;
+                if((dimOfModel[i]->notPaused && pause) || (!pause))
+                    dimOfModel[i]->EventsHandler(ME_KEYDOWN, &num);
+            }
+            for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                num = key;
+                dimOfSysModel[k]->EventsHandler(ME_KEYDOWN, &num);
+            }
+            return true;
+        }
+        bool KeyUp(int key){
+            int num;
+            for(int i = 0; i < (int)dimOfModel.size(); i++){
+                num = key;
+                if((dimOfModel[i]->notPaused && pause) || (!pause))
+                    dimOfModel[i]->EventsHandler(ME_KEYUP, &num);
+            }
+            for(int k = 0; k < (int)dimOfSysModel.size(); k++){
+                num = key;
+                dimOfSysModel[k]->EventsHandler(ME_KEYUP, &num);
+            }
+            return true;
+        }
+        bool Destroy(){
+            int TypeEvent =  ME_DESTROY;
+            for(int i = 0; i < (int)dimOfModel.size(); i++)
+                    dimOfModel[i]->EventsHandler(TypeEvent, NULL);
+            for(int i = 0; i < (int)dimOfSysModel.size(); i++)
+                    dimOfSysModel[i]->EventsHandler(TypeEvent, NULL);
+            return true;
+        }
+        int AddTimer(int timeSek){
+            if(timeSek <= 0)
+                return -1;
+            for(int i = 0; i < (int)timers.size(); i++)
+                if(timeSek == (int)timers[i]->MaxTime)
+                    return -2;
+            SysTimer* ntm = new SysTimer;
+            ntm->CurTime = 0;
+            ntm->MaxTime = timeSek;
+            timers.push_back(ntm);
+            return timers.size() - 1;
+        }
+        void* PutEventToQueue(int sizeOfData,int mess,int _to){
+            if(!mess)
+                return NULL;
+            Message M;
+
+            M.to = _to;
+            M.mess = mess;
+            if(sizeOfData){
+                M.dataFull = true;
+                M.data = malloc(sizeOfData);
+            }
+            else{
+                M.dataFull = false;
+                M.data = NULL;
+            }
+            messageQueue.push_back(M);
+            return M.data;
+        }
+        SMouse GetMouseStatus(void){
+            return mouse;
+        }
+        void CloseApp(){
+            exit(0);
+        }
+        void AccessModel(Model* model){
+            if(model->GetSubType() == 0)
+                dimOfSysModel.push_back(model);
+            else
+                dimOfModel.push_back(model);
+        }
+        bool GetModelDrawMode(int type){
+            Model* model = FindModel(type);
+            if(model)
+                return model->onlyDraw;
+            else
+                return false;
+        }
+        bool GetModelPauseMode(int type){
+            Model* model = FindModel(type);
+            if(model)
+                return model->notPaused;
+            else
+                return false;
         }
     }
-    delete get;
-    MakeQueueEvents();
-}
-System_ROOT::System_ROOT(){
-    Pause = DrawMode = false;
-    NumLevelDraw = 0;
-    Mouse.L = Mouse.R = Mouse.M = S_UP;
-}
-System_ROOT::~System_ROOT(){
-    for(GLuint i = 0; i < Timers.size(); i++)
-        delete Timers[i];
-}
-bool System_ROOT::Create(void){
-    srand((unsigned)time(0));
-    QDebug debug(QtDebugMsg);
-    debug<<"-----------------------------------------------------";
-    bool isCreated = Resources.Init_Resource();
-
-    for(GLuint j = 0; j < DimOfModels.size();j++)
-        if(DimOfModels[j]->SubType==0)
-            DimOfSysModel.push_back(DimOfModels[j]);
-
-    for(GLuint j=0;j<DimOfModels.size();j++)
-        if(!(DimOfModels[j]->SubType==0))
-            DimOfModel.push_back(DimOfModels[j]);
-
-    DimOfModels.clear();
-
-    for(GLuint i=0;i<DimOfModel.size();i++)
-        DimOfModel[i]->EventsHandler(ME_CREATE,NULL);
-
-    for(GLuint i=0;i<DimOfSysModel.size();i++)
-        DimOfSysModel[i]->EventsHandler(ME_CREATE,NULL);
-
-    return isCreated;
-}
-bool System_ROOT::Draw(void){
-    GLuint *nl;
-    nl = new GLuint;
-    for(GLuint i=0;i<NumLevelDraw;i++){
-        for(GLuint k=0;k<DimOfSysModel.size();k++){
-            *nl=i;
-            DimOfSysModel[k]->EventsHandler(ME_DRAW,nl);
-        }
-        for(GLuint j=0;j<DimOfModel.size();j++){
-            *nl=i;
-            if((DimOfModel[j]->OnlyDraw&&DrawMode)||(!DrawMode))
-                DimOfModel[j]->EventsHandler(ME_DRAW,nl);
-        }
-    }
-    delete nl;
-    return true;
-}
-bool System_ROOT::Timer(){
-    TimerPlus();
-    return true;
-}
-bool System_ROOT::MouseUp(int mButton){
-       switch(mButton){
-    case Qt::LeftButton:
-        Mouse.L = S_UP;
-        goto MouseClick;
-    case Qt::RightButton:
-        Mouse.R = S_UP;
-        goto MouseClick;
-    case Qt::MiddleButton:
-        Mouse.M = S_UP;
-        goto MouseClick;
-    }
-MouseClick:
-        int TypeEvent =  ME_MOUSECLICK;
-        for(GLuint i=0;i<DimOfModel.size();i++){
-            if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
-                DimOfModel[i]->EventsHandler(TypeEvent,NULL);
-        }
-        for(GLuint k=0;k<DimOfSysModel.size();k++){
-            DimOfSysModel[k]->EventsHandler(TypeEvent,NULL);
-        }
-        Mouse.L = Mouse.R = Mouse.M = 0;
-        return true;
-
-}
-bool System_ROOT::MouseDown(int mButton){
-       switch(mButton){
-    case Qt::LeftButton:
-        Mouse.L = S_DOWN;
-        goto MouseClick;
-    case Qt::RightButton:
-        Mouse.R = S_DOWN;
-        goto MouseClick;
-    case Qt::MiddleButton:
-        Mouse.M = S_DOWN;
-        goto MouseClick;
-    }
-MouseClick:
-        int TypeEvent =  ME_MOUSECLICK;
-        for(GLuint i=0;i<DimOfModel.size();i++){
-            if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
-                DimOfModel[i]->EventsHandler(TypeEvent,NULL);
-        }
-        for(GLuint k=0;k<DimOfSysModel.size();k++){
-            DimOfSysModel[k]->EventsHandler(TypeEvent,NULL);
-        }
-        Mouse.L = Mouse.R = Mouse.M = 0;
-        return true;
-}
-bool System_ROOT::MouseMove(int x, int y){
-    Mouse.x = (int)((double)x * WndScaleX);
-    Mouse.y = (int)((double)y * WndScaleY);
-    for(GLuint i=0;i<DimOfModel.size();i++){
-        if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
-            DimOfModel[i]->EventsHandler(ME_MOUSEMOVE,NULL);
-    }
-    for(GLuint k=0;k<DimOfSysModel.size();k++){
-        DimOfSysModel[k]->EventsHandler(ME_MOUSEMOVE,NULL);
-    }
-    return true;
-}
-bool System_ROOT::KeyDown(int key){
-    int num;
-    for(GLuint i = 0; i < DimOfModel.size(); i++){
-        num = key;
-        if((DimOfModel[i]->NotPaused && Pause) || (!Pause))
-            DimOfModel[i]->EventsHandler(ME_KEYDOWN, &num);
-    }
-    for(GLuint k = 0; k < DimOfSysModel.size(); k++){
-        num = key;
-        DimOfSysModel[k]->EventsHandler(ME_KEYDOWN, &num);
-    }
-    return true;
-}
-bool System_ROOT::KeyUp(int key){
-    int num;
-    for(GLuint i=0;i<DimOfModel.size();i++){
-        num = key;
-        if((DimOfModel[i]->NotPaused&&Pause)||(!Pause))
-            DimOfModel[i]->EventsHandler(ME_KEYUP, &num);
-    }
-    for(GLuint k=0;k<DimOfSysModel.size();k++){
-        num = key;
-        DimOfSysModel[k]->EventsHandler(ME_KEYUP, &num);
-    }
-    return true;
-}
-bool System_ROOT::Destroy(){
-    Resources.DisResources();
-       return true;
-}
-int System_ROOT::AddTimer(GLuint timeSek){
-    if(timeSek<=0)
-        return -1;
-    for(GLuint i=0;i<Timers.size();i++)
-        if(timeSek==Timers[i]->MaxTime)
-            return -2;
-    SysTimer* ntm=new SysTimer;
-    ntm->CurTime=0;
-    ntm->MaxTime=timeSek;
-    Timers.push_back(ntm);
-    return Timers.size()-1;
-}
-void* System_ROOT::PutEventToQueue(int SizeOfData,unsigned int mess,unsigned int _To){
-    if(!mess)
-        return NULL;
-    Message M;
-
-    M.To = _To;
-    M.Mess = mess;
-    if(SizeOfData){
-        M.DataFull = true;
-        M.Data = malloc(SizeOfData);
-    }
-    else{
-        M.DataFull = false;
-        M.Data = NULL;
-    }
-    EQ.push_back(M);
-    return M.Data;
-}
-sMouse System_ROOT::GetMouseStatus(void){
-    return Mouse;
-}
-void System_ROOT::CloseApp(){
-    exit(0);
-//    if(wndClass)
-//        wndClass->close();
-}
-int System_ROOT::GetScreenWidth(){
-    return ScreenWidth;
-}
-int System_ROOT::GetScreenHeight(){
-    return ScreenHeight;
 }
 
 

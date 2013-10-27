@@ -1,411 +1,422 @@
 #include "obj_manager.h"
 
-extern System_ROOT Root;
-extern int ScreenWidth;
-extern int ScreenHeight;
-extern cResources Resources;
-extern vector<Model_Objects*> DimOfModels;
+namespace INDIan{
+    namespace ObjManager{
+        enum ObjStatus{
+            OS_NORMAL = 1,
+            OS_DELETE,
+            OS_NOTACTUAL
+        };
+        bool find_in_vector(vector<IDn>& vector, IDn elem);
+        struct ObjRoom{
+            Object obj;
+            Object oldObj;
+            int status;
+            bool wasDraw;
+            int dateBorn;
+        };
 
-Obj_Manager ObjManager;
-cObjectsManager ObjectsManager;
+        Coord camera = {0, 0};
 
-void Obj_Manager::DrawByGrid(int NumLev){
-    if(!Grid)
-        return;
+        bool stageDraw = false;
+        vector<ObjRoom*> dimOfObj;
+        vector<int> dimOfDel;
+        Cell** grid = NULL;
+        bool gridBgIsFull = false;
+        bool newDraw = false;
+        int curDate = 0;
+        int widthGrid = 0, heightGrid = 0, widthCell = 0, heightCell = 0;
 
-    if(NewDraw)
-        StageDraw=!StageDraw;
+        void DrawByGrid(int numLev){
+            if(!grid)
+                return;
 
-    int left = Camera.x/((int)Width_Cell);
-    int right = (Camera.y+(int)Root.GetScreenWidth())/((int)Width_Cell);
-    int top = Camera.y/((int)Height_Cell);
-    int bottom = (Camera.y+(int)Root.GetScreenHeight())/((int)Height_Cell);
+            if(newDraw)
+                stageDraw =! stageDraw;
 
-    right=right>=(int)Width_Grid?(int)Width_Grid-1:right;
-    bottom=bottom>=(int)Height_Grid?(int)Height_Grid-1:bottom;
-    left=left<0?0:left;
-    top=top<0?0:top;
-    if(left>(int)Width_Grid||top>(int)Height_Grid||bottom<0||right<0)
-        return;
+            int left = camera.x / ((int)widthCell);
+            int right = (camera.y + (int)GLWindow::GetScreenWidth()) / ((int)widthCell);
+            int top = camera.y / ((int)heightCell);
+            int bottom = (camera.y + (int)GLWindow::GetScreenHeight()) / ((int)heightCell);
 
-    for(unsigned int j = (unsigned int)top; j <= (unsigned int)bottom; j++){
-        for(unsigned int i = (unsigned int)left; i <= (unsigned int)right; i++){
-            if(NewDraw)
-                Grid[i][j].CurNum=0;
-            unsigned int* lpNum=&(Grid[i][j].CurNum);
-            while(((*lpNum)<Grid[i][j].Objects.size())&&
-                    (DimOfObj[ObjManager.Grid[i][j].Objects[*lpNum].ID]->Obj.LevelOfDraw==(unsigned int)NumLev))
-            {
-                if(!(DimOfObj[Grid[i][j].Objects[*lpNum].ID]->Status==OS_DELETE)){
-                    if(!(DimOfObj[Grid[i][j].Objects[*lpNum].ID]->WasDraw==StageDraw)){
-                        if(!(Root.DrawMode&&!ObjManager.DimOfObj[Grid[i][j].Objects[*lpNum].ID]->Obj.GetLpModel()->OnlyDraw)){
-                            DimOfObj[Grid[i][j].Objects[*lpNum].ID]->Obj.DrawWithMove(-(Camera.x),-(Camera.y));
-                            DimOfObj[Grid[i][j].Objects[*lpNum].ID]->WasDraw=StageDraw;
+            right = right >= (int)widthGrid ? (int)widthGrid - 1 : right;
+            bottom = bottom>=(int)heightGrid ? (int)heightGrid - 1 : bottom;
+            left = left < 0 ? 0 : left;
+            top = top < 0 ? 0 : top;
+            if((left > (int)widthGrid) || (top > (int)heightGrid) || (bottom < 0) || (right < 0))
+                return;
+
+            for(int j = top; j <= bottom; j++){
+                for(int i = left; i <= right; i++){
+                    if(newDraw)
+                        grid[i][j].curNum=0;
+                    int* lpNum = &(grid[i][j].curNum);
+                    while(( (*lpNum) < (int)grid[i][j].objects.size() ) &&
+                            (dimOfObj[ObjManager::grid[i][j].objects[*lpNum].id]->obj.levelOfDraw == (int)numLev))
+                    {
+                        if(!(dimOfObj[grid[i][j].objects[*lpNum].id]->status == OS_DELETE)){
+                            if(!(dimOfObj[grid[i][j].objects[*lpNum].id]->wasDraw == stageDraw)){
+                                if(!( (Root::drawMode) && (! Root::GetModelDrawMode(ObjManager::dimOfObj[grid[i][j].objects[*lpNum].id]->obj.subType)))){
+                                    dimOfObj[grid[i][j].objects[*lpNum].id]->obj.DrawWithMove(-(camera.x),-(camera.y));
+                                    dimOfObj[grid[i][j].objects[*lpNum].id]->wasDraw = stageDraw;
+                                }
+                            }
+                        }
+                        (*lpNum) += 1;
+                    }
+
+                }
+            }
+            newDraw = false;
+        }
+        bool isActual(IDn id){
+            if( id.id >= (int)dimOfObj.size())
+                return false;
+            if ((dimOfObj[id.id]->status == OS_DELETE) || (dimOfObj[id.id]->dateBorn != id.dateBorn) )
+                return false;
+            return true;
+        }
+        Rect GetActualWindRect(){
+            Rect    rect;
+            rect.left = (int)(camera.x / widthCell);
+            rect.right = (int)((camera.x + GLWindow::GetScreenWidth()) / widthCell) + 1;
+            rect.top = (int)(camera.y / heightCell);
+            rect.bottom = (int)((camera.y + GLWindow::GetScreenHeight()) / heightCell) + 1;
+
+            rect.right = MIN(rect.right, widthGrid - 1);
+            rect.bottom = MIN(rect.bottom, heightGrid - 1);
+            rect.left = MAX(rect.left, 0);
+            rect.top = MAX(rect.top, 0);
+            return rect;
+        }
+        void ReBuildGrid(int _widthGrid,int _heightGrid,int _widthCell, int _heightCell,int sizeOfBg){
+            if(_widthGrid == 0 || _heightGrid == 0 || _widthCell == 0 || _heightCell == 0)
+                return;
+
+            if(grid){
+                for(int i = 0; i < (int)widthGrid; i++){
+                    for(int j = 0; j < (int)heightGrid; j++){
+                        grid[i][j].objects.clear();
+                        if(gridBgIsFull){
+                            delete[] (char*)grid[i][j].backGround;
+                            grid[i][j].backGround = NULL;
                         }
                     }
                 }
-                (*lpNum)+=1;
+                for(int i = 0; i < (int)widthGrid; i++)
+                    delete grid[i];
+                delete grid;
+                grid = NULL;
             }
+            widthGrid = _widthGrid;
+            heightGrid = _heightGrid;
+            widthCell = _widthCell;
+            heightCell = _heightCell;
+            if(sizeOfBg)
+                gridBgIsFull = true;
+            else
+                gridBgIsFull = false;
 
-        }
-    }
-    NewDraw=false;
-}
-bool Obj_Manager::isActual(IDn ID){
-    if( ID.ID >= DimOfObj.size())
-        return false;
-    if ((DimOfObj[ID.ID]->Status == OS_DELETE) || (DimOfObj[ID.ID]->DateBorn != ID.DateBorn) )
-        return false;
-    return true;
-}
-Rect Obj_Manager::GetActualWindRect(){
-    Rect    rect;
-    rect.left=(unsigned int)(Camera.x/Width_Cell);
-    rect.right=(unsigned int)((Camera.x+Root.GetScreenWidth())/Width_Cell) + 1;
-    rect.top=(unsigned int)(Camera.y/Height_Cell);
-    rect.bottom=(unsigned int)((Camera.y+Root.GetScreenHeight())/Height_Cell) + 1;
+            grid = new Cell*[widthGrid];
 
-    rect.right=MIN((unsigned)rect.right,Width_Grid-1);
-    rect.bottom=MIN((unsigned)rect.bottom,Height_Grid-1);
-    rect.left=MAX(rect.left,0);
-    rect.top=MAX(rect.top,0);
-    return rect;
-}
-void Obj_Manager::ReBuildGrid(unsigned int _Width_Grid,unsigned int _Height_Grid,unsigned int _Width_Cell, unsigned int _Height_Cell,int SizeOfBg){
-    if(_Width_Grid==0||_Height_Grid==0||_Width_Cell==0||_Height_Cell==0)
-        return;
+            for(int i = 0; i < widthGrid; i++)
+                grid[i] = new Cell[heightGrid];
 
-    if(Grid){
-        for(unsigned int i=0;i<Width_Grid;i++){
-            for(unsigned int j=0;j<Height_Grid;j++){
-                Grid[i][j].Objects.clear();
-                if(GridBgIsFull){
-                    delete[] (char*)Grid[i][j].BackGround;
-                    Grid[i][j].BackGround = NULL;
-                }
-            }
-        }
-        for(unsigned int i=0;i<Width_Grid;i++)
-            delete Grid[i];
-        delete Grid;
-        Grid = NULL;
-    }
-    Width_Grid = _Width_Grid;
-    Height_Grid = _Height_Grid;
-    Width_Cell = _Width_Cell;
-    Height_Cell = _Height_Cell;
-    if(SizeOfBg)
-        GridBgIsFull = true;
-    else
-        GridBgIsFull = false;
-
-    Grid = new Cell*[Width_Grid];
-
-    for(unsigned int i=0;i<Width_Grid;i++)
-        Grid[i]=new Cell[Height_Grid];
-
-    for(unsigned int i=0;i<Width_Grid;i++){
-        for(unsigned int j=0;j<Height_Grid;j++){
-            if(SizeOfBg){
-                char *lp = new char[SizeOfBg];
-                Grid[i][j].BackGround = (void*)lp;
-            }
-            else{
-                Grid[i][j].BackGround = NULL;
-            }
-        }
-    }
-}
-Obj_Manager::Obj_Manager(){
-    NewDraw=false;
-    Grid=NULL;
-    GridBgIsFull=false;
-    StageDraw=false;
-    CurDate=0;
-    Width_Grid = Height_Grid =
-        Width_Cell = Height_Cell = 0;
-    Camera.x = Camera.y = 0;
-}
-Obj_Manager::~Obj_Manager(){
-    if(Grid){
-        for(unsigned int i=0;i<Width_Grid;i++){
-            for(unsigned int j=0;j<Height_Grid;j++){
-                Grid[i][j].Objects.clear();
-                if(GridBgIsFull){
-                    delete[] (char*)Grid[i][j].BackGround;
-                    Grid[i][j].BackGround = NULL;
-                }
-            }
-        }
-        for(unsigned int i=0;i<Width_Grid;i++)
-            delete [](Grid[i]);
-        delete []Grid;
-        Grid = NULL;
-
-    }
-    for(unsigned int i = 0; i < DimOfObj.size(); i++){
-        if( (DimOfObj[i]->Obj.lpModel->SizeOfSubStr) && (DimOfObj[i]->Status == OS_NORMAL))
-            free(DimOfObj[i]->Obj.GetSubStr());
-        delete DimOfObj[i];
-    }
-}
-bool Obj_Manager::CreateObj(CObj obj, IDn& _ID){
-    if((!obj.lpModel)||(!obj.SubType))
-        return false;
-    IDn newID;
-    ObjRoom* Room=new ObjRoom;
-    if(obj.lpModel->SizeOfSubStr)
-        obj.SubStr = malloc(obj.lpModel->SizeOfSubStr);
-    Room->Obj=Room->OldObj=obj;
-    Room->Status=OS_NORMAL;
-    Room->WasDraw=StageDraw;
-    Room->DateBorn=newID.DateBorn=CurDate;
-    newID.ID=DimOfObj.size();
-    CurDate++;
-    DimOfObj.push_back(Room);
-    obj.lpModel->Plus(newID);
-    _ID = newID;
-    return true;
-}
-bool Obj_Manager::DeleteObj(IDn ID){
-    if(!isActual(ID))
-        return false;
-
-    DeleteFromGrid(ID);
-    DimOfDel.push_back(ID.ID);
-
-    if(DimOfObj[ID.ID]->Obj.lpModel->SizeOfSubStr){
-        free(DimOfObj[ID.ID]->Obj.SubStr);
-    }
-    DimOfObj[ID.ID]->Obj.lpModel->DeleteObj(ID);
-    DimOfObj[ID.ID]->Status=OS_DELETE;
-    return true;
-}
-bool Obj_Manager::GetObj(IDn ID,CObj& Obj){
-    if(!isActual(ID))
-        return false;
-
-    Obj = DimOfObj[ID.ID]->Obj;
-    return true;
-}
-bool Obj_Manager::ChangeObj(IDn ID,CObj Obj){
-    if(!isActual(ID))
-        return false;
-    DimOfObj[ID.ID]->Obj=Obj;
-    return true;
-}
-int Obj_Manager::GetObjStatus(IDn ID){
-    if(!isActual(ID))
-        return OS_NOTACTUAL;
-    return DimOfObj[ID.ID]->Status;
-}
-bool Obj_Manager::AddToGrid(IDn ID,bool SendHit){
-    if(!isActual(ID))
-        return false;
-    if(!Grid)
-        return false;
-
-    CObj obj = DimOfObj[ID.ID]->Obj;
-
-    pntRect rect = obj.GetPntRect();
-
-    int left = (MinXPntRect(rect) / (int)Width_Cell);
-    int right = (MaxXPntRect(rect) / (int)Width_Cell);
-    int top = (MinYPntRect(rect) / (int)Height_Cell);
-    int bottom = (MaxYPntRect(rect) / (int)Height_Cell);
-
-    right = right >= (int)Width_Grid ? (int)Width_Grid-1 : (int)right;
-    bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : (int)bottom;
-    left = left < 0 ? 0 : left;
-    top = top < 0 ? 0 : top;
-    if( (left > (int)Width_Grid) || (top > (int)Height_Grid) || (bottom < 0) || (right < 0))
-        return false;
-
-    vector<IDn> v_id;
-    vector<CObj> v_obj;
-
-    for( int i = left; i <= right; i++){
-        for( int j = top; j <= bottom; j++){
-            unsigned int NewNum = Grid[i][j].Objects.size();
-            unsigned int LevDr = obj.LevelOfDraw;
-            bool check_level_draw = false;
-            for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
-                IDn ID2 = Grid[i][j].Objects[k];
-                CObj obj2 = DimOfObj[ID2.ID]->Obj;
-
-                if(SendHit){
-                    if(!find_in_vector(v_id, ID2)){
-                        v_id.push_back(ID2);
-                        v_obj.push_back(obj2);
+            for(int i = 0; i < widthGrid; i++){
+                for(int j = 0; j < heightGrid; j++){
+                    if(sizeOfBg){
+                        char *lp = new char[sizeOfBg];
+                        grid[i][j].backGround = (void*)lp;
+                    }
+                    else{
+                        grid[i][j].backGround = NULL;
                     }
                 }
-                if( (!check_level_draw) && (obj2.LevelOfDraw > LevDr) ){
-                    check_level_draw = true;
-                    NewNum = k;
+            }
+        }
+        void Destroy(){
+            if(grid){
+                for(int i = 0; i < widthGrid; i++){
+                    for(int j = 0; j < heightGrid; j++){
+                        grid[i][j].objects.clear();
+                        if(gridBgIsFull){
+                            delete[] (char*)grid[i][j].backGround;
+                            grid[i][j].backGround = NULL;
+                        }
+                    }
                 }
-            }
-            Grid[i][j].Objects.insert(Grid[i][j].Objects.begin() + NewNum,ID);
-        }
-    }
-    GeoScaner geo_scan;
-    CObj obj_for_geo = obj;
-    CObj obj2;
-    IDn ID2;
-    geo_scan.init(GST_BREP_BREP, v_obj, &obj_for_geo, sizeof(CObj));
-    GEO_SCAN_ANS gs_answer;
-    while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
-        if( gs_answer == GSA_OK ){
-            obj2 = geo_scan.GetCurrElem();
-            ID2 = v_id[geo_scan.GetCurrElemNum()];
+                for(int i = 0; i < widthGrid; i++)
+                    delete [](grid[i]);
+                delete []grid;
+                grid = NULL;
 
-            OED_Clash* data = (OED_Clash*)Root.PutEventToQueue(sizeof(OED_Clash), OE_CLASH, obj.GetSubType());
-            data->id_dest = ID;
-            data->id_src = ID2;
-            if(obj.GetSubType() != obj2.GetSubType()){
-                OED_Clash* data = (OED_Clash*)Root.PutEventToQueue(sizeof(OED_Clash), OE_CLASH, obj2.GetSubType());
-                data->id_dest = ID2;
-                data->id_src = ID;
+            }
+            for(int i = 0; i < (int)dimOfObj.size(); i++){
+                if( (dimOfObj[i]->obj.sizeOfSubStr) && (dimOfObj[i]->status == OS_NORMAL))
+                    free(dimOfObj[i]->obj.subStr);
+                delete dimOfObj[i];
             }
         }
-    }
-    return true;
-}
-bool Obj_Manager::DeleteFromGrid(IDn ID){
-    if(!isActual(ID))
-        return false;
-    if(!Grid)
-        return false;
-
-    CObj* obj=&(DimOfObj[ID.ID]->Obj);
-
-    pntRect rect=obj->GetPntRect();
-
-    int left = (MinXPntRect(rect) / (int)Width_Cell);
-    int right = (MaxXPntRect(rect) / (int)Width_Cell);
-    int top = (MinYPntRect(rect) / (int)Height_Cell);
-    int bottom = (MaxYPntRect(rect) / (int)Height_Cell);
-
-    right = right >= (int)Width_Grid ? (int)Width_Grid-1 : right;
-    bottom = bottom >= (int)Height_Grid ? (int)Height_Grid-1 : bottom;
-    left = left < 0 ? 0 : left;
-    top = top < 0 ? 0 : top;
-    if( (left > (int)Width_Grid) || (top > (int)Height_Grid) || (bottom < 0) || (right < 0))
-        return false;
-
-
-    for( int i = left; i <= right; i++){
-        for( int j = top; j <= bottom; j++){
-            bool next = false;
-            for( int k = 0; k < (int)Grid[i][j].Objects.size(); k++){
-                if( (Grid[i][j].Objects[k].ID == ID.ID) && (Grid[i][j].Objects[k].DateBorn == ID.DateBorn)){
-                    Grid[i][j].Objects.erase(Grid[i][j].Objects.begin()+k);
-                    next = true;
-                }
-                if(next)
-                    break;
-            }
-        }
-    }
-    return true;
-}
-vector<IDn>* Obj_Manager::GetVObjByCrd(unsigned int _x, unsigned int _y){
-    unsigned int x = (unsigned int)(_x / Width_Cell);
-    unsigned int y = (unsigned int)(_y / Height_Cell);
-    if( (x >= Width_Grid) || (y >= Height_Grid))
-        return NULL;
-    return &(Grid[x][y].Objects);
-}
-vector<IDn>* Obj_Manager::GetVObjByNum(unsigned int x,unsigned int y){
-    if( (x >= Width_Grid) || (y >= Height_Grid))
-        return NULL;
-    return &(Grid[x][y].Objects);
-}
-void* Obj_Manager::GetBGByNum(unsigned int x,unsigned int y){
-    if( (x >= Width_Grid) || (y >= Height_Grid))
-        return NULL;
-    return Grid[x][y].BackGround;
-}
-bool Obj_Manager::GetGridStatus(void){
-    if(Grid)
-        return true;
-    return false;
-}
-bool Obj_Manager::GetGridParam(GridParam& gp){
-    if(!Grid)
-        return false;
-    gp.lpGrid = Grid;
-    gp.Width_Grid=Width_Grid;
-    gp.Height_Grid=Height_Grid;
-    gp.Width_Cell=Width_Cell;
-    gp.Height_Cell=Height_Cell;
-    return true;
-}
-void Obj_Manager::ChangeCrdByCamera(unsigned int& x, unsigned int& y){
-    x += Camera.x;
-    y += Camera.y;
-}
-void Obj_Manager::HandleMouseEvents(long mess){
-    sMouse ms = Root.GetMouseStatus();
-    vector<IDn>* vCell = GetVObjByCrd(ms.x, ms.y);
-    vector<CObj> vObj;
-    vector<IDn> vId;
-    CObj obj;
-    if((!vCell) || (!vCell->size()))
-        return;
-
-    for(int i = (int)vCell->size() - 1; i >= 0; i--)
-        if(GetObj((*vCell)[i], obj)){
-            vObj.push_back(obj);
-            vId.push_back((*vCell)[i]);
-        }
-
-    dCoord mouseCrd = {ms.x, ms.y};
-    GeoScaner geo_scan;
-    IDn id;
-    GEO_SCAN_ANS gs_answer;
-    geo_scan.init(GST_BREP_PNT, vObj, &mouseCrd, sizeof(dCoord));
-    while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
-        if( gs_answer == GSA_OK ){
-            obj = geo_scan.GetCurrElem();
-            id = vId[geo_scan.GetCurrElemNum()];
-
-            OED_Mouse* data = (OED_Mouse*)Root.PutEventToQueue(sizeof(OED_Mouse), mess, obj.GetSubType());
-            data->idObj = id;
-            data->mouse = ms;
-        }
-    }
-
-}
-
-
-
-cObjectsManager::cObjectsManager():Model_Objects(0,0){
-}
-void cObjectsManager::EventsHandler(unsigned int mess,void* data){
-    switch(mess){
-        case ME_DRAW:
-            if(*((unsigned int*)data) == 0)
-                ObjManager.NewDraw = true;
-            ObjManager.DrawByGrid(*((unsigned int*)data));
-            break;
-        case ME_MOUSECLICK:
-            ObjManager.HandleMouseEvents(OE_MOUSECLICK);
-            break;
-        case ME_MOUSEMOVE:
-            ObjManager.HandleMouseEvents(OE_MOUSEMOVE);
-            break;
-        default:
-            break;
-    }
-}
-
-bool find_in_vector(vector<IDn>& vect, IDn elem){
-    vector<IDn>::iterator iter;
-    for(iter = vect.begin(); iter != vect.end(); iter++){
-        if(*iter == elem){
+        bool CreateObj(Object obj, IDn& _id){
+            IDn newID;
+            ObjRoom* Room = new ObjRoom;
+            if(obj.sizeOfSubStr)
+                obj.subStr = malloc(obj.sizeOfSubStr);
+            Room->obj = Room->oldObj = obj;
+            Room->status = OS_NORMAL;
+            Room->wasDraw = stageDraw;
+            Room->dateBorn = newID.dateBorn = curDate;
+            newID.id = dimOfObj.size();
+            curDate++;
+            dimOfObj.push_back(Room);
+            _id = newID;
             return true;
         }
+        bool DeleteObj(IDn id){
+            if(!isActual(id))
+                return false;
+
+            DeleteFromGrid(id);
+            dimOfDel.push_back(id.id);
+
+            if(dimOfObj[id.id]->obj.sizeOfSubStr){
+                free(dimOfObj[id.id]->obj.subStr);
+            }
+            dimOfObj[id.id]->status = OS_DELETE;
+            return true;
+        }
+        bool GetObj(IDn id,Object& Obj){
+            if(!isActual(id))
+                return false;
+
+            Obj = dimOfObj[id.id]->obj;
+            return true;
+        }
+        bool ChangeObj(IDn id,Object Obj){
+            if(!isActual(id))
+                return false;
+            dimOfObj[id.id]->obj = Obj;
+            return true;
+        }
+        int GetObjStatus(IDn id){
+            if(!isActual(id))
+                return OS_NOTACTUAL;
+            return dimOfObj[id.id]->status;
+        }
+        bool AddToGrid(IDn id,bool SendHit){
+            if(!isActual(id))
+                return false;
+            if(!grid)
+                return false;
+
+            Object obj = dimOfObj[id.id]->obj;
+
+            PntRect rect = obj.GetPntRect();
+
+            int left = (MinXPntRect(rect) / (int)widthCell);
+            int right = (MaxXPntRect(rect) / (int)widthCell);
+            int top = (MinYPntRect(rect) / (int)heightCell);
+            int bottom = (MaxYPntRect(rect) / (int)heightCell);
+
+            right = right >= (int)widthGrid ? (int)widthGrid-1 : (int)right;
+            bottom = bottom >= (int)heightGrid ? (int)heightGrid-1 : (int)bottom;
+            left = left < 0 ? 0 : left;
+            top = top < 0 ? 0 : top;
+            if( (left > (int)widthGrid) || (top > (int)heightGrid) || (bottom < 0) || (right < 0))
+                return false;
+
+            vector<IDn> v_id;
+            vector<Object> v_obj;
+
+            for( int i = left; i <= right; i++){
+                for( int j = top; j <= bottom; j++){
+                    int NewNum = grid[i][j].objects.size();
+                    int LevDr = obj.levelOfDraw;
+                    bool check_level_draw = false;
+                    for( int k = 0; k < (int)grid[i][j].objects.size(); k++){
+                        IDn ID2 = grid[i][j].objects[k];
+                        Object obj2 = dimOfObj[ID2.id]->obj;
+
+                        if(SendHit){
+                            if(!find_in_vector(v_id, ID2)){
+                                v_id.push_back(ID2);
+                                v_obj.push_back(obj2);
+                            }
+                        }
+                        if( (!check_level_draw) && (obj2.levelOfDraw > LevDr) ){
+                            check_level_draw = true;
+                            NewNum = k;
+                        }
+                    }
+                    grid[i][j].objects.insert(grid[i][j].objects.begin() + NewNum,id);
+                }
+            }
+            GeoScaner geo_scan;
+            Object obj_for_geo = obj;
+            Object obj2;
+            IDn ID2;
+            geo_scan.init(GST_BREP_BREP, v_obj, &obj_for_geo, sizeof(Object));
+            GEO_SCAN_ANS gs_answer;
+            while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+                if( gs_answer == GSA_OK ){
+                    obj2 = geo_scan.GetCurrElem();
+                    ID2 = v_id[geo_scan.GetCurrElemNum()];
+
+                    OEDClash* data = (OEDClash*)Root::PutEventToQueue(sizeof(OEDClash), OE_CLASH, obj.subType);
+                    data->idDest = id;
+                    data->idSrc = ID2;
+                    if(obj.subType != obj2.subType){
+                        OEDClash* data = (OEDClash*)Root::PutEventToQueue(sizeof(OEDClash), OE_CLASH, obj2.subType);
+                        data->idDest = ID2;
+                        data->idSrc = id;
+                    }
+                }
+            }
+            return true;
+        }
+        bool DeleteFromGrid(IDn id){
+            if(!isActual(id))
+                return false;
+            if(!grid)
+                return false;
+
+            Object* obj = &(dimOfObj[id.id]->obj);
+
+            PntRect rect=obj->GetPntRect();
+
+            int left = (MinXPntRect(rect) / (int)widthCell);
+            int right = (MaxXPntRect(rect) / (int)widthCell);
+            int top = (MinYPntRect(rect) / (int)heightCell);
+            int bottom = (MaxYPntRect(rect) / (int)heightCell);
+
+            right = right >= (int)widthGrid ? (int)widthGrid-1 : right;
+            bottom = bottom >= (int)heightGrid ? (int)heightGrid-1 : bottom;
+            left = left < 0 ? 0 : left;
+            top = top < 0 ? 0 : top;
+            if( (left > (int)widthGrid) || (top > (int)heightGrid) || (bottom < 0) || (right < 0))
+                return false;
+
+
+            for( int i = left; i <= right; i++){
+                for( int j = top; j <= bottom; j++){
+                    bool next = false;
+                    for( int k = 0; k < (int)grid[i][j].objects.size(); k++){
+                        if( (grid[i][j].objects[k].id == id.id) && (grid[i][j].objects[k].dateBorn == id.dateBorn)){
+                            grid[i][j].objects.erase(grid[i][j].objects.begin()+k);
+                            next = true;
+                        }
+                        if(next)
+                            break;
+                    }
+                }
+            }
+            return true;
+        }
+        vector<IDn>* GetVObjByCrd(int _x, int _y){
+            int x = (int)(_x / widthCell);
+            int y = (int)(_y / heightCell);
+            if( (x >= widthGrid) || (y >= heightGrid))
+                return NULL;
+            return &(grid[x][y].objects);
+        }
+        vector<IDn>* GetVObjByNum(int x, int y){
+            if( (x >= widthGrid) || (y >= heightGrid))
+                return NULL;
+            return &(grid[x][y].objects);
+        }
+        void* GetBGByNum(int x, int y){
+            if( (x >= widthGrid) || (y >= heightGrid))
+                return NULL;
+            return grid[x][y].backGround;
+        }
+        bool GetGridStatus(void){
+            if(grid)
+                return true;
+            return false;
+        }
+        bool GetGridParam(GridParam& gp){
+            if(!grid)
+                return false;
+            gp.lpGrid = grid;
+            gp.widthGrid = widthGrid;
+            gp.heightGrid = heightGrid;
+            gp.widthCell = widthCell;
+            gp.heightCell = heightCell;
+            return true;
+        }
+        void ChangeCrdByCamera(int& x, int& y){
+            x += camera.x;
+            y += camera.y;
+        }
+        void HandleMouseEvents(long mess){
+            SMouse ms = Root::GetMouseStatus();
+            vector<IDn>* vCell = GetVObjByCrd(ms.x, ms.y);
+            vector<Object> vObj;
+            vector<IDn> vId;
+            Object obj;
+            if((!vCell) || (!vCell->size()))
+                return;
+
+            for(int i = (int)vCell->size() - 1; i >= 0; i--)
+                if(GetObj((*vCell)[i], obj)){
+                    vObj.push_back(obj);
+                    vId.push_back((*vCell)[i]);
+                }
+
+            DCoord mouseCrd = {(double)ms.x, (double)ms.y};
+            GeoScaner geo_scan;
+            IDn id;
+            GEO_SCAN_ANS gs_answer;
+            geo_scan.init(GST_BREP_PNT, vObj, &mouseCrd, sizeof(DCoord));
+            while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+                if( gs_answer == GSA_OK ){
+                    obj = geo_scan.GetCurrElem();
+                    id = vId[geo_scan.GetCurrElemNum()];
+
+                    OEDMouse* data = (OEDMouse*)Root::PutEventToQueue(sizeof(OEDMouse), mess, obj.subType);
+                    data->idObj = id;
+                    data->mouse = ms;
+                }
+            }
+
+        }
+
+        class ObjectsManagerModel : Model{
+        public:
+            ObjectsManagerModel() : Model(0,0){
+                Root::AccessModel(this);
+            }
+            void EventsHandler(int mess,void* data){
+                switch(mess){
+                    case ME_DRAW:
+                        if(*((int*)data) == 0)
+                            ObjManager::newDraw = true;
+                        ObjManager::DrawByGrid(*((int*)data));
+                        break;
+                    case ME_MOUSECLICK:
+                        ObjManager::HandleMouseEvents(OE_MOUSECLICK);
+                        break;
+                    case ME_MOUSEMOVE:
+                        ObjManager::HandleMouseEvents(OE_MOUSEMOVE);
+                        break;
+                    case ME_DESTROY:
+                        ObjManager::Destroy();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }ObjManModel;
+
+        bool find_in_vector(vector<IDn>& vect, IDn elem){
+            vector<IDn>::iterator iter;
+            for(iter = vect.begin(); iter != vect.end(); iter++){
+                if(*iter == elem){
+                    return true;
+                }
+            }
+            return false;
+        }
     }
-    return false;
 }
 

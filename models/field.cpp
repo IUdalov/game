@@ -1,39 +1,38 @@
 #include "field.h"
 
-Field field;
-
 #define TIMER_ANIM 5
 
-Field::Field() : Model_Objects(STO_FIELD, 0){
+Field::Field() : Model(STO_FIELD, 0){
 }
 Field::~Field(){
 }
-void Field::EventsHandler(unsigned int mess, void *data){
+void Field::EventsHandler(int mess, void *data){
     int PoleWidth, PoleHeight;
-    CObj obj;
+    Object obj;
     IDn id;
     Rect* r;
     switch(mess){
     case SE_CREATEFIELD:
         if(!data)
             return;
-        Root.AddTimer(TIMER_ANIM);
+        Root::AddTimer(TIMER_ANIM);
         gridWidth = PoleWidth = *((int*)data);
         gridHeight = PoleHeight = *(((int*)data) + 1);
         topCrdV.clear(); leftCrdV.clear();
         rightCrdV.clear(); bottomCrdV.clear();
 
-        dCoord crd;
-        this->CreateSimpleObj(&obj);
-        obj.BMP = ID_BMP_CELL;
+        DCoord crd;
+        obj.tileId = ID_BMP_CELL;
+        obj.subType = STO_FIELD;
+        obj.sizeOfSubStr = 0;
         int x, y, width, height;
-        width = Resources.Get_BMP(ID_BMP_CELL)->GetWidth();
-        height = Resources.Get_BMP(ID_BMP_CELL)->GetHeight();
-        x = Root.GetScreenWidth() / 2 - (width * PoleWidth / 2);
-        y = Root.GetScreenHeight() / 2 - (height * PoleHeight / 2);
+        width = Resources::GetTile(ID_BMP_CELL)->GetWidth();
+        height = Resources::GetTile(ID_BMP_CELL)->GetHeight();
+        x = GLWindow::GetScreenWidth() / 2 - (width * PoleWidth / 2);
+        y = GLWindow::GetScreenHeight() / 2 - (height * PoleHeight / 2);
         obj.image = 0;
         obj.SetRectByImage();
-        obj.LevelOfDraw = 0;
+        obj.levelOfDraw = 0;
         obj.y = y + 0.5 * height;
         for(int i = 0 ; i < PoleWidth; i ++){
             if(i == 0){
@@ -48,8 +47,9 @@ void Field::EventsHandler(unsigned int mess, void *data){
             obj.x = x + i * (width) + 0.5 * width;
             crd.x = obj.x; crd.y = obj.y;
             topCrdV.push_back(crd);
-            ObjManager.CreateObj(obj, id);
-            ObjManager.AddToGrid(id, false);
+            ObjManager::CreateObj(obj, id);
+            ObjManager::AddToGrid(id, false);
+            this->SaveObj(id);
         }
         obj.y = y + (height) * (PoleHeight - 1 ) + 0.5 * height;
         for(int i = 0 ; i < PoleWidth; i ++){
@@ -65,8 +65,9 @@ void Field::EventsHandler(unsigned int mess, void *data){
             obj.x = x + i * (width) + 0.5 * width;
             crd.x = obj.x; crd.y = obj.y;
             bottomCrdV.push_back(crd);
-            ObjManager.CreateObj(obj, id);
-            ObjManager.AddToGrid(id, false);
+            ObjManager::CreateObj(obj, id);
+            ObjManager::AddToGrid(id, false);
+            this->SaveObj(id);
         }
         for(int i = 0 ; i < (PoleHeight - 2); i ++){
             obj.image = 3;
@@ -74,26 +75,20 @@ void Field::EventsHandler(unsigned int mess, void *data){
             obj.y = y + height * 0.5 + ( i + 1) * (height);
             crd.x = obj.x; crd.y = obj.y;
             leftCrdV.push_back(crd);
-            ObjManager.CreateObj(obj, id);
-            ObjManager.AddToGrid(id, false);
+            ObjManager::CreateObj(obj, id);
+            ObjManager::AddToGrid(id, false);
+            this->SaveObj(id);
 
             obj.image = 5;
             obj.x = x + (width) * (PoleWidth - 1)  + 0.5 * width;
             obj.y = y + .5 * height + (i + 1) * (height);
             crd.x = obj.x; crd.y = obj.y;
             rightCrdV.push_back(crd);
-            ObjManager.CreateObj(obj, id);
-            ObjManager.AddToGrid(id, false);
+            ObjManager::CreateObj(obj, id);
+            ObjManager::AddToGrid(id, false);
+            this->SaveObj(id);
         }
-/*        for(int i = 0 ; i < PoleWidth; i ++){
-            for(int j = 0 ; j < PoleHeight; j ++){
-                obj.x = x + ((double)i + 0.5) * width;
-                obj.y = y + ((double)j + 0.5) * height;
-                ObjManager.CreateObj(obj, id);
-                ObjManager.AddToGrid(id, false);
-            }
-        }*/
-        r = (Rect*)Root.PutEventToQueue(sizeof(Rect), SE_FIELDPARAM, STO_CHEKERS);
+        r = (Rect*)Root::PutEventToQueue(sizeof(Rect), SE_FIELDPARAM, STO_CHEKERS);
         r->left = x;
         r->right = x + PoleWidth * width;
         r->top = y;
@@ -101,8 +96,10 @@ void Field::EventsHandler(unsigned int mess, void *data){
         fieldRect = *r;
         break;
     case SE_DELETEFIELD:
-        while(this->GetVolume())
-            ObjManager.DeleteObj(this->GetObj(0));
+        while(this->GetVolume()){
+            ObjManager::DeleteObj(this->GetObj(0));
+            this->DeleteObj(0);
+        }
         break;
     case SE_FIELD_SHINE_LEFT:
         CreateShineField(0);
@@ -111,13 +108,14 @@ void Field::EventsHandler(unsigned int mess, void *data){
         CreateShineField(1);
         break;
     case SE_FIELD_SHINE_CLOSE:{
-        int i = (gridWidth * 2 +  2 * (gridHeight - 2));
+        int i = 0/*(gridWidth * 2 +  2 * (gridHeight - 2))*/;
         while( i < (int)this->GetVolume()){
-            ObjManager.GetObj(this->GetObj(i), obj);
-            if((obj.BMP == ID_BMP_CELL_SHINE1) ||
-                    (obj.BMP == ID_BMP_CELL_SHINE2) ||
-                    (obj.BMP == ID_BMP_CELL_SHINE3)){
-                ObjManager.DeleteObj(this->GetObj(i));
+            ObjManager::GetObj(this->GetObj(i), obj);
+            if((obj.tileId == ID_BMP_CELL_SHINE1) ||
+                    (obj.tileId == ID_BMP_CELL_SHINE2) ||
+                    (obj.tileId == ID_BMP_CELL_SHINE3)){
+                ObjManager::DeleteObj(this->GetObj(i));
+                this->DeleteObj(i);
             }
             else
                 i++;
@@ -126,28 +124,32 @@ void Field::EventsHandler(unsigned int mess, void *data){
     case ME_TIMER:
         if(*((int*)data) != TIMER_ANIM)
             return;
-        for(int i = (gridWidth * 2 +  2 * (gridHeight - 2)); i < (int)this->GetVolume(); i++ ){
-            ObjManager.GetObj(this->GetObj(i), obj);
-            switch(obj.BMP){
+        for(int i = 0/*(gridWidth * 2 +  2 * (gridHeight - 2))*/; i < (int)this->GetVolume(); i++ ){
+            ObjManager::GetObj(this->GetObj(i), obj);
+            bool change = true;
+            switch(obj.tileId){
             case ID_BMP_CELL_SHINE1:
-                obj.BMP = ID_BMP_CELL_SHINE2;
+                obj.tileId = ID_BMP_CELL_SHINE2;
                 break;
             case ID_BMP_CELL_SHINE2:
-                obj.BMP = ID_BMP_CELL_SHINE3;
+                obj.tileId = ID_BMP_CELL_SHINE3;
+                break;
+            case ID_BMP_CELL_SHINE3:
+                obj.tileId = ID_BMP_CELL_SHINE1;
                 break;
             default:
-            case ID_BMP_CELL_SHINE3:
-                obj.BMP = ID_BMP_CELL_SHINE1;
+                change = false;
                 break;
             }
-            ObjManager.ChangeObj(this->GetObj(i), obj);
+            if(change)
+                ObjManager::ChangeObj(this->GetObj(i), obj);
         }
     default:
         break;
     }
 }
 void Field::CreateShineField(int part){
-    CObj obj;
+    Object obj;
     IDn id;
     int left = 0;
     int right = gridWidth - 1;
@@ -161,9 +163,10 @@ void Field::CreateShineField(int part){
         break;
     }
 
-    this->CreateSimpleObj(&obj);
-    obj.LevelOfDraw = 1;
-    obj.SetBmp(ID_BMP_CELL_SHINE1);
+    obj.subType = STO_FIELD;
+    obj.sizeOfSubStr = 0;
+    obj.levelOfDraw = 1;
+    obj.SetTile(ID_BMP_CELL_SHINE1);
     for(int i = left; i <= right; i++){
         if(i == left)
             obj.image = 6;
@@ -173,8 +176,9 @@ void Field::CreateShineField(int part){
             obj.image = 7;
         obj.x = topCrdV[i].x;
         obj.y = topCrdV[i].y;
-        ObjManager.CreateObj(obj, id);
-        ObjManager.AddToGrid(id, false);
+        ObjManager::CreateObj(obj, id);
+        ObjManager::AddToGrid(id, false);
+        this->SaveObj(id);
 
         if(i == left)
             obj.image = 0;
@@ -184,8 +188,9 @@ void Field::CreateShineField(int part){
             obj.image = 1;
         obj.x = bottomCrdV[i].x;
         obj.y = bottomCrdV[i].y;
-        ObjManager.CreateObj(obj, id);
-        ObjManager.AddToGrid(id, false);
+        ObjManager::CreateObj(obj, id);
+        ObjManager::AddToGrid(id, false);
+        this->SaveObj(id);
     }
     int r_x = topCrdV[right].x;
     int l_x = topCrdV[left].x;
@@ -193,13 +198,15 @@ void Field::CreateShineField(int part){
         obj.image = 3;
         obj.x = l_x;
         obj.y = leftCrdV[i].y;
-        ObjManager.CreateObj(obj, id);
-        ObjManager.AddToGrid(id, false);
+        ObjManager::CreateObj(obj, id);
+        ObjManager::AddToGrid(id, false);
+        this->SaveObj(id);
 
         obj.image = 5;
         obj.x = r_x;
         obj.y = leftCrdV[i].y;
-        ObjManager.CreateObj(obj, id);
-        ObjManager.AddToGrid(id, false);
+        ObjManager::CreateObj(obj, id);
+        ObjManager::AddToGrid(id, false);
+        this->SaveObj(id);
     }
 }

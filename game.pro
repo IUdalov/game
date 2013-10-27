@@ -12,7 +12,7 @@ TARGET = game
 TEMPLATE = app
 
 
-SOURCES += INDIan/main.cpp\
+SOURCES +=\
     INDIan/main_window.cpp \
     INDIan/formuls.cpp \
     INDIan/graphics.cpp \
@@ -28,7 +28,8 @@ SOURCES += INDIan/main.cpp\
     models/menu.cpp \
     models/show_menu.cpp \
     INDIan/geo.cpp \
-    inits/declarations.cpp
+    inits/declarations.cpp \
+    main.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \

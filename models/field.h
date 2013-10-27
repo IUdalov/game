@@ -5,24 +5,20 @@
 #include "../INDIan/core_includes.h"
 #include "../physics/physics.h"
 
-extern System_ROOT Root;
-extern int ScreenWidth;
-extern int ScreenHeight;
-extern cResources Resources;
-extern Obj_Manager ObjManager;
+using namespace INDIan;
 
-class Field : public Model_Objects{
-    vector<dCoord> topCrdV;
-    vector<dCoord> leftCrdV;
-    vector<dCoord> rightCrdV;
-    vector<dCoord> bottomCrdV;
+class Field : public Model{
+    vector<DCoord> topCrdV;
+    vector<DCoord> leftCrdV;
+    vector<DCoord> rightCrdV;
+    vector<DCoord> bottomCrdV;
     Rect fieldRect;
     int gridWidth;
     int gridHeight;
 public:
     Field();
     virtual ~Field();
-    virtual void EventsHandler(unsigned int mess, void *data);
+    virtual void EventsHandler(int mess, void *data);
     void CreateShineField(int part);
 };
 

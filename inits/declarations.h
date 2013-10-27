@@ -54,7 +54,7 @@ enum{
 
 //    ID_BMP_EXAMPLE,
 
-    NumBmpRes
+    NumTileRes
 };
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -83,9 +83,10 @@ enum CheckersType{
     small
 };
 
+INDIan::GEO_SCAN_STATUS gps_for_menu_rect(INDIan::GEO_SCAN_TYPE geo_pr_type, INDIan::Object obj, void* geo_pr_data);
+INDIan::GEO_SCAN_STATUS gps_for_menu_circle(INDIan::GEO_SCAN_TYPE geo_pr_type, INDIan::Object obj, void* geo_pr_data);
+INDIan::GEO_SCAN_STATUS gps_for_checker(INDIan::GEO_SCAN_TYPE geo_pr_type, INDIan::Object obj, void* geo_pr_data);
 
-GEO_SCAN_STATUS gps_for_menu_rect(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
-GEO_SCAN_STATUS gps_for_menu_circle(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
-GEO_SCAN_STATUS gps_for_checker(GEO_SCAN_TYPE geo_pr_type, CObj obj, void* geo_pr_data);
+void initImages();
 
 #endif

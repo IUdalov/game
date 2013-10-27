@@ -1,208 +1,199 @@
 #include "object.h"
 //#include "resources.h"
 
-extern cResources Resources;
 
-CObj::CObj(void){
-    angle = 0.;
-    x = 0;
-    y = 0;
-    memset(&rect, 0, sizeof(pntRect));
-    image = 0;
-    SubType = 0;
-    lpModel = NULL;
-    LevelOfDraw = 0;
-    BMP = 0;
-    SubStr = NULL;
-    isTurned = false;
-    Width = 0;
-    Height = 0;
-    geo.pre_processor = NULL;
-    geo.type = GEO_NONE;
-}
-CObj::CObj(const CObj& str){
-    x = str.x;
-    y = str.y;
-    memcpy(&rect, &str.rect, sizeof(pntRect));
-    image = str.image;
-    SubType = str.SubType;
-    lpModel = str.lpModel;
-    BMP = str.BMP;
-    SubStr = str.SubStr;
-    LevelOfDraw = str.LevelOfDraw;
-    isTurned = str.isTurned;
-    Width = str.Width;
-    Height = str.Height;
-    geo.pre_processor = str.geo.pre_processor;
-    geo.type = str.geo.type;
-}
-Rect CObj::GetRect(){
-    Rect r;
-    r.left = x + rect.x1.x;
-    r.right = x + rect.x2.x;
-    r.top = y + rect.x1.y;
-    r.bottom = y + rect.x3.y;
-    return r;
-}
-pntRect CObj::GetPntRect(){
-    pntRect r;
-
-    r.x1.x = x + rect.x1.x;
-    r.x1.y = y + rect.x1.y;
-
-    r.x2.x = x + rect.x2.x;
-    r.x2.y = y + rect.x2.y;
-
-    r.x3.x = x + rect.x3.x;
-    r.x3.y = y + rect.x3.y;
-
-    r.x4.x = x + rect.x4.x;
-    r.x4.y = y + rect.x4.y;
-
-    return r;
-}
-void CObj::Draw(void){
-    if(BMP){
-        pntRect r;
-        r = GetPntRect();
-        Resources.Get_BMP(BMP)->Draw(image, r.x1, r.x2, r.x3, r.x4);
+namespace INDIan{
+    Object::Object(void){
+        angle = 0.;
+        x = 0;
+        y = 0;
+        memset(&rect, 0, sizeof(PntRect));
+        image = 0;
+        subType = 0;
+        levelOfDraw = 0;
+        tileId = 0;
+        subStr = NULL;
+        sizeOfSubStr = 0;
+        isTurned = false;
+        width = 0;
+        height = 0;
+        geo.preScaner = NULL;
+        geo.type = GEO_NONE;
     }
-}
-void CObj::Draw( int _x,int _y){
-    if(BMP){
-        double old_x = x;
-        double old_y = y;
-
-        x = _x;
-        y = _y;
-
-        Draw();
-
-        x = old_x;
-        y = old_y;
-
-    }
-}
-void CObj::DrawWithMove(int xm,int ym){
-    if(BMP){
-        Draw( (int)x+xm, (int)y+ym);
-    }
-}
-CObj& CObj::operator=(const CObj& str){
+    Object::Object(const Object& str){
         x = str.x;
         y = str.y;
+        memcpy(&rect, &str.rect, sizeof(PntRect));
         image = str.image;
-        memcpy(&rect, &str.rect, sizeof(pntRect));
-        SubType = str.SubType;
-        BMP = str.BMP;
-        lpModel = str.lpModel;
-        SubStr = str.SubStr;
-        LevelOfDraw = str.LevelOfDraw;
-        Width = str.Width;
-        Height = str.Height;
-        geo.pre_processor = str.geo.pre_processor;
+        subType = str.subType;
+        tileId = str.tileId;
+        subStr = str.subStr;
+        sizeOfSubStr = str.sizeOfSubStr;
+        levelOfDraw = str.levelOfDraw;
+        isTurned = str.isTurned;
+        width = str.width;
+        height = str.height;
+        geo.preScaner = str.geo.preScaner;
         geo.type = str.geo.type;
-        return *this;
-}
-Model_Objects* CObj::GetLpModel(void){
-    return lpModel;
-}
-unsigned int CObj::GetSubType(void){
-    return SubType;
-}
-void* CObj::GetSubStr(void){
-    return SubStr;
-}
-void CObj::SetRectByImage(void){
-    if(BMP){
-        Width = Resources.Get_BMP(BMP)->GetWidth();
-        Height = Resources.Get_BMP(BMP)->GetHeight();
+    }
+    Rect Object::GetRect(){
+        Rect r;
+        r.left = x + rect.x1.x;
+        r.right = x + rect.x2.x;
+        r.top = y + rect.x1.y;
+        r.bottom = y + rect.x3.y;
+        return r;
+    }
+    PntRect Object::GetPntRect(){
+        PntRect r;
+
+        r.x1.x = x + rect.x1.x;
+        r.x1.y = y + rect.x1.y;
+
+        r.x2.x = x + rect.x2.x;
+        r.x2.y = y + rect.x2.y;
+
+        r.x3.x = x + rect.x3.x;
+        r.x3.y = y + rect.x3.y;
+
+        r.x4.x = x + rect.x4.x;
+        r.x4.y = y + rect.x4.y;
+
+        return r;
+    }
+    void Object::Draw(void){
+        if(tileId){
+            PntRect r;
+            r = GetPntRect();
+            Resources::GetTile(tileId)->Draw(image, r.x1, r.x2, r.x3, r.x4);
+        }
+    }
+    void Object::Draw( int _x,int _y){
+        if(tileId){
+            double old_x = x;
+            double old_y = y;
+
+            x = _x;
+            y = _y;
+
+            Draw();
+
+            x = old_x;
+            y = old_y;
+
+        }
+    }
+    void Object::DrawWithMove(int xm,int ym){
+        if(tileId){
+            Draw( (int)x+xm, (int)y+ym);
+        }
+    }
+    Object& Object::operator=(const Object& str){
+            x = str.x;
+            y = str.y;
+            image = str.image;
+            memcpy(&rect, &str.rect, sizeof(PntRect));
+            subType = str.subType;
+            tileId = str.tileId;
+            subStr = str.subStr;
+            sizeOfSubStr = str.sizeOfSubStr;
+            levelOfDraw = str.levelOfDraw;
+            width = str.width;
+            height = str.height;
+            geo.preScaner = str.geo.preScaner;
+            geo.type = str.geo.type;
+            return *this;
+    }
+    void Object::SetRectByImage(void){
+        if(tileId){
+            width = Resources::GetTile(tileId)->GetWidth();
+            height = Resources::GetTile(tileId)->GetHeight();
+            SetDefaultAngle();
+        }
+    }
+    Coord Object::TurnPoint(Coord crd1, Coord crd2, float angle){
+        isTurned = true;
+
+        float xt = (float)crd2.x + ((float)(crd1.x - crd2.x)) * cos(angle) + ((float)(crd2.y - crd1.y)) * sin(angle);
+        float yt = (float)crd2.y + ((float)(crd1.x - crd2.x)) * sin(angle) + ((float)(crd1.y - crd2.y)) * cos(angle);
+
+        crd1.x = xt;
+        crd1.y = yt;
+        return crd1;
+    }
+    void Object::TurnImage(float angle){
+        SetDefaultAngle();
+
+        Coord crd;
+        crd.x = 0;
+        crd.y = 0;
+
+        rect.x1 = TurnPoint(rect.x1, crd, angle);
+        rect.x2 = TurnPoint(rect.x2, crd, angle);
+        rect.x3 = TurnPoint(rect.x3, crd, angle);
+        rect.x4 = TurnPoint(rect.x4, crd, angle);
+    }
+    void Object::SetWidthHeight(int width, int height){
+        width = width;
+        height = height;
         SetDefaultAngle();
     }
-}
-Coord CObj::TurnPoint(Coord crd1, Coord crd2, float angle){
-    isTurned = true;
+    void Object::SetDefaultAngle(void){
+        isTurned = false;
 
-    float xt = (float)crd2.x + ((float)(crd1.x - crd2.x)) * cos(angle) + ((float)(crd2.y - crd1.y)) * sin(angle);
-    float yt = (float)crd2.y + ((float)(crd1.x - crd2.x)) * sin(angle) + ((float)(crd1.y - crd2.y)) * cos(angle);
+        int width1 = width / 2;
+        int height1 = height / 2;
+        int width2 = (width % 2 == 0) ? width1: width1 + 1;
+        int height2 = (height % 2 == 0) ? height1: height1 + 1;
 
-    crd1.x = xt;
-    crd1.y = yt;
-    return crd1;
-}
-void CObj::TurnImage(float angle){
-    SetDefaultAngle();
+        rect.x1.x = - width2;
+        rect.x1.y = - height2;
 
-    Coord crd;
-    crd.x = 0;
-    crd.y = 0;
+        rect.x2.x = width1;
+        rect.x2.y = - height2;
 
-    rect.x1 = TurnPoint(rect.x1, crd, angle);
-    rect.x2 = TurnPoint(rect.x2, crd, angle);
-    rect.x3 = TurnPoint(rect.x3, crd, angle);
-    rect.x4 = TurnPoint(rect.x4, crd, angle);
-}
-void CObj::SetWidthHeight(int width, int height){
-    Width = width;
-    Height = height;
-    SetDefaultAngle();
-}
-void CObj::SetDefaultAngle(void){
-    isTurned = false;
+        rect.x3.x = width1;
+        rect.x3.y = height1;
 
-    int width1 = Width / 2;
-    int height1 = Height / 2;
-    int width2 = (Width % 2 == 0) ? width1: width1 + 1;
-    int height2 = (Height % 2 == 0) ? height1: height1 + 1;
+        rect.x4.x = - width2;
+        rect.x4.y = height1;
+    }
+    bool Object::HitPoint(Coord pnt){
+        if(isTurned)
+            return false;
 
-    rect.x1.x = - width2;
-    rect.x1.y = - height2;
+        Rect r;
+        int width2 = width / 2;
+        int height2 = height / 2;
+        int width1 = (width % 2 == 0) ? width2 - 1 : width2;
+        int height1 = (height % 2 == 0) ? height2 - 1 : height2;
 
-    rect.x2.x = width1;
-    rect.x2.y = - height2;
+        r.left = x - width1;
+        r.right = x + width2;
+        r.top = y - height1;
+        r.bottom = y + height2;
 
-    rect.x3.x = width1;
-    rect.x3.y = height1;
-
-    rect.x4.x = - width2;
-    rect.x4.y = height1;
-}
-bool CObj::HitPoint(Coord pnt){
-    if(isTurned)
+        if( (pnt.x >= r.left) && (pnt.x <= r.right) && (pnt.y >= r.top) &&  (pnt.y <= r.bottom))
+            return true;
         return false;
-
-    Rect r;
-    int width2 = Width / 2;
-    int height2 = Height / 2;
-    int width1 = (Width % 2 == 0) ? width2 - 1 : width2;
-    int height1 = (Height % 2 == 0) ? height2 - 1 : height2;
-
-    r.left = x - width1;
-    r.right = x + width2;
-    r.top = y - height1;
-    r.bottom = y + height2;
-
-    if( (pnt.x >= r.left) && (pnt.x <= r.right) && (pnt.y >= r.top) &&  (pnt.y <= r.bottom))
+    }
+    bool Object::HitRect(Rect rect){
+        if(isTurned)
+            return false;
         return true;
-    return false;
+    }
+    int Object::GetWidth(){
+        return width;
+    }
+    int Object::GetHeight(){
+        return height;
+    }
+    void Object::SetTile(int idTile, bool setRectByImage){
+        tileId = idTile;
+        if(setRectByImage)
+            SetRectByImage();
+    }
 }
-bool CObj::HitRect(Rect rect){
-    if(isTurned)
-        return false;
-    return true;
-}
-int CObj::GetWidth(){
-    return Width;
-}
-int CObj::GetHeight(){
-    return Height;
-}
-void CObj::SetBmp(unsigned int id_bmp, bool setRectByImage){
-    BMP = id_bmp;
-    if(setRectByImage)
-        SetRectByImage();
-}
-
 
 
 

@@ -5,44 +5,39 @@
 #include "../INDIan/core_includes.h"
 #include "../physics/physics.h"
 
-extern System_ROOT Root;
-extern int ScreenWidth;
-extern int ScreenHeight;
-extern cResources Resources;
-extern Obj_Manager ObjManager;
+using namespace INDIan;
 
 struct ObjChecker{
     double weight;
-    dCoord vSpeed;
+    DCoord vSpeed;
     int type;
     int master;
     double angle;
     double angle_speed;
 };
 
-struct PosManager{
-    Coord       pnt[3];
-    IDn     checker[3];
-    bool       busy[3];
-    vector<IDn> big_chs;
-    vector<IDn> middle_chs;
-    vector<IDn> small_chs;
-};
-enum PlayersProgress{
-    _1st = 0,
-    _2nd
-};
-enum GamePart{
-    Start = 1,
-    Disposal,
-    Game,
-    End,
-};
-
-class CheckerManager : Model_Objects{
+class CheckerManager : Model{
+    struct PosManager{
+        Coord       pnt[3];
+        IDn     checker[3];
+        bool       busy[3];
+        vector<IDn> big_chs;
+        vector<IDn> middle_chs;
+        vector<IDn> small_chs;
+    };
+    enum PlayersProgress{
+        _1st = 0,
+        _2nd
+    };
+    enum GamePart{
+        Start = 1,
+        Disposal,
+        Game,
+        End
+    };
 public:
     short CheckEnable;
-    vector<CObj> arrows;
+    vector<Object> arrows;
     IDn CheckChecker;
     int CurNumMoveCh;
     bool ChangeProgressAfterStop;
@@ -56,7 +51,7 @@ public:
     PosManager selector;
     Coord point_to;
     bool NeedFlyToPos;
-    dCoord vMoveAfterHit;
+    DCoord vMoveAfterHit;
     //--
 
     //++общие параметры игры
@@ -71,8 +66,8 @@ public:
 
     CheckerManager();
     ~CheckerManager();
-    void CreateArrow( CObj& arrow, double x_c, double y_c, double x_l, double y_l, double length, int max_num_arrow = 10);
-    virtual void EventsHandler(unsigned int mess, void *data);
+    void CreateArrow( Object& arrow, double x_c, double y_c, double x_l, double y_l, double length, int max_num_arrow = 10);
+    virtual void EventsHandler(int mess, void *data);
 
     void LocateSelector(void);
     void PrepareForReturn(int type);
@@ -82,17 +77,17 @@ public:
     bool RectInRect(Rect r, Rect rf);
     bool RectOutField(Rect r);
     bool RectOutRect(Rect r1, Rect r2);
-    bool CheckerOutRect(dCoord crd, double radius, Rect r);
+    bool CheckerOutRect(DCoord crd, double radius, Rect r);
     bool CheckerInPartOfField(Rect rect, short part);
 
     void Disposal_Timer(void *data);
-    void Disposal_MouseDown(IDn,sMouse);
+    void Disposal_MouseDown(IDn,SMouse);
     void Disposal_MouseUp(void);
     void Disposal_MouseMove(void);
     void Disposal_HitChToCh(void* data);
 
     void Game_Timer(void *data);
-    void Game_MouseDown(IDn,sMouse);
+    void Game_MouseDown(IDn, SMouse);
     void Game_MouseUp(void);
     void Game_MouseMove(void);
     void Game_HitChToCh(void* data);
