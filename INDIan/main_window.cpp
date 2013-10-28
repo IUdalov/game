@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "core_includes.h"
 
 #define ScreenResolutionX 1024
 #define ScreenResolutionY 768

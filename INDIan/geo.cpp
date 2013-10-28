@@ -1,49 +1,53 @@
 #include "geo.h"
+#include "object.h"
 
 namespace INDIan{
     GeoScaner::GeoScaner(){
-        curr_elem = -1;
+        currElem = -1;
         status = GSS_BREAK;
     }
     GeoScaner::~GeoScaner(){
 
     }
-    void GeoScaner::init(GEO_SCAN_TYPE inGeoType, vector<Object> inVObj, void* inData, int inDataSize){
-        if((inGeoType == GST_BREP_BREP) && (((Object*)inData)->geo.type == GEO_NONE)){
+    bool GeoScaner::GeoScan(GEO_SCAN_TYPE _geoType, Object obj, void* data){
+        return true;
+    }
+    void GeoScaner::Init(GEO_SCAN_TYPE _geoType, vector<Object> inVObj, void* _data, int dataSize){
+        if((_geoType == GST_BREP_BREP) && (((Object*)_data)->geo.type == GEO_NONE)){
             status = GSS_BREAK;
             return;
         }
-        geo_type = inGeoType;
+        geoType = _geoType;
         vObj = inVObj;
-        data = malloc(inDataSize);
-        memcpy(data, inData, inDataSize);
-        curr_elem = -1;
+        data = malloc(dataSize);
+        memcpy(data, _data, dataSize);
+        currElem = -1;
         status = GSS_DO;
     }
 
-    GEO_SCAN_ANS GeoScaner::scan(){
+    GEO_SCAN_ANS GeoScaner::Scan(){
         if(!vObj.size())
             return GSA_CANCEL;
-        if(curr_elem < 0){
-            curr_elem = 0;
+        if(currElem < 0){
+            currElem = 0;
         }
         else{
-            curr_elem++;
-            if(curr_elem >= (int)vObj.size())
+            currElem++;
+            if(currElem >= (int)vObj.size())
                 return GSA_CANCEL;
         }
         if( status & GSS_BREAK )
             return GSA_CANCEL;
-        if(vObj[curr_elem].geo.preScaner){
-            status = (GEO_SCAN_STATUS)(*vObj[curr_elem].geo.preScaner)(geo_type, vObj[curr_elem], data);
-            if(geo_type == GST_BREP_BREP)
+        if(vObj[currElem].geo.preScaner){
+            status = (GEO_SCAN_STATUS)(*vObj[currElem].geo.preScaner)(geoType, vObj[currElem], data);
+            if(geoType == GST_BREP_BREP)
                 status = (GEO_SCAN_STATUS)(status |
-                           (*((Object*)data)->geo.preScaner)(geo_type, *((Object*)data), &vObj[curr_elem]));
+                           (*((Object*)data)->geo.preScaner)(geoType, *((Object*)data), &vObj[currElem]));
         }
         if( status & GSS_DO){
             status = ((GEO_SCAN_STATUS)(status & ~GSS_DO));
-            if(vObj[curr_elem].geo.type == GEO_BREP)
-                status = ((GEO_SCAN_STATUS)(status | geo_scan(geo_type, vObj[curr_elem], data)));
+            if(vObj[currElem].geo.type == GEO_BREP)
+                status = ((GEO_SCAN_STATUS)(status | GeoScan(geoType, vObj[currElem], data)));
             else
                 status = ((GEO_SCAN_STATUS)(status | GSS_CONTINUE));
         }
@@ -60,9 +64,9 @@ namespace INDIan{
         return GSA_CONTINUE;
     }
     int GeoScaner::GetCurrElemNum(){
-        return curr_elem;
+        return currElem;
     }
     Object GeoScaner::GetCurrElem(){
-        return vObj[curr_elem];
+        return vObj[currElem];
     }
 }

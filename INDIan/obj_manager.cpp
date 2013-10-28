@@ -1,4 +1,6 @@
-#include "obj_manager.h"
+#include "core_includes.h"
+//#include "obj_manager.h"
+//#include "object.h"
 
 namespace INDIan{
     namespace ObjManager{
@@ -255,9 +257,9 @@ namespace INDIan{
             Object obj_for_geo = obj;
             Object obj2;
             IDn ID2;
-            geo_scan.init(GST_BREP_BREP, v_obj, &obj_for_geo, sizeof(Object));
+            geo_scan.Init(GST_BREP_BREP, v_obj, &obj_for_geo, sizeof(Object));
             GEO_SCAN_ANS gs_answer;
-            while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+            while( GSA_CANCEL != (gs_answer = geo_scan.Scan()) ){
                 if( gs_answer == GSA_OK ){
                     obj2 = geo_scan.GetCurrElem();
                     ID2 = v_id[geo_scan.GetCurrElemNum()];
@@ -367,8 +369,8 @@ namespace INDIan{
             GeoScaner geo_scan;
             IDn id;
             GEO_SCAN_ANS gs_answer;
-            geo_scan.init(GST_BREP_PNT, vObj, &mouseCrd, sizeof(DCoord));
-            while( GSA_CANCEL != (gs_answer = geo_scan.scan()) ){
+            geo_scan.Init(GST_BREP_PNT, vObj, &mouseCrd, sizeof(DCoord));
+            while( GSA_CANCEL != (gs_answer = geo_scan.Scan()) ){
                 if( gs_answer == GSA_OK ){
                     obj = geo_scan.GetCurrElem();
                     id = vId[geo_scan.GetCurrElemNum()];

@@ -1,4 +1,4 @@
-#include "root.h"
+#include "core_includes.h"
 
 extern QGLWidget* wndClass;
 

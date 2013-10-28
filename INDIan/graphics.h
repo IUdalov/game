@@ -3,6 +3,7 @@
 
 #include "dependences.h"
 #include "formuls.h"
+#include "transport.h"
 
 namespace INDIan{
     class Tile{

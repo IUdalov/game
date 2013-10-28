@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "core_includes.h"
 
 QGLWidget* wndClass;
 

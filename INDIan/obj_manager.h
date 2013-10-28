@@ -1,15 +1,14 @@
 #ifndef OBJ_MANAGER_H
 #define OBJ_MANAGER_H
 
-//#include "dependences.h"
+#include "dependences.h"
+#include "formuls.h"
+#include "transport.h"
 //#include "models.h"
-//#include "object.h"
-#include "geo.h"
-//#include "root.h"
-#include "main_window.h"
-
 
 namespace INDIan{
+    class Object;
+
     namespace ObjManager{
         struct GridParam{
             int widthGrid, heightGrid, widthCell, heightCell;

@@ -1,8 +1,10 @@
 #ifndef MODELS_H
 #define MODELS_H
 
+#include "transport.h"
 #include "dependences.h"
 #include "formuls.h"
+
 
 namespace INDIan{
     class Model{

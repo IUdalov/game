@@ -1,27 +1,27 @@
 #ifndef GEO_H
 #define GEO_H
 
-#include "object.h"
-#include "transport.h"
 #include "dependences.h"
+#include "transport.h"
 #include "formuls.h"
 
+
 namespace INDIan{
+    class Object;
+
     class GeoScaner{
-        GEO_SCAN_TYPE geo_type;
+        GEO_SCAN_TYPE geoType;
         vector<Object> vObj;
         void* data;
-        int curr_elem;
+        int currElem;
         GEO_SCAN_STATUS status;
 
-        bool geo_scan(GEO_SCAN_TYPE geoType, Object obj, void* data){
-            return false;
-        }
+        bool GeoScan(GEO_SCAN_TYPE _geoType, Object obj, void* data);
     public:
         GeoScaner();
         ~GeoScaner();
-        void init(GEO_SCAN_TYPE geo_type, vector<Object> vobj, void* data, int in_data_size);
-        GEO_SCAN_ANS scan();
+        void Init(GEO_SCAN_TYPE _geoType, vector<Object> vobj, void* data, int dataSize);
+        GEO_SCAN_ANS Scan();
         int GetCurrElemNum();
         Object GetCurrElem();
     };

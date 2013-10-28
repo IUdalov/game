@@ -1,8 +1,9 @@
 #ifndef MainWindow_H
 #define MainWindow_H
 
-#include "root.h"
-#include "resources.h"
+#include "transport.h"
+#include "dependences.h"
+#include "formuls.h"
 
 //void ReportSender(QtMsgType type, const QMessageLogContext& log, const QString& msg);
 namespace INDIan{

@@ -1,11 +1,21 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "transport.h"
 #include "dependences.h"
 #include "formuls.h"
-#include "resources.h"
+
 
 namespace INDIan{
+    class Geo;
+
+    typedef GEO_SCAN_STATUS (*GEO_PRE_SCANER)(GEO_SCAN_TYPE geoScanType, Object obj, void* geoScanData);
+
+    struct Geo{
+        GEO_TYPE type;
+        GEO_PRE_SCANER preScaner;
+    };
+
     class Object{
     public:
         int levelOfDraw;

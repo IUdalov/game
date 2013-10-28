@@ -1,4 +1,4 @@
-#include "resources.h"
+#include "core_includes.h"
 
 
 namespace INDIan{

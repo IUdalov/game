@@ -4,7 +4,6 @@
 #include "formuls.h"
 
 namespace INDIan{
-    class Object;
     //системные сообщения (Main Event)
     enum{
         ME_KEYUP =	1,
@@ -56,13 +55,6 @@ namespace INDIan{
         GSA_CANCEL = 0,
         GSA_CONTINUE,
         GSA_OK
-    };
-
-    typedef GEO_SCAN_STATUS (*GEO_PRE_SCANER)(GEO_SCAN_TYPE geoScanType, Object obj, void* geoScanData);
-
-    struct Geo{
-        GEO_TYPE type;
-        GEO_PRE_SCANER preScaner;
     };
 }
 

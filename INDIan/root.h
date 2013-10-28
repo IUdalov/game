@@ -1,11 +1,13 @@
 #ifndef ROOT_H
 #define ROOT_H
 
-#include "formuls.h"
-#include "models.h"
 #include "transport.h"
+#include "dependences.h"
+#include "formuls.h"
 
 namespace INDIan {
+    class Model;
+
     namespace Root {
         struct Message{
             void*			data;
