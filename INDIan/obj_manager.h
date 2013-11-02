@@ -22,6 +22,7 @@ namespace INDIan{
         void ReBuildGrid(int _widthGrid,int _heightGrid,int _widthCell, int _heightCell,int sizeOfBg = 0);
         bool CreateObj(Object obj, IDn& id);
         bool DeleteObj(IDn id);
+        void DeleteObjs(const vector<IDn>& vId);
         bool GetObj(IDn id,Object& obj);
         bool ChangeObj(IDn id,Object obj);
         int GetObjStatus(IDn id);

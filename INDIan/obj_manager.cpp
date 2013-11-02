@@ -187,6 +187,10 @@ namespace INDIan{
             dimOfObj[id.id]->status = OS_DELETE;
             return true;
         }
+        void DeleteObjs(const vector<IDn>& vId){
+            for(vector<IDn>::const_iterator i = vId.begin(); i != vId.end(); i++)
+                DeleteObj(*i);
+        }
         bool GetObj(IDn id,Object& Obj){
             if(!isActual(id))
                 return false;
