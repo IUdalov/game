@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = game
 TEMPLATE = app
 
+QMAKE_CXX_FLAGS_WARN_ON += -Wextra
 
 SOURCES +=\
     INDIan/main_window.cpp \

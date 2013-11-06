@@ -4,6 +4,19 @@ Real RoundConPi(Real phi) {
     return phi - 2 *M_PI * trunc(phi / (2 * M_PI));
 }
 
+inline Real getAngle(Real x, Real y) {
+    if (fabs(x) + fabs(y) < MIN_REAL) return 0;
+    return (x > 0) ? atan(y / x) : atan(y / x) + M_PI;
+}
+
+inline Real getVecLen(Real x, Real y) {
+    return sqrt(x * x + y * y);
+}
+
+inline Real magicRatationTransform(Real radius) {
+    return sqrt(radius) * sqrt(Radius::big);
+}
+
 // вроде работает, от скуки можно пооптимизировать
 Error Move(PhChecker& ch, Real time) {
 
@@ -81,16 +94,16 @@ Error Clash(PhChecker& ch1, PhChecker& ch2) {
     vx21 = vx2 - vx1;
     vy21 = vy2 - vy1;
 
-    vx_cm = (m1 * vx1 + m2 * vx2) / (m1 + m2) ;
-    vy_cm = (m1 * vy1 + m2 * vy2)/(m1 + m2) ;
+    vx_cm = (m1 * vx1 + m2 * vx2) / (m1 + m2);
+    vy_cm = (m1 * vy1 + m2 * vy2) / (m1 + m2);
 
     //     *** I have inserted the following statements to avoid a zero divide;
     //         (for single precision calculations,
     //          1.0E-12 should be replaced by a larger value). **************
-    // так хитро избегоаем перехода через 0, захардкожени точность дабла
+    // так хитро избегаем перехода через 0, захардкожена точность дабла
     fy21 = 1.0E-12 * fabs(y21);
     if ( fabs(x21) < fy21 ) {
-        if (x21 < 0) { sign=-1; } else { sign=1;}
+        if (x21 < 0) { sign=-1; } else { sign=1; }
         x21=fy21 * sign;
     }
 
@@ -102,17 +115,31 @@ Error Clash(PhChecker& ch1, PhChecker& ch2) {
     vx1 = vx1 - m21 * dvx2;
     vy1 = vy1 - a * m21 * dvx2;
 
+     // angle speed
+    Real con_a = getAngle(x21, y21);
+
+    Real con1 = getAngle(ch1.speed.x, ch1.speed.y);
+    Real con2 = getAngle(ch2.speed.x, ch2.speed.y);
+
+    Real angle_speed = fabs(sin(con1 - con_a) * getVecLen(ch1.speed.x, ch1.speed.y)
+                            + sin(con2 - con_a) * getVecLen(ch2.speed.x, ch2.speed.y));
+
+    if (con_a > con1) {
+        ch1.angle_speed += angle_speed / magicRatationTransform(ch1.radius);
+        ch2.angle_speed += angle_speed / magicRatationTransform(ch2.radius);
+    } else {
+        ch1.angle_speed -= angle_speed / magicRatationTransform(ch1.radius);
+        ch2.angle_speed -= angle_speed / magicRatationTransform(ch2.radius);
+    }
+
+    // линейная скорость
     //     ***  velocity correction for inelastic collisions ***
     ch1.speed.x = (vx1 - vx_cm) * spring + vx_cm;
     ch1.speed.y = (vy1 - vy_cm) * spring + vy_cm;
     ch2.speed.x = (vx2 - vx_cm) * spring + vx_cm;
     ch2.speed.y = (vy2 - vy_cm) * spring + vy_cm;
 
-    // угловая скорость
-    Real tan_a = atan(a) + M_PI;
-    Real point_on_circle = (ch1.speed.x - ch2.speed.x) * cos(tan_a) - (ch1.speed.y - ch2.speed.y) * sin(tan_a);
-    ch1.angle_speed += point_on_circle / ch1.radius;
-    ch2.angle_speed -= point_on_circle / ch2.radius;
-
     return OK;
+
+
 }
