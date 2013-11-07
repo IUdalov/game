@@ -61,7 +61,6 @@ namespace INDIan{
         class ResourcesModel : public Model{
         public:
             ResourcesModel() : Model(0, 0){
-                Root::AccessModel(this);
             }
             ~ResourcesModel(){
             }
@@ -78,5 +77,8 @@ namespace INDIan{
                 }
             }
         }ResModel;
+        void Init(){
+            Root::AccessModel((Model*)&ResModel);
+        }
     }
 }

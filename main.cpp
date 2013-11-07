@@ -16,10 +16,13 @@ int main(int argc, char *argv[])
     Root::AccessModel((Model*)&field);
     Root::AccessModel((Model*)&menu);
 
+    Resources::Init();
+    ObjManager::Init();
+
     Resources::UserTilesLoader = initImages;
 
     QApplication a(argc, argv);
-    INDIan::GLWindow window;
+    GLWindow window;
     window.Run();
     
     return a.exec();

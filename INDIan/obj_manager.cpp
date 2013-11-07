@@ -390,7 +390,6 @@ namespace INDIan{
         class ObjectsManagerModel : Model{
         public:
             ObjectsManagerModel() : Model(0,0){
-                Root::AccessModel(this);
             }
             void EventsHandler(int mess,void* data){
                 switch(mess){
@@ -413,7 +412,9 @@ namespace INDIan{
                 }
             }
         }ObjManModel;
-
+        void Init(){
+            Root::AccessModel((Model*)&ObjManModel);
+        }
         bool find_in_vector(vector<IDn>& vect, IDn elem){
             vector<IDn>::iterator iter;
             for(iter = vect.begin(); iter != vect.end(); iter++){

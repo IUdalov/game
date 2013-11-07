@@ -34,6 +34,7 @@ namespace INDIan{
         bool GetGridStatus(void);
         bool GetGridParam(GridParam& gp);
         void ChangeCrdByCamera(int& x, int& y);
+        void Init();
     }
 }
 

@@ -21,6 +21,7 @@ namespace INDIan{
         Tile* GetTile( int num);
         int GetTileCount();
         void SetTileCount(int size);
+        void Init();
     }
 }
 

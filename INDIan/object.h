@@ -7,8 +7,6 @@
 
 
 namespace INDIan{
-    class Geo;
-
     typedef GEO_SCAN_STATUS (*GEO_PRE_SCANER)(GEO_SCAN_TYPE geoScanType, Object obj, void* geoScanData);
 
     struct Geo{
