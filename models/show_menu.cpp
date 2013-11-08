@@ -10,15 +10,23 @@ void Menu::InitMenuItems() {
     obj.geo.type = GEO_BREP;
 
     obj.x = GLWindow::GetScreenWidth() / 2;
-    obj.y = GLWindow::GetScreenHeight() / 5;
-    obj.tileId = ID_BMP_MENU_PLAY;
+    obj.y = GLWindow::GetScreenHeight() / 6;
+    obj.tileId = ID_BMP_MENU_SINGLE;
     obj.geo.preScaner = gps_for_menu_rect;
     obj.SetRectByImage();
     ObjManager::CreateObj(obj, id);
-    menuItems[ID_BMP_MENU_PLAY] = id;
+    menuItems[ID_BMP_MENU_SINGLE] = id;
 
     obj.x = GLWindow::GetScreenWidth() / 2;
-    obj.y = GLWindow::GetScreenHeight() * 2 / 5;
+    obj.y = GLWindow::GetScreenHeight() * 2 / 6;
+    obj.tileId = ID_BMP_MENU_MULTI;
+    obj.geo.preScaner = gps_for_menu_rect;
+    obj.SetRectByImage();
+    ObjManager::CreateObj(obj, id);
+    menuItems[ID_BMP_MENU_MULTI] = id;
+
+    obj.x = GLWindow::GetScreenWidth() / 2;
+    obj.y = GLWindow::GetScreenHeight() * 3 / 6;
     obj.tileId = ID_BMP_RULES;
     obj.geo.preScaner = gps_for_menu_rect;
     obj.SetRectByImage();
@@ -26,7 +34,7 @@ void Menu::InitMenuItems() {
     menuItems[ID_BMP_RULES] = id;
 
     obj.x = GLWindow::GetScreenWidth() / 2;
-    obj.y = GLWindow::GetScreenHeight() * 3 / 5;
+    obj.y = GLWindow::GetScreenHeight() * 4 / 6;
     obj.tileId = ID_BMP_OPTIONS;
     obj.geo.preScaner = gps_for_menu_rect;
     obj.SetRectByImage();
@@ -34,7 +42,7 @@ void Menu::InitMenuItems() {
     menuItems[ID_BMP_OPTIONS] = id;
 
     obj.x = GLWindow::GetScreenWidth() / 2;
-    obj.y = GLWindow::GetScreenHeight() * 4 / 5;
+    obj.y = GLWindow::GetScreenHeight() * 5 / 6;
     obj.tileId = ID_BMP_EXIT;
     obj.geo.preScaner = gps_for_menu_rect;
     obj.SetRectByImage();
@@ -77,7 +85,8 @@ void Menu::InitMenuItems() {
 
 
 void Menu::ShowStartMenu() {
-    ShowMenuItem(ID_BMP_MENU_PLAY);
+    ShowMenuItem(ID_BMP_MENU_SINGLE);
+    ShowMenuItem(ID_BMP_MENU_MULTI);
     ShowMenuItem(ID_BMP_RULES);
     ShowMenuItem(ID_BMP_OPTIONS);
     ShowMenuItem(ID_BMP_EXIT);
@@ -85,25 +94,37 @@ void Menu::ShowStartMenu() {
 }
 
 void Menu::HideStartMenu() {
-    HideMenuItem(ID_BMP_MENU_PLAY);
+    HideMenuItem(ID_BMP_MENU_SINGLE);
+    HideMenuItem(ID_BMP_MENU_MULTI);
     HideMenuItem(ID_BMP_RULES);
     HideMenuItem(ID_BMP_OPTIONS);
     HideMenuItem(ID_BMP_EXIT);
     return;
 }
 
-void Menu::ShowPositionMenu() {
+void Menu::ShowPositionSingleMenu() {
     ShowMenuItem(ID_BMP_PLAY);
     ShowMenuItem(ID_BMP_BACK);
     return;
 }
 
-void Menu::HidePositionMenu() {
+void Menu::HidePositionSingleMenu() {
     HideMenuItem(ID_BMP_PLAY);
     HideMenuItem(ID_BMP_BACK);
     return;
 }
 
+void Menu::ShowPositionMultiMenu() {
+    ShowMenuItem(ID_BMP_PLAY);
+    ShowMenuItem(ID_BMP_BACK);
+    return;
+}
+
+void Menu::HidePositionMultiMenu() {
+    HideMenuItem(ID_BMP_PLAY);
+    HideMenuItem(ID_BMP_BACK);
+    return;
+}
 void Menu::ShowOptionMenu() {
     ShowMenuItem(ID_BMP_BACK);
     return;

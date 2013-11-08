@@ -4,7 +4,8 @@
 #include "../INDIan/core_includes.h"
 
 enum{
-    SE_STARTGAME = 101,
+    SE_START_SINGLE_GAME = 101,
+    SE_START_MULTI_GAME,
     SE_CREATEFIELD,
     SE_DELETEFIELD,
     SE_FIELDPARAM,
@@ -43,7 +44,8 @@ enum{
     ID_BMP_CELL_SHINE3,
     ID_BMP_BTNPLAY,
 
-    ID_BMP_MENU_PLAY,
+    ID_BMP_MENU_SINGLE,
+    ID_BMP_MENU_MULTI,
     ID_BMP_RULES,
     ID_BMP_OPTIONS,
     ID_BMP_EXIT,

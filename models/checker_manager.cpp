@@ -67,7 +67,7 @@ void CheckerManager::EventsHandler(int mess, void *data){
         }
         else if(*((int*)data) == Qt::Key_F2){
             if(game_part == End){
-                gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+                gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_START_MULTI_GAME, STO_CHEKERS);
                 memcpy(gameparam, &game_param, sizeof(GameParam));
             }
             else
@@ -82,7 +82,7 @@ void CheckerManager::EventsHandler(int mess, void *data){
         break;
     case ME_CREATE:
         break;
-    case SE_STARTGAME:
+    case SE_START_MULTI_GAME:
         if(!data)
             return;
         gameparam = (GameParam*)data;
@@ -238,7 +238,7 @@ void CheckerManager::EventsHandler(int mess, void *data){
         break;
     case SE_REPLAY:
         Root::PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
-        gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+        gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_START_MULTI_GAME, STO_CHEKERS);
         memcpy(gameparam, &game_param, sizeof(GameParam));
         break;
     case SE_ENDGAME:

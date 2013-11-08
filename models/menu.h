@@ -12,7 +12,8 @@ typedef map<int, IDn> MenuItems;
 class Menu : public Model {
     enum {
         Start = 0,
-        Position,
+        PositionSingle,
+        PositionMulti,
         Option,
         Rules,
         Pause,
@@ -35,8 +36,10 @@ private:
 
     void ShowStartMenu();
     void HideStartMenu();
-    void ShowPositionMenu();
-    void HidePositionMenu();
+    void ShowPositionSingleMenu();
+    void HidePositionSingleMenu();
+    void ShowPositionMultiMenu();
+    void HidePositionMultiMenu();
     void ShowOptionMenu();
     void HideOptionMenu();
     void ShowRulesMenu();
