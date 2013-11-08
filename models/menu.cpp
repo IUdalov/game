@@ -46,10 +46,16 @@ void Menu::MouseClick(IDn objId, SMouse mouse) {
 
     if(mouse.L == Root::S_DOWN) {
         switch (obj.tileId) {
-        case ID_BMP_MENU_PLAY:
+        case ID_BMP_MENU_SINGLE:
             HideStartMenu();
-            currMenu = Position;
-            ShowPositionMenu();
+            currMenu = PositionSingle;
+            ShowPositionSingleMenu();
+            break;
+
+        case ID_BMP_MENU_MULTI:
+            HideStartMenu();
+            currMenu = PositionMulti;
+            ShowPositionMultiMenu();
             break;
 
         case ID_BMP_RULES:
@@ -76,8 +82,11 @@ void Menu::MouseClick(IDn objId, SMouse mouse) {
             case Rules:
                 HideRulesMenu();
                 break;
-            case Position:
-                HidePositionMenu();
+            case PositionSingle:
+                HidePositionSingleMenu();
+                break;
+            case PositionMulti:
+                HidePositionMultiMenu();
                 break;
             case GameSuspend:
                 HidePauseMenu();
@@ -91,18 +100,28 @@ void Menu::MouseClick(IDn objId, SMouse mouse) {
             break;
 
         case ID_BMP_PLAY:{
-            if (currMenu == Position) {
-                HidePositionMenu();
+            if (currMenu == PositionSingle) {
+                HidePositionSingleMenu();
                 currMenu = GameActive;
                 GameParam* gameparam;
-                gameparam = (GameParam*)Root::PutEventToQueue(sizeof(GameParam), SE_STARTGAME, STO_CHEKERS);
+                gameparam = (GameParam*)Root::PutEventToQueue(sizeof(GameParam), SE_START_SINGLE_GAME, STO_CHEKERS);
                 gameparam->FieldWidth = gameparam->FieldHeight = 8;
                 gameparam->big_num = 4;
                 gameparam->midle_num = 4;
                 gameparam->small_num = 4;
                 ShowGameMenu();
             }
-
+            if (currMenu == PositionMulti) {
+                HidePositionSingleMenu();
+                currMenu = GameActive;
+                GameParam* gameparam;
+                gameparam = (GameParam*)Root::PutEventToQueue(sizeof(GameParam), SE_START_MULTI_GAME, STO_CHEKERS);
+                gameparam->FieldWidth = gameparam->FieldHeight = 8;
+                gameparam->big_num = 4;
+                gameparam->midle_num = 4;
+                gameparam->small_num = 4;
+                ShowGameMenu();
+            }
             if (currMenu == GameSuspend) {
                 HidePauseMenu();
                 currMenu = GameActive;

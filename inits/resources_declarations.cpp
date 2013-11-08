@@ -25,7 +25,8 @@ void initImages(){
     Resources::AddTile(ID_BMP_CELL_SHINE2, QString("../images/cell_shine2.bmp"), QString("../images/cell_shine2_mask.bmp"), 9, 3, 3);
     Resources::AddTile(ID_BMP_CELL_SHINE3, QString("../images/cell_shine3.bmp"), QString("../images/cell_shine3_mask.bmp"), 9, 3, 3);
 
-    Resources::AddTile(ID_BMP_MENU_PLAY, QString("../images/button_menu_play.bmp"), QString("../images/button_menu_play_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_MENU_SINGLE, QString("../images/button_menu_single.bmp"), QString("../images/button_menu_single_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_MENU_MULTI, QString("../images/button_menu_multi.bmp"), QString("../images/button_menu_multi_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_RULES, QString("../images/button_rules.bmp"), QString("../images/button_rules_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_OPTIONS, QString("../images/button_options.bmp"), QString("../images/button_optionsr_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_EXIT, QString("../images/button_exit.bmp"), QString("../images/button_exit_mask.bmp"), 1, 1, 1);
