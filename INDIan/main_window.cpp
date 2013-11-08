@@ -32,14 +32,16 @@ namespace INDIan{
         if(x2 < y2){
             screenWidth = ScreenResolutionX;
             double coef = x2 / ScreenResolutionX;
-            screenHeight = ScreenResolutionY;
-            screenHeight += (y2 - ScreenResolutionY * coef);
+            screenHeight = int((double)y2 / coef);
+            //screenHeight = ScreenResolutionY;
+            //screenHeight += (y2 - ScreenResolutionY * coef);
         }
         else{
             screenHeight = ScreenResolutionY;
             double coef = (double)y2 / (double)ScreenResolutionY;
-            screenWidth = ScreenResolutionX;
-            screenWidth += (x2 - ScreenResolutionX * coef) + 1;
+            screenWidth = int((double)x2 / coef);
+            //screenWidth = ScreenResolutionX;
+            //screenWidth += (x2 - ScreenResolutionX * coef) + 1;
         }
         wndScaleX = (double)screenWidth / (double)x2;
         wndScaleY = (double)screenHeight / (double)y2;
