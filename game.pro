@@ -29,7 +29,8 @@ SOURCES +=\
     models/show_menu.cpp \
     INDIan/geo.cpp \
     inits/declarations.cpp \
-    main.cpp
+    main.cpp \
+    ai/ai.cpp
 
 HEADERS  += \
     INDIan/core_includes.h \
@@ -50,7 +51,8 @@ HEADERS  += \
     models/field.h \
     models/checker_manager.h \
     models/menu.h \
-    INDIan/geo.h
+    INDIan/geo.h \
+    ai/ai.h
     inits/declarations.h
 
 OTHER_FILES += \

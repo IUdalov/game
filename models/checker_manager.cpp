@@ -1,4 +1,5 @@
 #include "checker_manager.h"
+#include "../ai/ai.h"
 
 #define MaxArrowsCount 15
 
@@ -82,6 +83,7 @@ void CheckerManager::EventsHandler(int mess, void *data){
         break;
     case ME_CREATE:
         break;
+    case SE_START_SINGLE_GAME:
     case SE_START_MULTI_GAME:
         if(!data)
             return;
@@ -96,6 +98,10 @@ void CheckerManager::EventsHandler(int mess, void *data){
         }
         game_part = Start;
         memcpy(&game_param, gameparam, sizeof(GameParam));
+        if(mess == SE_START_SINGLE_GAME)
+            sec_player_control = _ai;
+        else
+            sec_player_control = _2nd;
         break;
     case SE_FIELDPARAM:
         FieldRect = *((Rect*)data);
@@ -114,6 +120,8 @@ void CheckerManager::EventsHandler(int mess, void *data){
             img1 = ID_BMP_BIG_CHEKER2; img2 = ID_BMP_MID_CHEKER2; img3 = ID_BMP_SMALL_CHEKER2;
             xStep = FieldRect.right + Resources::GetTile(ID_BMP_BIG_CHEKER2)->GetWidth();
             break;
+        case _ai:
+            AIDisposalChecks();
         default:
             return;
         }
@@ -209,12 +217,12 @@ void CheckerManager::EventsHandler(int mess, void *data){
         }
         else if(game_part == Disposal){
             if(players_progress == _1st){
-                players_progress = _2nd;
+                players_progress = sec_player_control;
                 Root::PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
                 Root::PutEventToQueue( 0, SE_FIELD_SHINE_RIGHT, STO_FIELD);
                 Root::PutEventToQueue( 0, SE_INITSELECTOR, STO_CHEKERS);
             }
-            else if(players_progress == _2nd){
+            else if(players_progress == sec_player_control){
                 Root::PutEventToQueue( 0, SE_FIELD_SHINE_CLOSE, STO_FIELD);
                 ClearSelector();
                 players_progress = _1st;
@@ -229,16 +237,22 @@ void CheckerManager::EventsHandler(int mess, void *data){
                 CheckEnable = 0;
             }
             else if(players_progress == _1st){
-                players_progress = _2nd;
+                players_progress = sec_player_control;
+                if(players_progress == _ai){
+                    AIMakeStep();
+                }
             }
-            else if(players_progress == _2nd){
+            else if(players_progress == sec_player_control){
                 players_progress = _1st;
             }
         }
         break;
     case SE_REPLAY:
         Root::PutEventToQueue( 0, SE_ENDGAME, STO_CHEKERS);
-        gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_START_MULTI_GAME, STO_CHEKERS);
+        if(sec_player_control == _ai)
+            gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_START_SINGLE_GAME, STO_CHEKERS);
+        else
+            gameparam = (GameParam*)Root::PutEventToQueue( sizeof(GameParam), SE_START_MULTI_GAME, STO_CHEKERS);
         memcpy(gameparam, &game_param, sizeof(GameParam));
         break;
     case SE_ENDGAME:
@@ -604,30 +618,30 @@ bool CheckerManager::CheckerOutRect(DCoord crd, double radius, Rect rf){
         if( crd.x < rf.left && crd.y < rf.top ){
             if( sqrt( pow(crd.x - rf.left, 2.)
                       + pow(crd.y - rf.top, 2.)) > radius){
-                return false;
+                return true;
             }
         }
         if( crd.x > rf.right && crd.y < rf.top ){
             if( sqrt( pow(crd.x - rf.right, 2.)
                       + pow(crd.y - rf.top, 2.)) > radius){
-                return false;
+                return true;
             }
         }
         if( crd.x > rf.right && crd.y > rf.bottom){
             if( sqrt( pow(crd.x - rf.right, 2.)
                       + pow(crd.y - rf.bottom, 2.)) > radius){
-                return false;
+                return true;
             }
         }
         if( crd.x < rf.left && crd.y > rf.bottom ){
             if( sqrt( pow(crd.x - rf.left, 2.)
                       + pow(crd.y - rf.bottom, 2.)) > radius){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 void CheckerManager::Disposal_Timer(void *data){
     Object obj;
@@ -777,42 +791,55 @@ void CheckerManager::Game_Timer(void *data){
     Object obj;
     if(*((int*)data) == 1){
         CurNumMoveCh = 0;
+        Rect screenRect = {0, GLWindow::GetScreenWidth(), 0,GLWindow::GetScreenHeight()};
         for( int i = 0; i < (int)this->GetVolume(); i ++){
             ObjManager::GetObj(this->GetObj(i),obj);
             ObjChecker* objch = (ObjChecker*)obj.subStr;
-            if( (objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0)
-                    && (objch->angle_speed == 0.)){
-                DCoord crd = {obj.x, obj.y};
-                if(!CheckerOutRect(crd, Resources::GetTile(obj.tileId)->GetWidth()/2, FieldRect)){
-                    int points;
-                    switch(objch->type){
-                    case big:
-                        points = POINTS_FOR_BIG_CH;
-                        break;
-                    case middle:
-                        points = POINTS_FOR_MIDDLE_CH;
-                        break;
-                    case small: default:
-                        points = POINTS_FOR_SMALL_CH;
-                        break;
-                    }
-                    switch(objch->master){
-                    case _1st:
-                        points_1st += points;
-                        alive_che1_count--;
-                        break;
-                    case _2nd:
-                        points_2nd += points;
-                        alive_che2_count--;
-                        break;
-                    default:
-                        break;
-                    }
-                    ObjManager::DeleteObj(this->GetObj(i));
-                    this->DeleteObj(this->GetObj(i));
+            DCoord crd = {obj.x, obj.y};
+            bool doDel = false;
+            bool doMove = true;
+            if( ((objch->vSpeed.x == 0)  && (objch->vSpeed.y == 0)
+                    && (objch->angle_speed == 0.))){
+                doMove = false;
+                if(CheckerOutRect(crd, Resources::GetTile(obj.tileId)->GetWidth() / 2, FieldRect)){
+                    doDel = true;
                 }
-                continue;
             }
+            if(CheckerOutRect(crd, Resources::GetTile(obj.tileId)->GetWidth() / 2, screenRect)){
+                doDel = true;
+                doMove = false;
+            }
+            if(doDel){
+                int points;
+                switch(objch->type){
+                case big:
+                    points = POINTS_FOR_BIG_CH;
+                    break;
+                case middle:
+                    points = POINTS_FOR_MIDDLE_CH;
+                    break;
+                case small: default:
+                    points = POINTS_FOR_SMALL_CH;
+                    break;
+                }
+                switch(objch->master){
+                case _1st:
+                    points_1st += points;
+                    alive_che1_count--;
+                    break;
+                case _ai:
+                case _2nd:
+                    points_2nd += points;
+                    alive_che2_count--;
+                    break;
+                default:
+                    break;
+                }
+                ObjManager::DeleteObj(this->GetObj(i));
+                this->DeleteObj(this->GetObj(i));
+            }
+            if(!doMove)
+                continue;
             CurNumMoveCh++;
             ObjManager::DeleteFromGrid(this->GetObj(i));
             PhChecker ch;
@@ -967,6 +994,7 @@ void CheckerManager::RecalcActualAliveCheCount(){
             case _1st:
                 alive_che1_count++;
                 break;
+            case _ai:
             case _2nd:
                 alive_che2_count++;
                 break;
@@ -975,4 +1003,131 @@ void CheckerManager::RecalcActualAliveCheCount(){
             }
         }
     }
+}
+void CheckerManager::AIDisposalChecks(void){
+    ClearSelector();
+
+    Object obj;
+    IDn ID;
+    int img1, img2, img3;
+    int xDef, yDef, yStep, chWidth;
+    img1 = ID_BMP_BIG_CHEKER2; img2 = ID_BMP_MID_CHEKER2; img3 = ID_BMP_SMALL_CHEKER2;
+
+    obj.subType = STO_CHEKERS;
+    obj.sizeOfSubStr = sizeof(ObjChecker);
+    obj.levelOfDraw = 2;
+    obj.image = 0;
+    obj.geo.type = GEO_BREP;
+    obj.geo.preScaner = gps_for_checker;
+
+
+    chWidth = Resources::GetTile(img1)->GetWidth();
+    xDef = FieldMiddle + chWidth / 2;
+    yDef = (FieldRect.bottom + FieldRect.top) / 2
+            - (game_param.big_num / 2) * chWidth + chWidth / 2;
+    yStep = chWidth;
+
+    ObjChecker* obj_ch;
+    for(int i = 0 ; i < game_param.big_num; i ++){
+        obj.tileId = img1;
+        obj.SetRectByImage();
+        obj.x = xDef;
+        obj.y = yDef + yStep * i;
+        ObjManager::CreateObj(obj, ID);
+        this->SaveObj(ID);
+        ObjManager::GetObj(ID, obj);
+        obj_ch = ((ObjChecker*)obj.subStr);
+        obj_ch->master = players_progress;
+        obj_ch->weight = Weight::huge;
+        obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+        obj_ch->type = big;
+        obj_ch->angle = 0;
+        obj_ch->angle_speed = 0.;
+        ObjManager::AddToGrid(ID);
+    }
+
+    xDef += chWidth / 2;
+    chWidth = Resources::GetTile(img2)->GetWidth();
+    xDef += chWidth / 2;
+    yDef = (FieldRect.bottom + FieldRect.top) / 2
+            - (game_param.midle_num / 2) * chWidth + chWidth / 2;
+    yStep = chWidth;
+
+    for(int i = 0 ; i < game_param.midle_num; i ++){
+        obj.tileId = img2;
+        obj.SetRectByImage();
+        obj.x = xDef;
+        obj.y = yDef + i * yStep;
+        ObjManager::CreateObj(obj, ID);
+        this->SaveObj(ID);
+        ObjManager::GetObj(ID, obj);
+        obj_ch = ((ObjChecker*)obj.subStr);
+        obj_ch->master = players_progress;
+        obj_ch->weight = Weight::normal;
+        obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+        obj_ch->type = middle;
+        obj_ch->angle = 0;
+        obj_ch->angle_speed = 0.;
+        ObjManager::AddToGrid(ID);
+    }
+
+    xDef += chWidth / 2;
+    chWidth = Resources::GetTile(img3)->GetWidth();
+    xDef += chWidth / 2;
+    yDef = (FieldRect.bottom + FieldRect.top) / 2
+            - (game_param.small_num / 2) * chWidth + chWidth / 2;
+    yStep = chWidth;
+
+    for(int i = 0 ; i < game_param.small_num; i ++){
+        obj.tileId = img3;
+        obj.SetRectByImage();
+        obj.x = xDef;
+        obj.y = yDef + i * yStep;
+        ObjManager::CreateObj(obj, ID);
+        this->SaveObj(ID);
+        ObjManager::GetObj(ID, obj);
+        obj_ch = ((ObjChecker*)obj.subStr);
+        obj_ch->master = players_progress;
+        obj_ch->weight = Weight::low;
+        obj_ch->vSpeed.x = obj_ch ->vSpeed.y = 0;
+        obj_ch->type = small;
+        obj_ch->angle = 0;
+        obj_ch->angle_speed = 0.;
+        ObjManager::AddToGrid(ID);
+    }
+    Root::PutEventToQueue(0, SE_NEXTGAMEPART, STO_CHEKERS);
+}
+void CheckerManager::AIMakeStep(void){
+    Object obj;
+    PhChecker phChecker;
+    IDn id;
+    AiChecker aiChecker;
+    AI::SetMaxSpeed(MaxArrowsCount);
+    AI::ClearAll();
+    for(int i = 0; i < GetVolume(); i++){
+        id = GetObj(i);
+        if(ObjManager::GetObj(id, obj)){
+            ObjToChecker(phChecker, *((ObjChecker*)obj.subStr), obj.x, obj.y,
+                         Resources::GetTile(obj.tileId)->GetWidth() / 2);
+            aiChecker.phChecker = phChecker;
+            aiChecker.id = id;
+            aiChecker.type = ((ObjChecker*)obj.subStr)->type;
+            switch(((ObjChecker*)obj.subStr)->master){
+            case _1st:
+                AI::AddEnemy(aiChecker);
+                break;
+            case _ai:
+                AI::AddFriend(aiChecker);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    id = AI::MakeStep();
+    if(ObjManager::GetObj(id, obj)){
+        ((ObjChecker*)obj.subStr)->vSpeed.x = AI::GetFriend(id)->phChecker.speed.x;
+        ((ObjChecker*)obj.subStr)->vSpeed.y = AI::GetFriend(id)->phChecker.speed.y;
+    }
+    ChangeProgressAfterStop = true;
 }

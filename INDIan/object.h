@@ -29,8 +29,6 @@ namespace INDIan{
         int width, height;
         float angle;
         bool isTurned;
-
-        Coord TurnPoint(Coord crd, Coord crd2, float angle);
     public:
         Object(void);
         Object(const Object& str);

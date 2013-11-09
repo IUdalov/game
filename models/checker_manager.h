@@ -10,7 +10,7 @@ using namespace INDIan;
 struct ObjChecker{
     double weight;
     DCoord vSpeed;
-    int type;
+    CheckersType type;
     int master;
     double angle;
     double angle_speed;
@@ -27,7 +27,8 @@ class CheckerManager : Model{
     };
     enum PlayersProgress{
         _1st = 0,
-        _2nd
+        _2nd,
+        _ai
     };
     enum GamePart{
         Start = 1,
@@ -58,6 +59,7 @@ public:
     GameParam game_param;
     int game_part;
     int players_progress;
+    int sec_player_control;
     int points_1st;
     int points_2nd;
     int alive_che1_count;
@@ -91,6 +93,9 @@ public:
     void Game_MouseUp(void);
     void Game_MouseMove(void);
     void Game_HitChToCh(void* data);
+
+    void AIDisposalChecks(void);
+    void AIMakeStep(void);
 
     void RecalcActualAliveCheCount();
 };

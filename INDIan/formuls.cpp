@@ -79,6 +79,22 @@ namespace INDIan{
         res.y = crd1.y + crd2.y;
         return res;
     }
+    Coord TurnPoint(Coord crd1, Coord crd2, float angle){
+        float xt = (float)crd2.x + ((float)(crd1.x - crd2.x)) * cos(angle) + ((float)(crd2.y - crd1.y)) * sin(angle);
+        float yt = (float)crd2.y + ((float)(crd1.x - crd2.x)) * sin(angle) + ((float)(crd1.y - crd2.y)) * cos(angle);
+
+        crd1.x = xt;
+        crd1.y = yt;
+        return crd1;
+    }
+    DCoord TurnPoint(DCoord crd1, DCoord crd2, float angle){
+        float xt = (float)crd2.x + ((float)(crd1.x - crd2.x)) * cos(angle) + ((float)(crd2.y - crd1.y)) * sin(angle);
+        float yt = (float)crd2.y + ((float)(crd1.x - crd2.x)) * sin(angle) + ((float)(crd1.y - crd2.y)) * cos(angle);
+
+        crd1.x = xt;
+        crd1.y = yt;
+        return crd1;
+    }
 }
 
 
