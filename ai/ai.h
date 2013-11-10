@@ -6,6 +6,8 @@ struct AiChecker {
     PhChecker phChecker;
     CheckersType type;
     INDIan::IDn id;
+    double profit;
+
 };
 
 namespace AI {
