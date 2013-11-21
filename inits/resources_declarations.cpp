@@ -6,13 +6,13 @@ void initImages(){
     Resources::SetTileCount(NumTileRes);
 
 //    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/big_checker.bmp"), QString("../images/big_ch_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/men.jpg"), QString("../images/men_mask.jpg"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/middle_checker.bmp"), QString("../images/middle_ch_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/small_checker.bmp"), QString("../images/small_ch_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/men.bmp"), QString("../images/men_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/men_middle.bmp"), QString("../images/men_mask_middle.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/men_small.bmp"), QString("../images/men_mask_small.bmp"), 1, 1, 1);
 
-    Resources::AddTile(ID_BMP_BIG_CHEKER2, QString("../images/big_checker2.bmp"), QString("../images/big_ch2_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER2, QString("../images/middle_checker2.bmp"), QString("../images/middle_ch2_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER2, QString("../images/small_checker2.bmp"), QString("../images/small_ch2_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_BIG_CHEKER2, QString("../images/men2.bmp"), QString("../images/men2_mask.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_MID_CHEKER2, QString("../images/men2_middle.bmp"), QString("../images/men2_mask_middle.bmp"), 1, 1, 1);
+    Resources::AddTile(ID_BMP_SMALL_CHEKER2, QString("../images/men2_small.bmp"), QString("../images/men2_mask_small.bmp"), 1, 1, 1);
 
     Resources::AddTile(ID_BMP_SELECTOR_BIG, QString("../images/selector_big.bmp"), QString("../images/selector_big_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_SELECTOR_MIDDLE, QString("../images/selector_middle.bmp"), QString("../images/selector_middle_mask.bmp"), 1, 1, 1);
