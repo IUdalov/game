@@ -6,7 +6,7 @@ struct AiChecker {
     PhChecker phChecker;
     CheckersType type;
     INDIan::IDn id;
-    double profit;
+   // double profit;
 
 };
 
