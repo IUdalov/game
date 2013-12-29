@@ -9,7 +9,10 @@ struct AiChecker {
    // double profit;
 
 };
-
+inline bool operator==(const AiChecker &a, const AiChecker &b)
+{
+    return(a.id.id ==b.id.id);
+}
 namespace AI {
     INDIan::IDn MakeStep();
     void Disposal();

@@ -1,7 +1,10 @@
 #include "ai.h"
 #define PERIOD 1. //need 5-20 mlsc
+#define FIRST_FOUR_CHECKERS_ITER 36
+#define OTHER_CHECKERS_ITER 1
 #define MAX_X 1024
 #define MAX_Y 768
+#define DEBUG 0
 namespace AI{
     vector<AiChecker> vFriends;
     vector<AiChecker> vEnemys;
@@ -102,134 +105,158 @@ namespace AI{
         return;
     }
 
-    double Simulate(int _i,int _j,vector<PhChecker> friends, vector<PhChecker> enemys){
-        vector<PhChecker*> movingCheckers;
-        vector<bool> isYours;
-        bool isAlreadyMoving;
+    double Simulate(INDIan::DCoord v,int _i,vector<AiChecker> friends, vector<AiChecker> enemys){
+        vector<AiChecker*> movingCheckers;
+        bool isAlreadyMoving;//potential bug
+        bool isYour;
         double profit=0;
-        INDIan::DCoord v = {1, 0};
-        INDIan::DCoord c = {0, 0};
-        double length = (int)maxSpeed;
-        v = INDIan::vect_mult_d(v, length);
-        double angle;
-        if((enemys[_j].coord.x-friends[_i].coord.x)!=0)
-            angle=atan2(enemys[_j].coord.y-friends[_i].coord.y,enemys[_j].coord.x-friends[_i].coord.x);
-        else
-            angle=M_PI/2;
-        v = INDIan::TurnPoint(v, c, angle);
-        friends[_i].speed.x = v.x;
-        friends[_i].speed.y = v.y;
-        //
+        int num=0;
+        friends[_i].phChecker.speed.x = v.x;
+        friends[_i].phChecker.speed.y = v.y;
         movingCheckers.push_back(&friends[_i]);
-        isYours.push_back(true);
+
         while(movingCheckers.size()>0){
-            int nMoving=(int)movingCheckers.size();
-            for(int k=0;k<nMoving;k++){
-                //FILE *stream;
-                //stream = fopen("checkers.txt", "a");
-                //fprintf (stream, "Checker %d:[%f;%f] has radius %f speed(x)=%f speed(y)=%f \n", k,movingCheckers[k]->coord.x,movingCheckers[k]->coord.y, movingCheckers[k]->radius,movingCheckers[k]->speed.y,movingCheckers[k]->speed.x);
-                //fclose(stream);
-                if((movingCheckers[k]->coord.x<0)||(movingCheckers[k]->coord.y<0)||(movingCheckers[k]->coord.x>MAX_X)||(movingCheckers[k]->coord.y>MAX_Y)){
-                    if(isYours[k]==true)//LOLWUT?
-                        profit-=movingCheckers[k]->radius;
-                    else
-                        profit+=movingCheckers[k]->radius;
+           // int nMoving=(int)movingCheckers.size();
+           // for(int k=0;k<nMoving;k++){
+            for(int k=0;k<(int)movingCheckers.size();k++){
+#if DEBUG
+                FILE *stream;
+                stream = fopen("checkers.txt", "a");
+                fprintf (stream, "Checker %d:[%f;%f] has radius %f speed(x)=%f speed(y)=%f \n", k,movingCheckers[k]->phChecker.coord.x,movingCheckers[k]->phChecker.coord.y, movingCheckers[k]->phChecker.radius,movingCheckers[k]->phChecker.speed.y,movingCheckers[k]->phChecker.speed.x);
+                fclose(stream);
+#endif
+               if((movingCheckers[k]->phChecker.coord.x<0-movingCheckers[k]->phChecker.radius)||(movingCheckers[k]->phChecker.coord.y<0-movingCheckers[k]->phChecker.radius)||(movingCheckers[k]->phChecker.coord.x>MAX_X+movingCheckers[k]->phChecker.radius)||(movingCheckers[k]->phChecker.coord.y>MAX_Y+movingCheckers[k]->phChecker.radius)){
+                   isYour=3;
 
-                    //stream = fopen("movingcheckers.txt", "a");
-                    //fprintf (stream, "Checker %d:[%f;%f] has radius %f speed(x)=%f speed(y)=%f \n", k,movingCheckers[k]->coord.x,movingCheckers[k]->coord.y, movingCheckers[k]->radius,movingCheckers[k]->speed.y,movingCheckers[k]->speed.x);
-                    //fclose(stream);
-                    movingCheckers.erase(movingCheckers.begin()+k);
-                    nMoving--;
-                    isYours.erase(isYours.begin()+k);
+                   for(int i=0; i < (int)friends.size(); i++)
+                       if(*movingCheckers[k]==friends[i]){
+                           num=i;
+                           isYour=1;
+                       }
 
-                    k--;
+                  // if(isYour!=1){
+                       for(int i=0; i < (int)enemys.size(); i++)
+                           if(*movingCheckers[k]==enemys[i]){
+                               num=i;
+                               isYour=0;
+                           }
+                   //}
+
+                   if(isYour){
+                        profit-=(int)movingCheckers[k]->phChecker.weight;
+                        friends.erase(friends.begin()+num);
+                   }
+                   else{
+                        profit+=(int)movingCheckers[k]->phChecker.weight;
+                        enemys.erase(enemys.begin()+num);
+                   }
+
+                   if(isYour==3)
+                       profit+=100500;
+                   movingCheckers.erase(movingCheckers.begin()+k);
+          //         nMoving--;
+                   k--;
                 }
                 else
-                    if((movingCheckers[k]->speed.y==0)&&(movingCheckers[k]->speed.x==0)){
-                    movingCheckers.erase(movingCheckers.begin()+k);
-                    isYours.erase(isYours.begin()+k);
-                    k--;
-                    nMoving--;
+               {
+                 if((movingCheckers[k]->phChecker.speed.y==0)&&(movingCheckers[k]->phChecker.speed.x==0)){
+                        movingCheckers.erase(movingCheckers.begin()+k);
+                        k--;
+           //             nMoving--;
                 }
                 else{
-                    Move(*movingCheckers[k], PERIOD);//WTF CHANGE ME
-
+                    Move(movingCheckers[k]->phChecker, PERIOD);
                     for(int l=0;l<(int)enemys.size();l++)
-                          if(movingCheckers[k]!=&enemys[l]){
-                        //  if(!((enemys[l].coord.x==movingCheckers[k]->coord.x)&&(enemys[l].coord.y==movingCheckers[k]->coord.y))){
-                            if(FindDistance(*movingCheckers[k],enemys[l])<(movingCheckers[k]->radius+enemys[l].radius)){
+                          if(!(*movingCheckers[k]==enemys[l])){
+                            if(FindDistance(movingCheckers[k]->phChecker,enemys[l].phChecker)<(movingCheckers[k]->phChecker.radius+enemys[l].phChecker.radius)){
                                     isAlreadyMoving=0;
                                     for(int i=0;i<(int)movingCheckers.size();i++)
-                                        if(movingCheckers[i]==&enemys[l])
+                                        if(*movingCheckers[i]==enemys[l])
                                             isAlreadyMoving=1;
                                     if(isAlreadyMoving==0){
-                                        Clash(*movingCheckers[k],enemys[l]);
-                                        movingCheckers.push_back(&(enemys[l]));
-                                        isYours.push_back(false);
-                                    }
+                                        Clash(movingCheckers[k]->phChecker,enemys[l].phChecker);
+                                        movingCheckers.push_back(&enemys[l]);
+                                        }
                             }
                     }
 
                     for(int l=0;l<(int)friends.size();l++)
-                        if(!((friends[l].coord.x==movingCheckers[k]->coord.x)&&(friends[l].coord.y==movingCheckers[k]->coord.y))){
-                            if(FindDistance(*movingCheckers[k],friends[l])<(movingCheckers[k]->radius+friends[l].radius)){
+                        if(!(*movingCheckers[k]==friends[l])){
+                            if(FindDistance(movingCheckers[k]->phChecker,friends[l].phChecker)<(movingCheckers[k]->phChecker.radius+friends[l].phChecker.radius)){
                                 isAlreadyMoving=0;
                                 for(int i=0;i<(int)movingCheckers.size();i++)
-                                    if(movingCheckers[i]==&friends[l])
+                                    if(*movingCheckers[i]==friends[l])
                                         isAlreadyMoving=1;
                                 if(isAlreadyMoving==0){
-                                    Clash(*movingCheckers[k],friends[l]);
-                                    movingCheckers.push_back(&(friends[l]));
-                                    isYours.push_back(true);
-                                }
+                                    Clash(movingCheckers[k]->phChecker,friends[l].phChecker);
+                                    movingCheckers.push_back(&friends[l]);
+                                     }
                             }
-                    }
-
-                    //if
-                }//else
+                        }// for
+                    }//else ( not zero speed)
+                }//else ( not outta field)
             }//for
         }//while
         return profit;
     }
 
-    void CallSimulate(double** Matrix,int* iHigh, int* jHigh ,int iMax, int jMax){
+    INDIan::DCoord CallSimulate(int* iHigh, int iMax, int jMax){
         *iHigh=0;
-        *jHigh=0;
-        vector<PhChecker> copyOfFriends;
+        INDIan::DCoord curVector = {1, 0};
+        INDIan::DCoord c = {0, 0};
+        INDIan::DCoord bestVector=curVector;
+        int maxProfit=0;
+        int curProfit=0;
+        double angle;
+        double length = maxSpeed;
+        int nIter=0;
+        vector<AiChecker> copyOfFriends;
         for(int i=0;i<(int)vFriends.size();i++)
-            copyOfFriends.push_back(vFriends[i].phChecker);
+            copyOfFriends.push_back(vFriends[i]);
 
-        vector<PhChecker> copyOfEnemys;
+        vector<AiChecker> copyOfEnemys;
         for(int i=0;i<(int)vEnemys.size();i++)
-            copyOfEnemys.push_back(vEnemys[i].phChecker);
+            copyOfEnemys.push_back(vEnemys[i]);
 
         for(int i=0;i<iMax;i++)
             for(int j=0;j<jMax;j++){
-               // if (Matrix[i][j]>0){
-                    Matrix[i][j]=Simulate(i,j,copyOfFriends,copyOfEnemys);
-              //  }
+                if(i<4)
+                    nIter=FIRST_FOUR_CHECKERS_ITER;
+                else
+                    nIter=OTHER_CHECKERS_ITER;
+                for(int iteration=0; iteration < nIter; iteration++){
+                curVector = {1, 0};
+                curVector = INDIan::vect_mult_d(curVector, length);
+                if((copyOfEnemys[j].phChecker.coord.x-copyOfFriends[i].phChecker.coord.x)!=0)
+                    angle=atan2(copyOfEnemys[j].phChecker.coord.y-copyOfFriends[i].phChecker.coord.y,copyOfEnemys[j].phChecker.coord.x-copyOfFriends[i].phChecker.coord.x);
+                else
+                    angle=M_PI/2;
+                angle+=pow(-1,iteration)*iteration*M_PI/(8*nIter);//now it's linear
+                if ( angle < -M_PI)
+                    angle=  2*M_PI+angle;
+                if ( angle > M_PI)
+                    angle= -2*M_PI+angle;
+                curVector = INDIan::TurnPoint(curVector, c, angle);
+
+                curProfit=Simulate(curVector,i,copyOfFriends,copyOfEnemys);
+#if DEBUG
+                FILE *stream;
+                stream = fopen("curProfits.txt", "a");
+                fprintf (stream, "Profit of %i checker for angle %f.5 is %i //Iteration = %i \n",i,angle*57.295779513, curProfit, iteration);
+                fclose(stream);
+#endif
+                if(curProfit>maxProfit){
+                    maxProfit=curProfit;
+                    bestVector=curVector;
+                    *iHigh=i;
+                }
+                }
             }
 
-      /*
-       FILE *stream;
-       stream = fopen("matrix.txt", "w");
-       for(int i=0;i<iMax;i++){
-           for(int j=0;j<jMax;j++)
-               fprintf (stream, "%f ", Matrix[i][j]);
-           fprintf(stream, "\n ");
-       }
-       fclose(stream);
-        */
         copyOfFriends.clear();
         copyOfEnemys.clear();
-        for(int i=0;i<iMax;i++)
-            for(int j=0;j<jMax;j++)
-                if (Matrix[i][j]>Matrix[*iHigh][*jHigh]){
-                    *iHigh=i;
-                    *jHigh=j;
 
-            }
-
+        return bestVector;
     }
 
     void CalcProfitInTableRow(int row,double* tableRow)
@@ -251,29 +278,18 @@ namespace AI{
     }
 
     INDIan::IDn MakeStep(){
-        int num=0,chosen_enemy=0;
-        double ** profitTable= new double*[vFriends.size()];
-        for(int i=0;i<(int)vFriends.size();i++)
-            profitTable[i]=new double[vEnemys.size()];
-        for(int i=0;i<(int)vFriends.size();i++)
-            CalcProfitInTableRowNew(i,profitTable[i]);
-        CallSimulate(profitTable,&num,&chosen_enemy,vFriends.size(),vEnemys.size());
-        INDIan::DCoord v = {1, 0};
-        INDIan::DCoord c = {0, 0};
-        double length = (int)maxSpeed;
-        v = INDIan::vect_mult_d(v, length);
-        double angle;
-        if((vEnemys[chosen_enemy].phChecker.coord.x-vFriends[num].phChecker.coord.x)!=0)
-            angle=atan2(vEnemys[chosen_enemy].phChecker.coord.y-vFriends[num].phChecker.coord.y,vEnemys[chosen_enemy].phChecker.coord.x-vFriends[num].phChecker.coord.x);
-        else
-            angle=M_PI/2;
-        v = INDIan::TurnPoint(v, c, angle);
-        vFriends[num].phChecker.speed.x = v.x;
-        vFriends[num].phChecker.speed.y = v.y;
-        for(int i=0;i<(int)vFriends.size();i++)
-            delete[] profitTable[i];
-        delete[] profitTable;
-        return vFriends[num].id;
+#if DEBUG
+                FILE *stream;
+                stream = fopen("curProfits.txt", "w");
+                fclose(stream);
+                stream = fopen("checkers.txt", "w");
+                fclose(stream);
+#endif
+        int chosenChecker=0;
+        INDIan::DCoord v =CallSimulate(&chosenChecker,vFriends.size(),vEnemys.size());
+        vFriends[chosenChecker].phChecker.speed.x = v.x;
+        vFriends[chosenChecker].phChecker.speed.y = v.y;
+        return vFriends[chosenChecker].id;
     }
     void Disposal(){
     }
