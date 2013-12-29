@@ -79,8 +79,11 @@ namespace INDIan{
         res.y = crd1.y + crd2.y;
         return res;
     }
+    double vect_length(DCoord crd){
+        return sqrt(pow(crd.x, 2) + pow(crd.y, 2));
+    }
     double vect_distance(DCoord crd1, DCoord crd2){
-        return sqrt(pow((crd1.x-crd2.x),2)+pow((crd1.y-crd2.y),2));
+        return sqrt(pow(crd1.x - crd2.x, 2) + pow(crd1.y - crd2.y, 2));
     }
     Coord TurnPoint(Coord crd1, Coord crd2, float angle){
         float xt = (float)crd2.x + ((float)(crd1.x - crd2.x)) * cos(angle) + ((float)(crd2.y - crd1.y)) * sin(angle);

@@ -25,7 +25,7 @@ namespace INDIan{
                 tileDim[idTile] = New = new Tile;
             }
             if(!New->Create(fileName, maskFileName,volume,colums,lines)){
-                  delete New;
+                delete New;
                 New = NULL;
                 fail = true;
                 tileDim[idTile] = NULL;

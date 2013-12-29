@@ -77,7 +77,7 @@ namespace INDIan{
     DCoord vect_null(void);
     DCoord vect_min(DCoord crd1, DCoord crd2);
     DCoord vect_sum(DCoord crd1, DCoord crd2);
-
+    double vect_length(DCoord crd);
     double vect_distance(DCoord crd1, DCoord crd2);
 
     Coord TurnPoint(Coord crd1, Coord crd2, float angle);

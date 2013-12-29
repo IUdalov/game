@@ -75,7 +75,7 @@ namespace INDIan{
         glViewport(0, 0, (GLint)nWidth, (GLint)nHeight);
     }
     void GLWindow::paintGL(){
-        glClearColor(0., 0., 0., 0.);
+        glClearColor(255., 255., 255., 0.);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glPushMatrix();
