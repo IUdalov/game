@@ -5,9 +5,8 @@ using namespace INDIan;
 void initImages(){
     Resources::SetTileCount(NumTileRes);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 //    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/big_checker.bmp"), QString("../images/big_ch_mask.bmp"), 1, 1, 1);
+
     Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/1_big.bmp"), QString("../images/1_mask_big.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/1_middle.bmp"), QString("../images/1_mask_middle.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/1_small.bmp"), QString("../images/1_mask_small.bmp"), 1, 1, 1);
@@ -15,24 +14,6 @@ void initImages(){
     Resources::AddTile(ID_BMP_BIG_CHEKER2, QString("../images/2_big.bmp"), QString("../images/2_mask_big.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_MID_CHEKER2, QString("../images/2_middle.bmp"), QString("../images/2_mask_middle.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_SMALL_CHEKER2, QString("../images/2_small.bmp"), QString("../images/2_mask_small.bmp"), 1, 1, 1);
-=======
-    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/checker_big.bmp"), QString("../images/checker_big_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/checker_middle.bmp"), QString("../images/checker_middle_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/checker_small.bmp"), QString("../images/checker_small_mask.bmp"), 1, 1, 1);
-
-    Resources::AddTile(ID_BMP_BIG_CHEKER2, QString("../images/checker2_big.bmp"), QString("../images/checker2_big_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER2, QString("../images/checker2_middle.bmp"), QString("../images/checker2_middle_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER2, QString("../images/checker2_small.bmp"), QString("../images/checker2_small_mask.bmp"), 1, 1, 1);
->>>>>>> aa2a3a08dfd4aee14071cfcb846539fccf0b991f
-=======
-    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/checker_big.bmp"), QString("../images/checker_big_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/checker_middle.bmp"), QString("../images/checker_middle_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/checker_small.bmp"), QString("../images/checker_small_mask.bmp"), 1, 1, 1);
-
-    Resources::AddTile(ID_BMP_BIG_CHEKER2, QString("../images/checker2_big.bmp"), QString("../images/checker2_big_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_MID_CHEKER2, QString("../images/checker2_middle.bmp"), QString("../images/checker2_middle_mask.bmp"), 1, 1, 1);
-    Resources::AddTile(ID_BMP_SMALL_CHEKER2, QString("../images/checker2_small.bmp"), QString("../images/checker2_small_mask.bmp"), 1, 1, 1);
->>>>>>> aa2a3a08dfd4aee14071cfcb846539fccf0b991f
 
     Resources::AddTile(ID_BMP_SELECTOR_BIG, QString("../images/selector_big.bmp"), QString("../images/selector_big_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_SELECTOR_MIDDLE, QString("../images/selector_middle.bmp"), QString("../images/selector_middle_mask.bmp"), 1, 1, 1);
