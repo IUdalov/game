@@ -676,13 +676,44 @@ void CheckerManager::Disposal_Timer(void *data){
             objch->vSpeed.x = objch->vSpeed.y = 0;
             return;
         }
-        ObjManager::DeleteFromGrid(CheckChecker);
         objch->vSpeed.x = (mouse.x - obj.x) / 10;
         objch->vSpeed.y = (mouse.y - obj.y) / 10;
+        objch->vSpeed = vect_mult_d(vect_norm(objch->vSpeed), MIN(vect_length(objch->vSpeed), 5));
+
+        int fx = obj.x + objch->vSpeed.x;
+        int fy = obj.y + objch->vSpeed.y;
+
+        Object s_obj;
+        bool once = false;
+        for(int i = 0; i < this->GetVolume(); i++){
+            IDn s_id = GetObj(i);
+            if((s_id != CheckChecker) && (ObjManager::GetObjStatus(s_id) & ObjManager::OS_INGRID)){
+                if(ObjManager::GetObj(s_id, s_obj)){
+                    DCoord vect;
+                    vect.x = fx - s_obj.x;
+                    vect.y = fy - s_obj.y;
+                    int real_d = (Resources::GetTile(obj.tileId)->GetWidth() / 2) +
+                            (Resources::GetTile(s_obj.tileId)->GetWidth() / 2);
+                    if(vect_length(vect) <= real_d){
+                        if(once)
+                            return;
+                        once = true;
+                        vect = vect_mult_d(vect_norm(vect), fabs(vect_length(vect) - real_d));
+                        objch->vSpeed = vect_sum(vect, objch->vSpeed);
+                    }
+                }
+            }
+        }
+        if(vect_length(objch->vSpeed) < 1.)
+            return;
+
+        ObjManager::DeleteFromGrid(CheckChecker);
+
         obj.x += objch->vSpeed.x;
         obj.y += objch->vSpeed.y;
+
         ObjManager::ChangeObj(CheckChecker, obj);
-        ObjManager::AddToGrid(CheckChecker, true);
+        ObjManager::AddToGrid(CheckChecker, false);
     }
 }
 void CheckerManager::Disposal_MouseDown(IDn id, SMouse mouse){
@@ -789,6 +820,7 @@ void CheckerManager::Disposal_HitChToCh(void *data){
 
 void CheckerManager::Game_Timer(void *data){
     Object obj;
+    vector<IDn> vobj;
     if(*((int*)data) == 1){
         CurNumMoveCh = 0;
         Rect screenRect = {0, GLWindow::GetScreenWidth(), 0,GLWindow::GetScreenHeight()};
@@ -837,6 +869,7 @@ void CheckerManager::Game_Timer(void *data){
                 }
                 ObjManager::DeleteObj(this->GetObj(i));
                 this->DeleteObj(this->GetObj(i));
+                i--;
             }
             if(!doMove)
                 continue;
@@ -871,8 +904,10 @@ void CheckerManager::Game_Timer(void *data){
                 obj.TurnImage(objch->angle);
             }
             ObjManager::ChangeObj(this->GetObj(i), obj);
-            ObjManager::AddToGrid(this->GetObj(i), true);
+            vobj.push_back(this->GetObj(i));
         }
+        ObjManager::DeleteFromGrid(vobj);
+        ObjManager::AddToGrid(vobj, true);
         if((!CurNumMoveCh) && ChangeProgressAfterStop){
             Root::PutEventToQueue( 0, SE_NEXTGAMEPART, STO_CHEKERS);
             ChangeProgressAfterStop = false;

@@ -14,10 +14,15 @@ namespace INDIan{
             int widthGrid, heightGrid, widthCell, heightCell;
             Cell** lpGrid;
         };
+        enum ObjStatus{
+            OS_DELETE = 0x00000000,
+            OS_ACTUAL = 0x00000001,
+            OS_INGRID = 0x00000010
+        };
 
         extern Coord Camera;
 
-        bool IsActual(IDn ID);
+        bool IsActual(IDn id);
         Rect GetActualWindRect();
         void ReBuildGrid(int _widthGrid,int _heightGrid,int _widthCell, int _heightCell,int sizeOfBg = 0);
         bool CreateObj(Object obj, IDn& id);
@@ -28,6 +33,8 @@ namespace INDIan{
         int GetObjStatus(IDn id);
         bool AddToGrid(IDn id,bool sendHit = false);
         bool DeleteFromGrid(IDn id);
+        void AddToGrid(vector<IDn> v_id,bool sendHit = false);
+        void DeleteFromGrid(vector<IDn> v_id);
         vector<IDn>* GetVObjByCrd(int _x, int _y);
         vector<IDn>* GetVObjByNum(int x, int y);
         void* GetBGByNum(int x, int y);

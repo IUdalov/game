@@ -15,7 +15,7 @@ namespace INDIan{
     void Model::CompliteContainers(int size){
         if(size < 0)
             return;
-        else if(size > objId.size())
+        else if(size > (int)objId.size())
             objId.resize(size);
         else
             return;
