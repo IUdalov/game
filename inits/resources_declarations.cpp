@@ -6,7 +6,6 @@ void initImages(){
     Resources::SetTileCount(NumTileRes);
 
 
-//    Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/big_checker.bmp"), QString("../images/big_ch_mask.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_BIG_CHEKER, QString("../images/1_big.bmp"), QString("../images/1_mask_big.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_MID_CHEKER, QString("../images/1_middle.bmp"), QString("../images/1_mask_middle.bmp"), 1, 1, 1);
     Resources::AddTile(ID_BMP_SMALL_CHEKER, QString("../images/1_small.bmp"), QString("../images/1_mask_small.bmp"), 1, 1, 1);

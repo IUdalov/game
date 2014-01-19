@@ -4,11 +4,6 @@
 
 namespace INDIan{
     namespace ObjManager{
-        enum ObjStatus{
-            OS_NORMAL = 1,
-            OS_DELETE,
-            OS_NOTACTUAL
-        };
         bool find_in_vector(vector<IDn>& vector, IDn elem);
         struct ObjRoom{
             Object obj;
@@ -56,7 +51,7 @@ namespace INDIan{
                     while(( (*lpNum) < (int)grid[i][j].objects.size() ) &&
                             (dimOfObj[ObjManager::grid[i][j].objects[*lpNum].id]->obj.levelOfDraw == (int)numLev))
                     {
-                        if(!(dimOfObj[grid[i][j].objects[*lpNum].id]->status == OS_DELETE)){
+                        if(dimOfObj[grid[i][j].objects[*lpNum].id]->status & OS_ACTUAL){
                             if(!(dimOfObj[grid[i][j].objects[*lpNum].id]->wasDraw == stageDraw)){
                                 if(!( (Root::drawMode) && (! Root::GetModelDrawMode(ObjManager::dimOfObj[grid[i][j].objects[*lpNum].id]->obj.subType)))){
                                     dimOfObj[grid[i][j].objects[*lpNum].id]->obj.DrawWithMove(-(camera.x),-(camera.y));
@@ -71,10 +66,10 @@ namespace INDIan{
             }
             newDraw = false;
         }
-        bool isActual(IDn id){
+        bool IsActual(IDn id){
             if( id.id >= (int)dimOfObj.size())
                 return false;
-            if ((dimOfObj[id.id]->status == OS_DELETE) || (dimOfObj[id.id]->dateBorn != id.dateBorn) )
+            if ((!(dimOfObj[id.id]->status & OS_ACTUAL)) || (dimOfObj[id.id]->dateBorn != id.dateBorn) )
                 return false;
             return true;
         }
@@ -98,6 +93,12 @@ namespace INDIan{
             if(grid){
                 for(int i = 0; i < (int)widthGrid; i++){
                     for(int j = 0; j < (int)heightGrid; j++){
+                        for(int k = 0; k < (int)grid[i][j].objects.size(); k++){
+                            IDn id = grid[i][j].objects[k];
+                            if(IsActual(id)){
+                                dimOfObj[id.id]->status &= (~OS_INGRID);
+                            }
+                        }
                         grid[i][j].objects.clear();
                         if(gridBgIsFull){
                             delete[] (char*)grid[i][j].backGround;
@@ -154,7 +155,7 @@ namespace INDIan{
 
             }
             for(int i = 0; i < (int)dimOfObj.size(); i++){
-                if( (dimOfObj[i]->obj.sizeOfSubStr) && (dimOfObj[i]->status == OS_NORMAL))
+                if( (dimOfObj[i]->obj.sizeOfSubStr) && (dimOfObj[i]->status == OS_ACTUAL))
                     free(dimOfObj[i]->obj.subStr);
                 delete dimOfObj[i];
             }
@@ -165,7 +166,7 @@ namespace INDIan{
             if(obj.sizeOfSubStr)
                 obj.subStr = malloc(obj.sizeOfSubStr);
             Room->obj = Room->oldObj = obj;
-            Room->status = OS_NORMAL;
+            Room->status = OS_ACTUAL;
             Room->wasDraw = stageDraw;
             Room->dateBorn = newID.dateBorn = curDate;
             newID.id = dimOfObj.size();
@@ -175,7 +176,7 @@ namespace INDIan{
             return true;
         }
         bool DeleteObj(IDn id){
-            if(!isActual(id))
+            if(!IsActual(id))
                 return false;
 
             DeleteFromGrid(id);
@@ -192,25 +193,25 @@ namespace INDIan{
                 DeleteObj(*i);
         }
         bool GetObj(IDn id,Object& Obj){
-            if(!isActual(id))
+            if(!IsActual(id))
                 return false;
 
             Obj = dimOfObj[id.id]->obj;
             return true;
         }
         bool ChangeObj(IDn id,Object Obj){
-            if(!isActual(id))
+            if(!IsActual(id))
                 return false;
             dimOfObj[id.id]->obj = Obj;
             return true;
         }
         int GetObjStatus(IDn id){
-            if(!isActual(id))
-                return OS_NOTACTUAL;
+            if(!IsActual(id))
+                return -1;
             return dimOfObj[id.id]->status;
         }
         bool AddToGrid(IDn id,bool SendHit){
-            if(!isActual(id))
+            if(!IsActual(id))
                 return false;
             if(!grid)
                 return false;
@@ -218,6 +219,8 @@ namespace INDIan{
             Object obj = dimOfObj[id.id]->obj;
 
             PntRect rect = obj.GetPntRect();
+
+            dimOfObj[id.id]->status |= OS_INGRID;
 
             int left = (MinXPntRect(rect) / (int)widthCell);
             int right = (MaxXPntRect(rect) / (int)widthCell);
@@ -281,7 +284,7 @@ namespace INDIan{
             return true;
         }
         bool DeleteFromGrid(IDn id){
-            if(!isActual(id))
+            if(!IsActual(id))
                 return false;
             if(!grid)
                 return false;
@@ -289,6 +292,8 @@ namespace INDIan{
             Object* obj = &(dimOfObj[id.id]->obj);
 
             PntRect rect=obj->GetPntRect();
+
+            dimOfObj[id.id]->status &= (~OS_INGRID);
 
             int left = (MinXPntRect(rect) / (int)widthCell);
             int right = (MaxXPntRect(rect) / (int)widthCell);
@@ -318,6 +323,17 @@ namespace INDIan{
             }
             return true;
         }
+        void AddToGrid(vector<IDn> v_id,bool sendHit){
+            if(!grid)
+                return;
+            
+            for(int i = 0; i < (int)v_id.size(); i++)
+                AddToGrid(v_id[i], sendHit);
+        }
+        void DeleteFromGrid(vector<IDn> v_id){
+            for(int i = 0; i < (int)v_id.size(); i++)
+                DeleteFromGrid(v_id[i]);
+        }        
         vector<IDn>* GetVObjByCrd(int _x, int _y){
             int x = (int)(_x / widthCell);
             int y = (int)(_y / heightCell);

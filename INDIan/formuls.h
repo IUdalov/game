@@ -21,6 +21,9 @@ namespace INDIan{
                 return true;
             return false;
         }
+        bool operator!=(const IDn& idn){
+            return !(*this == idn);
+        }
     };
 
     struct DCoord{
