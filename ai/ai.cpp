@@ -1,7 +1,10 @@
-
+/* KNOWN ISSUES:
+ *  Extra calculations due to Reachable() not properly working with checkers out of square between $to and $from.
+ *
+*/
 #include "ai.h"
 #define PERIOD						1.	/* need 5-20 mlsc */
-#define FIRST_FOUR_CHECKERS_ITER	36
+#define FIRST_FOUR_CHECKERS_ITER	29 //
 #define OTHER_CHECKERS_ITER			1
 #define MAX_X						1024
 #define MAX_Y						768
@@ -106,90 +109,282 @@ int CheckForCollision(AiChecker from, AiChecker to, vector<AiChecker> friends, v
 /*
  =======================================================================================================================
     Checks whether the checker "to" is reachable from the position of "from".
+    Hell, it's a huge function!
  =======================================================================================================================
  */
-int Reachable(AiChecker from, AiChecker to, vector<AiChecker> friends, vector<AiChecker> enemys)
+int Reachable(const AiChecker _from, const AiChecker _to, const vector<AiChecker> friends, const vector<AiChecker> enemys, double angle )
 {
-	double	k = (to.phChecker.coord.y - from.phChecker.coord.y) / (to.phChecker.coord.x - from.phChecker.coord.x);
+#if DEBUG
+            FILE	*stream;
+            stream = fopen("reachable.txt", "a");
+            fprintf
+            (
+                stream,
+                "K based on angle = %f ;K old = %f\n",
+                tan(angle),
+                (_to.phChecker.coord.y - _from.phChecker.coord.y) / (_to.phChecker.coord.x - _from.phChecker.coord.x)
+            );
+            fclose(stream);
+#endif
+
+    AiChecker from = _from;
+    AiChecker to   = _to;
+    double k = tan(angle);
+    //double	k = (to.phChecker.coord.y - from.phChecker.coord.y) / (to.phChecker.coord.x - from.phChecker.coord.x);
     double	b = from.phChecker.coord.y - k * from.phChecker.coord.x;
 
-	if((to.phChecker.coord.y < from.phChecker.coord.y))
+    if((to.phChecker.coord.y < from.phChecker.coord.y)&&(to.phChecker.coord.x < from.phChecker.coord.x))
 	{
-		for(int j = 0; j < (int) enemys.size(); j++)
+        for(int j = 0; j < (int) enemys.size(); j++)
 		{
 			if
 			(
-				(enemys[j].phChecker.coord.y < from.phChecker.coord.y)
-			&&	(enemys[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
+                (enemys[j].phChecker.coord.y <= from.phChecker.coord.y)
+            &&	(enemys[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
+            &&	(enemys[j].phChecker.coord.x <= from.phChecker.coord.x)
+            &&	(enemys[j].phChecker.coord.x > to.phChecker.coord.x)	/* if the checker's normal is on the line */
+            &&	(enemys[j]!= to)
 			&&	(
-					!((enemys[j].phChecker.coord.x == to.phChecker.coord.x)
-					&&	(enemys[j].phChecker.coord.y == to.phChecker.coord.y)
-					)
+                    (fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                        (max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
 				)
-			&&	(
-					(fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
-						(max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
-				)
-			) return 0;
+            )
+            {
+#if DEBUG
+                        FILE	*stream;
+                        stream = fopen("unreachable.txt", "a");
+                        fprintf
+                        (
+                            stream,
+                            "Enemy %d[%f,%f] is on the way \n",
+                            j,
+                            enemys[j].phChecker.coord.x,
+                            enemys[j].phChecker.coord.y);
+                        fclose(stream);
+#endif
+                return 0;
+            }
 		}
 
-		for(int j = 0; j < (int) friends.size(); j++)
+        for(int j = 0; j < (int) friends.size(); j++)
 		{
 			if
-			(
-				(friends[j].phChecker.coord.y < from.phChecker.coord.y)
-			&&	(enemys[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
-			&&	(
-					!((friends[j].phChecker.coord.x == from.phChecker.coord.x)
-					&&	(friends[j].phChecker.coord.y == from.phChecker.coord.y)
-					)
-				)	/* it's not the same checker */
-			&&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) < (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
-			) return 0;
+            (
+                (friends[j].phChecker.coord.y <= from.phChecker.coord.y)
+            &&	(friends[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
+            &&  (friends[j].phChecker.coord.x <= from.phChecker.coord.x)
+            &&	(friends[j].phChecker.coord.x > to.phChecker.coord.x)	/* if the checker's normal is on the line */
+            &&	(friends[j]!= from)
+            &&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                 (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
+            ) {
+#if DEBUG
+                        FILE	*stream;
+                        stream = fopen("unreachable.txt", "a");
+                        fprintf
+                        (
+                            stream,
+                            "Friend %d[%f,%f] is on the way \n",
+                            j,
+                            friends[j].phChecker.coord.x,
+                            friends[j].phChecker.coord.y);
+                        fclose(stream);
+#endif
+                return 0;
+            }
 		}
 	}
 	else
+        if((to.phChecker.coord.y > from.phChecker.coord.y)&&(to.phChecker.coord.x < from.phChecker.coord.x))
 	{
-		for(int j = 0; j < (int) enemys.size(); j++)
+        for(int j = 0; j < (int) enemys.size(); j++)
 		{
 			if
-			(
-				(enemys[j].phChecker.coord.y >= from.phChecker.coord.y)
-			&&	(enemys[j].phChecker.coord.y < to.phChecker.coord.y)		/* if the checker's normal is on the line */
+            (
+                (enemys[j].phChecker.coord.y >= from.phChecker.coord.y)
+            &&	(enemys[j].phChecker.coord.y < to.phChecker.coord.y)		/* if the checker's normal is on the line */
+            &&	(enemys[j].phChecker.coord.x <= from.phChecker.coord.x)
+            &&	(enemys[j].phChecker.coord.x > to.phChecker.coord.x)	/* if the checker's normal is on the line */
+            &&	(enemys[j]!= to)
 			&&	(
-					!((enemys[j].phChecker.coord.x == to.phChecker.coord.x)
-					&&	(enemys[j].phChecker.coord.y == to.phChecker.coord.y)
-					)
+                    (fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                        (max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
 				)
-			&&	(
-					(fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
-						(max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
-				)
-			) return 0;
+            ){
+#if DEBUG
+                        FILE	*stream;
+                        stream = fopen("unreachable.txt", "a");
+                        fprintf
+                        (
+                            stream,
+                            "Enemy %d[%f,%f] is on the way \n",
+                            j,
+                            enemys[j].phChecker.coord.x,
+                            enemys[j].phChecker.coord.y);
+                        fclose(stream);
+#endif
+                return 0;
+            }
 		}
 
-		for(int j = 0; j < (int) friends.size(); j++)
+        for(int j = 0; j < (int) friends.size(); j++)
 		{
 			if
-			(
-				(friends[j].phChecker.coord.y >= from.phChecker.coord.y)	/* if the checker's normal is on the line */
-			&&	(enemys[j].phChecker.coord.y < to.phChecker.coord.y)
-			&&	(
-					!((friends[j].phChecker.coord.x == from.phChecker.coord.x)
-					&&	(friends[j].phChecker.coord.y == from.phChecker.coord.y)
-					)
-				)	/* it's not the same checker */
-			&&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) < (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
-			) return 0;
+            (
+                (friends[j].phChecker.coord.y >= from.phChecker.coord.y)	/* if the checker's normal is on the line */
+            &&	(friends[j].phChecker.coord.y < to.phChecker.coord.y)
+            &&  (friends[j].phChecker.coord.x <= from.phChecker.coord.x)
+            &&	(friends[j].phChecker.coord.x > to.phChecker.coord.x)	/* if the checker's normal is on the line */
+            &&	(friends[j]!= from)
+            &&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                 (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
+            ) {
+#if DEBUG
+                        FILE	*stream;
+                        stream = fopen("unreachable.txt", "a");
+                        fprintf
+                        (
+                            stream,
+                            "Friend %d[%f,%f] is on the way \n",
+                            j,
+                            friends[j].phChecker.coord.x,
+                            friends[j].phChecker.coord.y);
+                        fclose(stream);
+#endif
+                return 0;
+            }
 		}
 	}
+    else
+            if((to.phChecker.coord.y < from.phChecker.coord.y)&&(to.phChecker.coord.x > from.phChecker.coord.x))
+            {
+                for(int j = 0; j < (int) enemys.size(); j++)
+                {
+                    if
+                    (
+                        (enemys[j].phChecker.coord.y <= from.phChecker.coord.y)
+                    &&	(enemys[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
+                    &&	(enemys[j].phChecker.coord.x >= from.phChecker.coord.x)
+                    &&	(enemys[j].phChecker.coord.x < to.phChecker.coord.x)	/* if the checker's normal is on the line */
+                    &&	(enemys[j]!= to)
+                    &&	(
+                            (fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                                (max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
+                        )
+                    )
+                    {
+        #if DEBUG
+                                FILE	*stream;
+                                stream = fopen("unreachable.txt", "a");
+                                fprintf
+                                (
+                                    stream,
+                                    "Enemy %d[%f,%f] is on the way \n",
+                                    j,
+                                    enemys[j].phChecker.coord.x,
+                                    enemys[j].phChecker.coord.y);
+                                fclose(stream);
+        #endif
+                        return 0;
+                    }
+                }
+
+                for(int j = 0; j < (int) friends.size(); j++)
+                {
+                    if
+                    (
+                        (friends[j].phChecker.coord.y <= from.phChecker.coord.y)
+                    &&	(friends[j].phChecker.coord.y > to.phChecker.coord.y)	/* if the checker's normal is on the line */
+                    &&  (friends[j].phChecker.coord.x >= from.phChecker.coord.x)
+                    &&	(friends[j].phChecker.coord.x < to.phChecker.coord.x)	/* if the checker's normal is on the line */
+                    &&	(friends[j]!= from)
+                    &&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                         (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
+                    ) {
+        #if DEBUG
+                                FILE	*stream;
+                                stream = fopen("unreachable.txt", "a");
+                                fprintf
+                                (
+                                    stream,
+                                    "Friend %d[%f,%f] is on the way \n",
+                                    j,
+                                    friends[j].phChecker.coord.x,
+                                    friends[j].phChecker.coord.y);
+                                fclose(stream);
+        #endif
+                        return 0;
+                    }
+                }
+            }
+            else
+                if((to.phChecker.coord.y > from.phChecker.coord.y)&&(to.phChecker.coord.x > from.phChecker.coord.x))
+            {
+                for(int j = 0; j < (int) enemys.size(); j++)
+                {
+                    if
+                    (
+                        (enemys[j].phChecker.coord.y >= from.phChecker.coord.y)
+                    &&	(enemys[j].phChecker.coord.y < to.phChecker.coord.y)		/* if the checker's normal is on the line */
+                    &&	(enemys[j].phChecker.coord.x >= from.phChecker.coord.x)
+                    &&	(enemys[j].phChecker.coord.x < to.phChecker.coord.x)	/* if the checker's normal is on the line */
+                    &&	(enemys[j]!= to)
+                    &&	(
+                            (fabs(k * enemys[j].phChecker.coord.x - enemys[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                                (max(from.phChecker.radius, to.phChecker.radius) + enemys[j].phChecker.radius)
+                        )
+                    ){
+        #if DEBUG
+                                FILE	*stream;
+                                stream = fopen("unreachable.txt", "a");
+                                fprintf
+                                (
+                                    stream,
+                                    "Enemy %d[%f,%f] is on the way \n",
+                                    j,
+                                    enemys[j].phChecker.coord.x,
+                                    enemys[j].phChecker.coord.y);
+                                fclose(stream);
+        #endif
+                        return 0;
+                    }
+                }
+
+                for(int j = 0; j < (int) friends.size(); j++)
+                {
+                    if
+                    (
+                        (friends[j].phChecker.coord.y >= from.phChecker.coord.y)	/* if the checker's normal is on the line */
+                    &&	(friends[j].phChecker.coord.y < to.phChecker.coord.y)
+                    &&  (friends[j].phChecker.coord.x >= from.phChecker.coord.x)
+                    &&	(friends[j].phChecker.coord.x < to.phChecker.coord.x)	/* if the checker's normal is on the line */
+                    &&	(friends[j]!= from)
+                    &&	((fabs(k * friends[j].phChecker.coord.x - friends[j].phChecker.coord.y + b) / (sqrt(pow(k, 2) + 1))) <
+                         (max(from.phChecker.radius, to.phChecker.radius) + friends[j].phChecker.radius))
+                    ) {
+        #if DEBUG
+                                FILE	*stream;
+                                stream = fopen("unreachable.txt", "a");
+                                fprintf
+                                (
+                                    stream,
+                                    "Friend %d[%f,%f] is on the way \n",
+                                    j,
+                                    friends[j].phChecker.coord.x,
+                                    friends[j].phChecker.coord.y);
+                                fclose(stream);
+        #endif
+                        return 0;
+                    }
+                }
+            }
 
 	return 1;
 }
 
 /*
  =======================================================================================================================
-    Finds the position of highest value of matrix.
+    Obsolete function. Finds the position of highest value of matrix.
  =======================================================================================================================
  */
 void FindHighestInMatrix(double **matrix, int *iHigh, int *jHigh, int iMax, int jMax)
@@ -257,13 +452,13 @@ double Simulate(INDIan::DCoord v, int _i, vector<AiChecker> friends, vector<AiCh
 			{
 				isYour = 3;
 
-				for(int i = 0; i < (int) friends.size(); i++)
+                for(int i = 0; i < (int) friends.size(); i++)
 					if(*movingCheckers[k] == friends[i])
 					{
 						num = i;
 						isYour = 1;
                     }
-				for(int i = 0; i < (int) enemys.size(); i++)
+                for(int i = 0; i < (int) enemys.size(); i++)
 					if(*movingCheckers[k] == enemys[i])
 					{
 						num = i;
@@ -272,7 +467,7 @@ double Simulate(INDIan::DCoord v, int _i, vector<AiChecker> friends, vector<AiCh
 				if(isYour)
 				{
 					profit -= (int) movingCheckers[k]->phChecker.weight;
-					friends.erase(friends.begin() + num);
+                    friends.erase(friends.begin() + num);
 				}
 				else
 				{
@@ -358,13 +553,15 @@ INDIan::DCoord CallSimulate(int *iHigh, int iMax, int jMax)
 	INDIan::DCoord		curVector = { 1, 0 };
 	INDIan::DCoord		c = { 0, 0 };
 	INDIan::DCoord		bestVector = curVector;
-	int					maxProfit = 0;
+    int					maxProfit = -1;
 	int					curProfit = 0;
 	double				angle;
 	double				length = maxSpeed;
-	int					nIter = 0;
-	vector<AiChecker>	copyOfFriends;
+    int					nIter = 0;
+    vector<AiChecker>	copyOfFriends;
     vector<AiChecker>	copyOfEnemys;
+    vector<AiChecker>	friends;
+    vector<AiChecker>	enemys;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     for(int i = 0; i < (int) vFriends.size(); i++)
@@ -381,47 +578,93 @@ INDIan::DCoord CallSimulate(int *iHigh, int iMax, int jMax)
 				nIter = FIRST_FOUR_CHECKERS_ITER;
 			else
 				nIter = OTHER_CHECKERS_ITER;
+
 			for(int iteration = 0; iteration < nIter; iteration++)
 			{
-				curVector = { 1, 0 };
-				curVector = INDIan::vect_mult_d(curVector, length);
-				if((copyOfEnemys[j].phChecker.coord.x - copyOfFriends[i].phChecker.coord.x) != 0)
-				{
-					angle = atan2
-						(
-							copyOfEnemys[j].phChecker.coord.y - copyOfFriends[i].phChecker.coord.y,
-							copyOfEnemys[j].phChecker.coord.x - copyOfFriends[i].phChecker.coord.x
-						);
-				}
-				else
-					angle = M_PI / 2;
-				angle += pow(-1, iteration) * iteration * M_PI / (8 * nIter);	/* now it's linear */
-				if(angle < -M_PI) angle = 2 * M_PI + angle;
-				if(angle > M_PI) angle = -2 * M_PI + angle;
-				curVector = INDIan::TurnPoint(curVector, c, angle);
+                //Calculate the angle
+                if((copyOfEnemys[j].phChecker.coord.x - copyOfFriends[i].phChecker.coord.x) != 0)
+                {
+                    angle = atan2
+                        (
+                            copyOfEnemys[j].phChecker.coord.y - copyOfFriends[i].phChecker.coord.y,
+                            copyOfEnemys[j].phChecker.coord.x - copyOfFriends[i].phChecker.coord.x
+                        );
+                }
+                else
+                    angle = M_PI / 2;
+                angle += pow(-1, iteration) * iteration * M_PI / (8 * nIter);	/* now it's linear */
+                //If changed, don't forget to change in function Reachable.
+                if(angle < -M_PI)
+                    angle = 2 * M_PI + angle;
+                if(angle > M_PI)
+                    angle = -2 * M_PI + angle;
 
-				curProfit = Simulate(curVector, i, copyOfFriends, copyOfEnemys);
 
 #if DEBUG
-				FILE	*stream;
-				stream = fopen("curProfits.txt", "a");
-				fprintf
-				(
-					stream,
-					"Profit of %i checker for angle %f.5 is %i //Iteration = %i \n",
-					i,
-					angle * 57.295779513,
-					curProfit,
-					iteration
-				);
-				fclose(stream);
+                        FILE	*stream;
 #endif
-				if(curProfit > maxProfit)
-				{
-					maxProfit = curProfit;
-					bestVector = curVector;
-					*iHigh = i;
-				}
+                //If reachable, start simulation.
+                if ( Reachable(copyOfFriends[i], copyOfEnemys[j], copyOfFriends, copyOfEnemys, angle))
+                {
+                    curVector = { 1, 0 };
+                    curVector = INDIan::vect_mult_d(curVector, length);
+                    curVector = INDIan::TurnPoint(curVector, c, angle);
+
+                    friends = copyOfFriends;
+                    enemys = copyOfEnemys;
+                    curProfit = Simulate(curVector, i, friends, enemys);
+#if DEBUG
+                        stream = fopen("countcheckers.txt", "a");
+                        fprintf(stream,"\n Iteration %i \n",iteration);
+                        for(int zi = 0 ; zi < (int)copyOfFriends.size(); zi++)
+                        fprintf
+                        (
+                            stream,
+                            "Friend %i is located in [%f,%f] \n",
+                            zi,
+                            copyOfFriends[zi].phChecker.coord.x,
+                            copyOfFriends[zi].phChecker.coord.y);
+                        fclose(stream);
+#endif
+    #if DEBUG
+                    FILE	*stream;
+                    stream = fopen("curProfits.txt", "a");
+                    fprintf
+                    (
+                        stream,
+                        "Profit of %i checker for angle %f.5 is %i //Iteration = %i \n",
+                        i,
+                        angle * 57.295779513,
+                        curProfit,
+                        iteration
+                    );
+                    fclose(stream);
+    #endif
+
+                    if(curProfit > maxProfit)
+                    {
+                        maxProfit = curProfit;
+                        bestVector = curVector;
+                        *iHigh = i;
+                    }
+                }
+#if DEBUG
+                else{
+                FILE	*stream;
+                stream = fopen("curProfits.txt", "a");
+                fprintf
+                (
+                    stream,
+                    "Unreachable!! %i checker for angle %f.5 //Iteration = %i \n",
+                    i,
+                    angle * 57.295779513,
+                    curProfit,
+                    iteration
+                );
+                fclose(stream);
+                }
+#endif
+
 			}
 		}
 	}
@@ -440,11 +683,13 @@ INDIan::DCoord CallSimulate(int *iHigh, int iMax, int jMax)
         radius^2, if reachable.
  =======================================================================================================================
  */
+
+/*
 void CalcProfitInTableRowNew(int row, double *tableRow)
 {
 	for(int j = 0; j < (int) vEnemys.size(); j++)
 	{
-		if(Reachable(vFriends[row], vEnemys[j], vFriends, vEnemys))
+        if(Reachable(vFriends[row], vEnemys[j], vFriends, vEnemys))
 			tableRow[j] = vFriends[row].phChecker.radius * vEnemys[j].phChecker.radius;
 		else
 			tableRow[j] = 0;
@@ -452,6 +697,7 @@ void CalcProfitInTableRowNew(int row, double *tableRow)
 
 	return;
 }
+*/
 
 /*
  =======================================================================================================================
@@ -463,10 +709,16 @@ INDIan::IDn MakeStep()
 
 #if DEBUG
     FILE	*stream;
-	stream = fopen("curProfits.txt", "w");
-	fclose(stream);
-	stream = fopen("checkers.txt", "w");
-	fclose(stream);
+    stream = fopen("curProfits.txt", "w");
+    fclose(stream);
+    stream = fopen("reachable.txt", "w");
+    fclose(stream);
+    stream = fopen("unreachable.txt", "w");
+    fclose(stream);
+    stream = fopen("checkers.txt", "w");
+    fclose(stream);
+    stream = fopen("countcheckers.txt", "w");
+    fclose(stream);
 #endif
 
 	int				chosenChecker = 0;

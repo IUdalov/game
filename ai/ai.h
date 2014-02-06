@@ -10,7 +10,11 @@ struct AiChecker {
 
 inline bool operator==(const AiChecker &a, const AiChecker &b)
 {
-    return(a.id.id ==b.id.id);
+    return(a.id.id == b.id.id);
+}
+inline bool operator!=(const AiChecker &a, const AiChecker &b)
+{
+    return(a.id.id != b.id.id);
 }
 
 namespace AI {
