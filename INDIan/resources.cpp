@@ -64,7 +64,7 @@ namespace INDIan{
             }
             ~ResourcesModel(){
             }
-            void EventsHandler(int mess,void* data){
+            void EventsHandler(int mess,void*){
                 switch(mess){
                 case ME_CREATE:
                     InitResource();
