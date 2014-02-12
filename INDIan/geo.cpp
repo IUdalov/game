@@ -9,7 +9,7 @@ namespace INDIan{
     GeoScaner::~GeoScaner(){
 
     }
-    bool GeoScaner::GeoScan(GEO_SCAN_TYPE _geoType, Object obj, void* data){
+    bool GeoScaner::GeoScan(GEO_SCAN_TYPE, Object, void*){
         return true;
     }
     void GeoScaner::Init(GEO_SCAN_TYPE _geoType, vector<Object> inVObj, void* _data, int dataSize){

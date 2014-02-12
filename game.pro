@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = game
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -Wall -std=c++11 -Wpedantic
 
 SOURCES +=\
     INDIan/main_window.cpp \

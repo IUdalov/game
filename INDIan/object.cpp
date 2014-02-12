@@ -168,7 +168,7 @@ namespace INDIan{
             return true;
         return false;
     }
-    bool Object::HitRect(Rect rect){
+    bool Object::HitRect(Rect){
         if(isTurned)
             return false;
         return true;

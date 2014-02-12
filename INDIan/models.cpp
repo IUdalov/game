@@ -10,7 +10,7 @@ namespace INDIan{
     Model::~Model(void){
         objId.clear();
     }
-    void Model::EventsHandler(int mess,void* data){
+    void Model::EventsHandler(int,void*){
     }
     void Model::CompliteContainers(int size){
         if(size < 0)
