@@ -112,7 +112,7 @@ int CheckForCollision(AiChecker from, AiChecker to, vector<AiChecker> friends, v
     Hell, it's a huge function!
  =======================================================================================================================
  */
-int Reachable(const AiChecker _from, const AiChecker _to, const vector<AiChecker> friends, const vector<AiChecker> enemys, double angle )
+int Reachable(const AiChecker& _from, const AiChecker& _to, const vector<AiChecker>& friends, const vector<AiChecker>& enemys, double angle )
 {
 #if DEBUG
             FILE	*stream;
@@ -475,7 +475,6 @@ double Simulate(INDIan::DCoord v, int _i, vector<AiChecker> friends, vector<AiCh
 					enemys.erase(enemys.begin() + num);
 				}
 
-				if(isYour == 3) profit += 100500;
 				movingCheckers.erase(movingCheckers.begin() + k);
 				k--;
 			}
@@ -768,7 +767,7 @@ AiChecker *GetFriend(INDIan::IDn id)
 {
     vector<AiChecker>::iterator iter;
 
-	for(iter = vFriends.begin(); iter != vFriends.end(); iter++)
+    for(iter = vFriends.begin(); iter != vFriends.end(); ++iter)
 	{
 		if(iter->id == id) return &(*iter);
 	}
@@ -781,7 +780,7 @@ AiChecker *GetEnemy(INDIan::IDn id)
 {
     vector<AiChecker>::iterator iter;
 
-	for(iter = vEnemys.begin(); iter != vEnemys.end(); iter++)
+    for(iter = vEnemys.begin(); iter != vEnemys.end(); ++iter)
 	{
 		if(iter->id == id) return &(*iter);
 	}
